@@ -81,7 +81,7 @@ Contexto técnico: React 19.2 con StrictMode, Zustand 5 + zundo, sin React Compi
   patrón de `compileCached`). La salida (`schemas` e `issues`) es idéntica; los schemas de Zod no
   guardan estado, así que compartirlos es seguro. No cambia ninguna firma.
 
-### [ ] A3 · MEDIA · El selector de color escribe al store en cada movimiento del puntero
+### [x] ~~A3 · MEDIA · El selector de color escribe al store en cada movimiento del puntero~~ (2026-11-22, sin parche: absorbido por la causa, Fase 2)
 
 - **Dónde:** `components/molecules/ColorPickerField/ColorPickerField.tsx:50`
   (`<HexColorPicker onChange={onChange}>`). Lo usan `panels/StylesPanel` (campos del formulario) y
@@ -214,17 +214,19 @@ y verificar la anterior. Cada corrección deja su nota en `docs/Decisiones.md`.
 
 - [x] ~~A1 `onDragCancel`.~~ (2026-11-21)
 - [x] ~~A2 caché de schemas.~~ (2026-11-21, medido: 0,08 ms por tecla, no se hace)
-- [ ] A3 escritura del color limitada a una por cuadro. **Medido (2026-11-22): costo real, pero
-      la solución por cuadro no sirve; pendiente de que el usuario elija opción.** Medir primero (renders y
-      tareas largas mientras se arrastra el color, en Chrome por DevTools); si no se nota, se
-      descarta como A2.
+- [x] ~~A3 escritura del color limitada a una por cuadro.~~ (2026-11-22) Medido: el costo es real
+      pero es el de **cualquier** escritura al store, no del color. Decisión del usuario: sin parche;
+      se ataca la causa en la Fase 2.
 - [ ] A5 resultado de `saveDraft` y toast.
 - [ ] B4 manejo de error del portapapeles.
 
 **Fase 2: rendimiento del PDF y estructura del store**
 
+- [ ] Perfilar primero una tecla en Etiqueta y un paso de color (formulario y PDF): qué
+      componentes se llevan los ~12 ms por escritura. Con eso se ordena lo que sigue.
 - [ ] A4 memo de `PdfTableView` + `onSelectCell` y `selectedIds` estables.
-- [ ] A6 helpers que comparten estructura.
+- [ ] A6 helpers que comparten estructura + O1 (memo de filas y chips del lienzo), si el perfil lo
+      confirma: arreglan a la vez escribir y arrastrar el color (A3).
 - [ ] B1, B2 y B3.
 
 **Fase 3: solo con evidencia del Profiler**
