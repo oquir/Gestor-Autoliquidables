@@ -13,7 +13,6 @@ export function FormSummary() {
   const formSteps = useFormStore((state) => state.formSteps)
   const setupConfig = useFormStore((state) => state.setupConfig)
   const introSteps = useFormStore((state) => state.introModal.steps)
-  const lastSavedAt = useFormStore((state) => state.lastSavedAt)
 
   const formTypeLabel: string =
     FORM_TYPES.find((option) => option.value === setupConfig.formType)?.label ?? 'Sin definir'
@@ -22,7 +21,6 @@ export function FormSummary() {
     0,
   )
   const hasIntro: boolean = setupConfig.hasIntroModal
-  const savedLabel: string = lastSavedAt ? new Date(lastSavedAt).toLocaleTimeString() : '—'
 
   return (
     <>
@@ -51,16 +49,6 @@ export function FormSummary() {
           <span className={METRIC_NUMBER_CLASSES}>{fieldCount}</span>
           <span className={METRIC_CAPTION_CLASSES}>Campos</span>
         </div>
-      </div>
-
-      <div className="flex items-center gap-2 text-[11px] text-fg-muted">
-        <span
-          className={`h-1.5 w-1.5 shrink-0 rounded-full ring-[3px] ${
-            lastSavedAt ? 'bg-success ring-success/20' : 'bg-fg-subtle ring-fg-subtle/20'
-          }`}
-        />
-        {lastSavedAt ? 'Guardado' : 'Sin guardar'}
-        <span className="ml-auto font-medium tabular-nums text-fg-soft">{savedLabel}</span>
       </div>
     </>
   )

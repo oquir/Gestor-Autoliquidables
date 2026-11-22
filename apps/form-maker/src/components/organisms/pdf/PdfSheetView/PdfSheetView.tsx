@@ -1,5 +1,10 @@
 import { type CSSProperties, useEffect, useRef, useState } from 'react'
-import { PDF_CANVAS_CLASS } from '../../../../constants'
+import {
+  PDF_BACK_MARGIN_PX,
+  PDF_CANVAS_CLASS,
+  PDF_PAPER_HEIGHT_PX,
+  PDF_PAPER_WIDTH_PX,
+} from '../../../../constants'
 import { contentBox, documentStyleMap, mmToPx, sheetEdgeStyleMap } from '../../../../lib/pdfDesign'
 import { usePdfOverflowToast } from '../../../../hooks/usePdfOverflowToast'
 import { sanitizePdfHtml } from '../../../../lib/pdfHtml'
@@ -7,13 +12,7 @@ import type { PdfContentBox } from '../../../../types'
 import { PdfTableView } from '../PdfTableView'
 import type { PdfSheetViewProps, SheetOverflow } from './PdfSheetView.types'
 import { measureSheetOverflow } from './PdfSheetView.utils'
-import {
-  BACK_MARGIN_PX,
-  NO_OVERFLOW,
-  PAPER_HEIGHT_PX,
-  PAPER_SIZE,
-  PAPER_WIDTH_PX,
-} from './PdfSheetView.constants'
+import { NO_OVERFLOW, PAPER_SIZE } from './PdfSheetView.constants'
 
 // Hoja de carta como la pondra el back; papel blanco tambien en oscuro. Guias: gris los 5 mm del
 // back, naranja el margen extra. Lo que no cabe no pasa a la siguiente hoja: se recorta y se avisa.
@@ -76,13 +75,13 @@ export function PdfSheetView({
 
   return (
     <section className={PDF_CANVAS_CLASS.sheet}>
-      <div style={{ width: PAPER_WIDTH_PX * zoom, height: PAPER_HEIGHT_PX * zoom }}>
+      <div style={{ width: PDF_PAPER_WIDTH_PX * zoom, height: PDF_PAPER_HEIGHT_PX * zoom }}>
         <div
           className={`${PDF_CANVAS_CLASS.paper} ${isActive && total > 1 ? PDF_CANVAS_CLASS.active : ''}`}
           style={paperStyle}
           onClick={onActivate}
         >
-          <div className={PDF_CANVAS_CLASS.back} style={{ inset: BACK_MARGIN_PX }}>
+          <div className={PDF_CANVAS_CLASS.back} style={{ inset: PDF_BACK_MARGIN_PX }}>
             <div className={contentClass} style={contentStyle}>
               <div ref={flowRef} className={PDF_CANVAS_CLASS.flow} style={sheetEdgeStyleMap()}>
                 {sheet.blocks.map((block) =>

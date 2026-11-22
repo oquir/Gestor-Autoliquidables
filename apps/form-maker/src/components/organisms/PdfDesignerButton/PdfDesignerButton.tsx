@@ -6,11 +6,8 @@ import { PDF_BUTTON_CLASSES } from './PdfDesignerButton.constants'
 import type { PdfDesignerButtonProps } from './PdfDesignerButton.types'
 
 // Una plantilla por impuesto, no por formulario: dos formularios del mismo impuesto comparten la
-// misma.
-export function PdfDesignerButton({
-  iconOnly = false,
-  shortLabel = false,
-}: PdfDesignerButtonProps) {
+// misma. Solo en el chip plegado: con el panel abierto se entra por la vista previa.
+export function PdfDesignerButton({ iconOnly = false }: PdfDesignerButtonProps) {
   const formType = useFormStore((state) => state.setupConfig.formType)
   const setPdfDesignerOpen = useFormStore((state) => state.setPdfDesignerOpen)
 
@@ -28,7 +25,7 @@ export function PdfDesignerButton({
         className={PDF_BUTTON_CLASSES}
       >
         <FilePdf size={13} />
-        {!iconOnly && (shortLabel ? 'PDF' : 'Diseñar PDF')}
+        {!iconOnly && 'Diseñar PDF'}
       </button>
     </Tooltip>
   )

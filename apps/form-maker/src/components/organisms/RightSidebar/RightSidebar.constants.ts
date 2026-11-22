@@ -23,5 +23,5 @@ export const PANEL_TAB_DROP_DOT_CLASSES: string =
 export const PANEL_COLLAPSE_BUTTON_CLASSES: string =
   'flex h-[26px] w-[26px] items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-surface-raised hover:text-fg-strong hover:cursor-pointer dark:hover:bg-surface-inset'
 
-// Terciario, como Guardar y Exportar con quienes comparte el pie del bloque Formulario.
+// Terciario, como Exportar, con quien comparte el pie del bloque Formulario.
 export const OPEN_PROJECT_BUTTON_CLASSES: string = ACTION_TIER_CLASSES.tertiary.compact

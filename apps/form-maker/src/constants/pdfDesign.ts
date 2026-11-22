@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import type { PdfComponentOption, PdfFontFamily, PdfFontOption, PdfMargins } from '../types'
 
 // Perfil de conversion: el contrato con el back (Pendientes-PDF §2.1 y §7.2). Carta, vertical, 5 mm
@@ -11,6 +12,27 @@ export const PDF_WEB_PAGE_WIDTH_PX: number = 778
 // los pone el back.
 export const PDF_PX_PER_MM: number =
   PDF_WEB_PAGE_WIDTH_PX / (PDF_PAPER_WIDTH_MM - 2 * PDF_BACK_MARGIN_MM)
+
+// La hoja entera con los 5 mm del back, en la misma escala: el lienzo y la miniatura del panel.
+export const PDF_BACK_MARGIN_PX: number = PDF_BACK_MARGIN_MM * PDF_PX_PER_MM
+
+export const PDF_PAPER_WIDTH_PX: number = PDF_PAPER_WIDTH_MM * PDF_PX_PER_MM
+
+export const PDF_PAPER_HEIGHT_PX: number = PDF_PAPER_HEIGHT_MM * PDF_PX_PER_MM
+
+// La miniatura del panel derecho: lo mas grande que quepa en el alto libre de Proyecto, hasta 260 px
+// de ancho (unos 336 de alto). Mide contra un ancestro con container-type: size (PdfPreviewBlock);
+// se descuenta el alto de la leyenda para que tambien quepa.
+export const PDF_THUMBNAIL_MAX_WIDTH_PX: number = 260
+
+export const PDF_THUMBNAIL_CAPTION_PX: number = 24
+
+export const PDF_THUMBNAIL_FRAME_STYLE: CSSProperties = {
+  aspectRatio: `${PDF_PAPER_WIDTH_MM} / ${PDF_PAPER_HEIGHT_MM}`,
+  width: `min(${PDF_THUMBNAIL_MAX_WIDTH_PX}px, 100cqw, calc((100cqh - ${PDF_THUMBNAIL_CAPTION_PX}px) * ${
+    PDF_PAPER_WIDTH_MM / PDF_PAPER_HEIGHT_MM
+  }))`,
+}
 
 // Alto util de una hoja con solo los 5 mm del back: unos 1018 px.
 export const PDF_SHEET_HEIGHT_PX: number =

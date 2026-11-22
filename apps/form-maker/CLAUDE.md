@@ -17,6 +17,7 @@ Guidance for Claude Code in this app (FormMaker, formerly "Form Orchestrator"): 
 | Area                                                                                     | Section                                                                    |
 | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | Right panel, collapsed chip, tabs, zoom control                                          | `The right panel (RightSidebar)`                                           |
+| PDF preview image at the bottom of Proyecto (`PdfPreviewBlock`, `lib/pdfThumbnail`)      | `The right panel (RightSidebar)` → `The PDF preview`                       |
 | Crash screens                                                                            | `Render errors (ErrorBoundary)`                                            |
 | Hidden steps                                                                             | `Hidden steps (step.hidden)`                                               |
 | Ctrl+←/→                                                                                 | `Step navigation shortcut`                                                 |

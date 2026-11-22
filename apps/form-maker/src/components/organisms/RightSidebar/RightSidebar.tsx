@@ -6,11 +6,12 @@ import { CanvasZoomControl } from '../../molecules/CanvasZoomControl/CanvasZoomC
 import { FormSummary } from '../../molecules/FormSummary/FormSummary'
 import { PanelBlock } from '../../molecules/PanelBlock/PanelBlock'
 import { RightPanelToggle } from '../../molecules/RightPanelToggle/RightPanelToggle'
+import { SaveStatus } from '../../molecules/SaveStatus/SaveStatus'
 import { TransferNotice } from '../../molecules/TransferNotice/TransferNotice'
 import { ViewModeSwitch } from '../../molecules/ViewModeSwitch/ViewModeSwitch'
 import { CanvasTabs } from '../CanvasTabs/CanvasTabs'
 import { ExportButton } from '../ExportButton/ExportButton'
-import { PdfDesignerButton } from '../PdfDesignerButton/PdfDesignerButton'
+import { PdfPreviewBlock } from '../PdfPreviewBlock/PdfPreviewBlock'
 import { ProjectImportModal } from '../ProjectImportModal/ProjectImportModal'
 import { SaveButton } from '../SaveButton/SaveButton'
 import { SimulatorButton } from '../SimulatorButton/SimulatorButton'
@@ -58,12 +59,12 @@ export function RightSidebar() {
 
   return (
     <div className="flex h-full flex-col">
-      {/* La importancia crece hacia el borde: los secundarios a la izquierda y Subir, el primario,
-          pegado al boton de plegar. Todo con texto, y "PDF" corto: Guardar, Abrir y Exportar bajaron al
-          bloque Formulario. Medir en 295px utiles si se cambia una etiqueta. */}
+      {/* La importancia crece hacia el borde: Guardar y Simulador con borde (secundarios) y Subir, el
+          primario, pegado al boton de plegar. Sin boton PDF: con el panel abierto se entra por la
+          vista previa del fondo de Proyecto. Medir en 295px utiles si se cambia una etiqueta. */}
       <div className="flex items-center gap-1 border-b border-border px-3 py-2">
+        <SaveButton bordered />
         <SimulatorButton />
-        <PdfDesignerButton shortLabel />
         <div className="ml-auto flex items-center gap-1">
           <UploadButton />
           <RightPanelToggle className={PANEL_COLLAPSE_BUTTON_CLASSES} iconSize={14} />
@@ -109,10 +110,8 @@ export function RightSidebar() {
 
               <PanelBlock title="Formulario">
                 <FormSummary />
-                {/* Los terciarios del formulario, a partes iguales: se guarda solo, y Abrir y Exportar
-                    son las dos caras del mismo archivo. */}
-                <div className="mt-1 grid grid-cols-3 gap-1">
-                  <SaveButton />
+                {/* Abrir y Exportar, las dos caras del mismo archivo, a partes iguales. */}
+                <div className="mt-1 grid grid-cols-2 gap-1">
                   <Tooltip content="Abrir un formulario exportado (.json). Reemplaza el actual, con confirmación.">
                     <button
                       type="button"
@@ -126,6 +125,8 @@ export function RightSidebar() {
                   <ExportButton />
                 </div>
               </PanelBlock>
+
+              <PdfPreviewBlock />
             </>
           )}
 
@@ -148,6 +149,8 @@ export function RightSidebar() {
           )}
         </div>
       </div>
+
+      <SaveStatus />
 
       {isImportOpen && <ProjectImportModal onClose={() => setImportOpen(false)} />}
     </div>
