@@ -3,7 +3,7 @@ import { CANVAS_TOOLS } from '../../constants/canvasTool'
 import { ZOOM_DEFAULT } from '../../constants/canvasZoom'
 import { STEP_NAVIGATION_OFFSETS } from '../../constants/stepNavigation'
 import { zoomIn, zoomOut } from '../../lib/canvasZoom/canvasZoom'
-import { saveDraft } from '../../lib/persistence/persistence'
+import { saveDraftOrWarn } from '../../lib/draftSave/draftSave'
 import { adjacentStep, orderedSteps } from '../../lib/stepNavigation/stepNavigation'
 import { getActiveRows, getAllFields, useFormStore } from '../../store/formStore'
 import type { FormState } from '../../types/formStoreTypes'
@@ -84,13 +84,15 @@ export function useKeyboardShortcuts() {
         // Con el diseñador de PDF abierto, Ctrl+S guarda el PDF (usePdfDesignerShortcuts).
         if (!state.setupConfig.isComplete || state.isPdfDesignerOpen) return
 
-        saveDraft({
-          formSteps: state.formSteps,
-          introModal: state.introModal,
-          formScript: state.formScript,
-          setupConfig: state.setupConfig,
-        })
-        state.markSaved()
+        saveDraftOrWarn(
+          {
+            formSteps: state.formSteps,
+            introModal: state.introModal,
+            formScript: state.formScript,
+            setupConfig: state.setupConfig,
+          },
+          state.markSaved,
+        )
         return
       }
 

@@ -1,7 +1,12 @@
-import type { DraftLoad, DraftPayload, FieldRename } from '../../types'
+import type { DraftLoad, DraftPayload, DraftSaveResult, FieldRename } from '../../types'
 import { migrateFieldNames } from '../fieldName'
 import { migrateRows } from '../rowLayout'
-import { DRAFT_KEY, DRAFT_SCHEMA_VERSION } from './persistence.constants'
+import {
+  DRAFT_KEY,
+  DRAFT_QUOTA_MESSAGE,
+  DRAFT_SAVE_FAILED_MESSAGE,
+  DRAFT_SCHEMA_VERSION,
+} from './persistence.constants'
 import { migrateDraft } from './persistence.migrations'
 import { draftPayloadSchema } from './persistence.schema'
 import type { LooseDraft } from './persistence.types'
@@ -20,8 +25,18 @@ export function buildDraftPayload(
   }
 }
 
-export function saveDraft(payload: Omit<DraftPayload, 'savedAt' | 'schemaVersion'>): void {
-  localStorage.setItem(DRAFT_KEY, JSON.stringify(buildDraftPayload(payload)))
+// No lanza, como savePdfDesign: con el almacenamiento lleno el error salia del intervalo o del clic
+// y nadie se enteraba.
+export function saveDraft(
+  payload: Omit<DraftPayload, 'savedAt' | 'schemaVersion'>,
+): DraftSaveResult {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(buildDraftPayload(payload)))
+    return { ok: true }
+  } catch (error) {
+    const isQuota: boolean = error instanceof DOMException && error.name === 'QuotaExceededError'
+    return { ok: false, error: isQuota ? DRAFT_QUOTA_MESSAGE : DRAFT_SAVE_FAILED_MESSAGE }
+  }
 }
 
 export function loadDraft(): DraftLoad {

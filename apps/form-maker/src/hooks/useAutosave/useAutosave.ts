@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { saveDraft } from '../../lib'
+import { saveDraftOrWarn } from '../../lib'
 import { useFormStore } from '../../store'
 import { AUTOSAVE_INTERVAL_MS } from './useAutosave.constants'
 
@@ -14,8 +14,7 @@ export function useAutosave() {
       // Antes de terminar el asistente no hay nada que valga la pena guardar.
       if (!setupConfig.isComplete) return
 
-      saveDraft({ formSteps, introModal, formScript, setupConfig })
-      markSaved()
+      saveDraftOrWarn({ formSteps, introModal, formScript, setupConfig }, markSaved)
     }, AUTOSAVE_INTERVAL_MS)
 
     return () => clearInterval(intervalId)

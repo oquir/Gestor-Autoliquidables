@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { saveDraft } from '../../lib'
+import { saveDraftOrWarn } from '../../lib'
 import { readProjectFile, summarizeProjectFile } from '../../lib'
 import { useFormStore } from '../../store'
 import type { ProjectFileLoad, ProjectFileSummary } from '../../types'
@@ -36,13 +36,15 @@ export function useProjectImport(): UseProjectImportResult {
     const { draft } = result
     restoreDraft(draft)
     // Se guarda en el acto: recargar antes del autoguardado devolveria el borrador anterior.
-    saveDraft({
-      formSteps: draft.formSteps,
-      introModal: draft.introModal,
-      formScript: draft.formScript,
-      setupConfig: draft.setupConfig,
-    })
-    markSaved()
+    saveDraftOrWarn(
+      {
+        formSteps: draft.formSteps,
+        introModal: draft.introModal,
+        formScript: draft.formScript,
+        setupConfig: draft.setupConfig,
+      },
+      markSaved,
+    )
   }
 
   const summary: ProjectFileSummary | null =

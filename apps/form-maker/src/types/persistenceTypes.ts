@@ -21,3 +21,6 @@ export type DraftLoad =
   | { status: 'empty' }
   | { status: 'invalid' }
   | { status: 'ok'; draft: DraftPayload; renamed: FieldRename[] }
+
+// Guardar el borrador no lanza: quien llama marca "Guardado" o avisa.
+export type DraftSaveResult = { ok: true } | { ok: false; error: string }

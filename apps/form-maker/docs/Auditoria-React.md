@@ -132,7 +132,13 @@ Contexto técnico: React 19.2 con StrictMode, Zustand 5 + zundo, sin React Compi
   sirve: `PdfTableView` con `React.memo` (la recursión usa la versión memoizada), `onSelectCell`
   estable en `PdfCanvas` y `selectedIds` estable (conservar el `Set` si tiene los mismos ids).
 
-### [ ] A5 · MEDIA (integridad) · El guardado del borrador falla en silencio si se llena `localStorage`
+### [x] ~~A5 · MEDIA (integridad) · El guardado del borrador falla en silencio si se llena `localStorage`~~ (2026-11-22, «Avisa cuando no se puede guardar el borrador»)
+
+> **Hecho.** Eran **cuatro** llamadas, no tres: también abrir un archivo exportado
+> (`useProjectImport`), que además dejaba el modal abierto. Las cuatro pasan por
+> `lib/draftSave` → `saveDraftOrWarn` (decisión del usuario: aviso en cada intento fallido, mismo
+> toast reemplazado). Reproducido en Chrome con el almacenamiento lleno (excepción silenciosa en
+> los cuatro caminos) y corregido; controles con espacio sin cambios.
 
 - **Dónde:** `lib/persistence/persistence.ts:24` (`saveDraft`), con llamadas desde
   `hooks/useAutosave/useAutosave.ts:17`, `hooks/useSaveButton/useSaveButton.ts:17` y
@@ -217,7 +223,7 @@ y verificar la anterior. Cada corrección deja su nota en `docs/Decisiones.md`.
 - [x] ~~A3 escritura del color limitada a una por cuadro.~~ (2026-11-22) Medido: el costo es real
       pero es el de **cualquier** escritura al store, no del color. Decisión del usuario: sin parche;
       se ataca la causa en la Fase 2.
-- [ ] A5 resultado de `saveDraft` y toast.
+- [x] ~~A5 resultado de `saveDraft` y toast.~~ (2026-11-22)
 - [ ] B4 manejo de error del portapapeles.
 
 **Fase 2: rendimiento del PDF y estructura del store**

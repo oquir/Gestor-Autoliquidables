@@ -75,6 +75,7 @@ Guidance for Claude Code in this app (FormMaker, formerly "Form Orchestrator"): 
 - **Never in the draft or export**: the simulator banks (catalogs, fechas, UVT), the PDF design (own `localStorage` key per tax), `canvasZoom`, `canvasTool`, panel state.
 - **Never store rich text/PDF HTML as raw HTML**; the serializer/sanitizer is the barrier, `safeHref` runs at insert, serialize and draft load.
 - **The `DndContext` needs `onDragCancel` → `resetDragState`**: dnd-kit cancels on Escape, `pointercancel`, tab switch and resize and then never calls `onDragEnd`; without it the drag state and the window listeners survive the drag.
+- **Save the draft through `saveDraftOrWarn`** (`lib/draftSave`), never `saveDraft` + `markSaved` by hand: `saveDraft` returns ok/error (full `localStorage`), and only `saveDraftOrWarn` marks "Guardado" or shows the error toast.
 - **Equality for undo is `sameDocument`** — selection, zoom, tool and drag state never create a history step. Edits that change nothing must return the same reference.
 - **Rounding/negatives/decimals change the value, not just display**; the formatted text never leaves the input (state holds a real `number`).
 - Nothing in the collapsed right chip's container may set `transform`/`filter`/`backdrop-filter`/`will-change`/`container-type` (breaks `ModalShell`). That's why the floating bar's `@container` lives in its own layer inside `CanvasToolbar`.
