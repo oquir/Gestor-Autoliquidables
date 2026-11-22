@@ -60,7 +60,14 @@ Contexto técnico: React 19.2 con StrictMode, Zustand 5 + zundo, sin React Compi
 - **Solución:** `handleDragCancel` en `useDragAndDrop`, que llame a `resetDragState()`; devolverlo
   en el hook (`types/dragAndDropReturn.ts`) y pasarlo como `onDragCancel` en `FormBuilder`.
 
-### [ ] A2 · MEDIA · El simulador rehidrata todos los schemas de Zod en cada tecla
+### [x] ~~A2 · MEDIA · El simulador rehidrata todos los schemas de Zod en cada tecla~~ (2026-11-21, medido y descartado)
+
+> **No se hace (decisión del usuario).** La caché se implementó, pasó todas las pruebas y se
+> descartó al medir: el ICA tiene 75 campos pero **13 textos de schema distintos**, y el motor ya
+> reutiliza la compilación de un `new Function` con el mismo texto. Hidratar costaba **0,084 ms**
+> por tecla (con caché, 0,011 ms; `validateRuntime` completo, 0,15 ms). La ganancia no se nota y la
+> caché exigía que los schemas no guarden estado. La auditoría lo sobreestimó: **medir antes de
+> implementar** lo que queda de rendimiento (A3, A4).
 
 - **Dónde:** `lib/runtimeValidation/runtimeValidation.ts:32` → `lib/zodHydrate/zodHydrate.ts`
   (`hydrateFieldSchemas`), invocado desde `hooks/useFormPreview/useFormPreview.ts:66`.
@@ -184,8 +191,10 @@ y verificar la anterior. Cada corrección deja su nota en `docs/Decisiones.md`.
 **Fase 1: bugs y arreglos baratos sin riesgo**
 
 - [x] ~~A1 `onDragCancel`.~~ (2026-11-21)
-- [ ] A2 caché de schemas.
-- [ ] A3 escritura del color limitada a una por cuadro.
+- [x] ~~A2 caché de schemas.~~ (2026-11-21, medido: 0,08 ms por tecla, no se hace)
+- [ ] A3 escritura del color limitada a una por cuadro. **Siguiente.** Medir primero (renders y
+      tareas largas mientras se arrastra el color, en Chrome por DevTools); si no se nota, se
+      descarta como A2.
 - [ ] A5 resultado de `saveDraft` y toast.
 - [ ] B4 manejo de error del portapapeles.
 
