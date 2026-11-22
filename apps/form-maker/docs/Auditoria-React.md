@@ -95,6 +95,23 @@ Contexto técnico: React 19.2 con StrictMode, Zustand 5 + zundo, sin React Compi
   último color en un ref, como máximo una escritura por cuadro, vaciado al cerrar o desmontar. La
   vista previa en vivo se conserva; el input hexadecimal no cambia.
 
+> **Medido el 2026-11-22: el costo es real, pero esta solución no sirve.** Arrastre de 60 pasos
+> sobre el selector en Chrome (DevTools protocol, `vite preview`), CPU del hilo principal por cada
+> paso que se pinta, con la CPU normal y frenada como el "slowdown" de DevTools:
+>
+> | Paso de color        | CPU ×1  | CPU ×4                           | CPU ×6              |
+> | -------------------- | ------- | -------------------------------- | ------------------- |
+> | Formulario (Fondo)   | 11,7 ms | 62,6 ms (16 pasos/s, entrecorta) | 102 ms (10 pasos/s) |
+> | PDF (Color de celda) | 7,8 ms  | 35,6 ms                          | 61 ms (17 pasos/s)  |
+>
+> `react-colorful` 5.8.1 no agrupa nada (sin `requestAnimationFrame`): cada `mousemove` es una
+> escritura. Pero el navegador ya entrega los `mousemove` como mucho uno por cuadro (Chrome lo
+> documenta), así que "una escritura por cuadro" no baja la cantidad de escrituras: lo caro es
+> **cada escritura** (todo el lienzo y los paneles se repintan). Opciones, **pendiente de decisión
+> del usuario**: escribir solo al soltar (sin vista previa en el lienzo mientras se arrastra),
+> escribir cada ~100 ms y al soltar (vista previa a saltos), o atacar la causa con A6 + O1 / A4
+> (repintar menos en cada escritura).
+
 ### [ ] A4 · MEDIA · El lienzo del PDF repinta y vuelve a sanear todas las celdas en cada tecla, zoom o clic
 
 - **Dónde:** `components/organisms/pdf/PdfCanvas/PdfCanvas.tsx:148, 188, 196`,
@@ -192,7 +209,8 @@ y verificar la anterior. Cada corrección deja su nota en `docs/Decisiones.md`.
 
 - [x] ~~A1 `onDragCancel`.~~ (2026-11-21)
 - [x] ~~A2 caché de schemas.~~ (2026-11-21, medido: 0,08 ms por tecla, no se hace)
-- [ ] A3 escritura del color limitada a una por cuadro. **Siguiente.** Medir primero (renders y
+- [ ] A3 escritura del color limitada a una por cuadro. **Medido (2026-11-22): costo real, pero
+      la solución por cuadro no sirve; pendiente de que el usuario elija opción.** Medir primero (renders y
       tareas largas mientras se arrastra el color, en Chrome por DevTools); si no se nota, se
       descarta como A2.
 - [ ] A5 resultado de `saveDraft` y toast.
