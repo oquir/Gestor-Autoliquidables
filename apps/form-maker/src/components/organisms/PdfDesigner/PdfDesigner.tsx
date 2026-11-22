@@ -15,6 +15,7 @@ import { PdfSidebar } from '../pdf/PdfSidebar'
 import { PdfToolbar } from '../pdf/PdfToolbar'
 import {
   BACK_BUTTON_CLASSES,
+  BACK_DIVIDER_CLASSES,
   DOWNLOAD_BUTTON_CLASSES,
   HAND_CURSOR_CLASSES,
   OPEN_BUTTON_CLASSES,
@@ -62,7 +63,7 @@ export function PdfDesigner() {
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-surface-sunken text-fg">
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-6 py-2">
-        <div className="flex min-w-0 items-center gap-4">
+        <div className="flex min-w-0 items-center gap-5">
           <Tooltip content="Volver al formulario">
             <button
               type="button"
@@ -73,6 +74,7 @@ export function PdfDesigner() {
               Volver
             </button>
           </Tooltip>
+          <span aria-hidden className={BACK_DIVIDER_CLASSES} />
           <div className="min-w-0">
             <h1 className="text-base font-semibold text-fg-strong">Diseñar PDF</h1>
             <p className="truncate text-xs text-fg-muted">
