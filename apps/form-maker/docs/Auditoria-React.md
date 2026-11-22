@@ -117,7 +117,11 @@ Contexto técnico: React 19.2 con StrictMode, Zustand 5 + zundo, sin React Compi
 > así que O1 deja de ser "barato" (ver la tabla de oportunidades). Medido en Chrome headless con
 > render por software: confirmar con el Profiler en una máquina real antes de decidir.
 
-### [ ] A4 · MEDIA · El lienzo del PDF repinta y vuelve a sanear todas las celdas en cada tecla, zoom o clic
+### [x] ~~A4 · MEDIA · El lienzo del PDF repinta y vuelve a sanear todas las celdas en cada tecla, zoom o clic~~ (2026-11-22, «Memoiza las filas y tablas del lienzo del PDF»)
+
+> **Hecho, con otro diseño (decisión del usuario):** memo **por fila**, no solo por tabla, porque
+> la plantilla ICA tiene 226 de sus 253 celdas en una sola tabla. Tecla 4,72 → 3,11 ms, color
+> 4,65 → 3,01 ms, paso de zoom 3,31 → 0,83 ms. El saneador del HTML no era el costo.
 
 - **Dónde:** `components/organisms/pdf/PdfCanvas/PdfCanvas.tsx:148, 188, 196`,
   `pdf/PdfSheetView`, `pdf/PdfTableView/PdfTableView.tsx:25, 32, 69, 83`.
@@ -243,7 +247,7 @@ por la causa (Fase 2).
       62,6 → 25,8 ms y **0 cuadros lentos** (antes 120). Queda: `Tooltip` 27 veces por tecla, 1,1 ms
       de 2,9 ms de JS (T1).
 - [ ] T1 (nuevo) `Tooltip` perezoso: que un globo cerrado no corra floating-ui.
-- [ ] A4 memo de `PdfTableView`: el PDF ya cuesta la mitad por escritura; volver a medir antes.
+- [x] ~~A4 memo de `PdfTableView`.~~ (2026-11-22) Por fila: tecla −34 %, zoom −75 %.
 - [ ] B1, B2 y B3.
 
 ### Perfil de la Fase 2 (2026-11-22)

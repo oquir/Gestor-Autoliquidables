@@ -145,9 +145,20 @@ export function PdfCanvas() {
     drag.last = hit.cellId
   }
 
-  const selectedIds: ReadonlySet<string> = useMemo(
-    () => new Set(design ? selectedCellIds(design, selection) : []),
+  // Estables por contenido: las filas de las tablas se memoizan, y un Set o una funcion nuevos en
+  // cada tecla las repintarian todas. La clave solo cambia si cambian los ids seleccionados.
+  const selectedKey: string = useMemo(
+    () => (design ? selectedCellIds(design, selection).join('|') : ''),
     [design, selection],
+  )
+  const selectedIds: ReadonlySet<string> = useMemo(
+    () => new Set(selectedKey ? selectedKey.split('|') : []),
+    [selectedKey],
+  )
+  const handleSelectCell: (tableId: string, cellId: string, extend: boolean) => void = useCallback(
+    (tableId: string, cellId: string, extend: boolean): void =>
+      selectCell(tableId, cellId, extend || tool === 'select'),
+    [selectCell, tool],
   )
   const selectedBlockId: string | null = selection?.kind === 'block' ? selection.blockId : null
   const designCss: string = useMemo(() => (design ? pdfStyleSheet(design) : ''), [design])
@@ -193,9 +204,7 @@ export function PdfCanvas() {
                     setActiveSheet(sheet.id)
                     clearSelection()
                   }}
-                  onSelectCell={(tableId, cellId, extend) =>
-                    selectCell(tableId, cellId, extend || tool === 'select')
-                  }
+                  onSelectCell={handleSelectCell}
                   onSelectBlock={selectBlock}
                 />
               ))}
