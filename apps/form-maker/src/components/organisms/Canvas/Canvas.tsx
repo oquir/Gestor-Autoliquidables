@@ -1,4 +1,4 @@
-import { type PointerEvent, useState } from 'react'
+import { type PointerEvent, useCallback, useState } from 'react'
 import { useCanvasViewport, useViewModeScroll } from '../../../hooks'
 import { getActiveGroups, getActiveRows, useFormStore } from '../../../store'
 import type { FieldContextMenuState } from '../../../types'
@@ -36,9 +36,11 @@ export function Canvas() {
     if (!hitsSelectable) selectField(null)
   }
 
-  function openContextMenu(fieldId: string, x: number, y: number): void {
-    setContextMenu({ fieldId, x, y })
-  }
+  // Estable: llega a cada fila, y una funcion nueva por render anularia su memo.
+  const openContextMenu: (fieldId: string, x: number, y: number) => void = useCallback(
+    (fieldId: string, x: number, y: number): void => setContextMenu({ fieldId, x, y }),
+    [],
+  )
 
   if (viewMode !== 'canvas') {
     return (

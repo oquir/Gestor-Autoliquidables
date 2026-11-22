@@ -1,15 +1,15 @@
 import { useDraggable, useDroppable } from '@dnd-kit/core'
-import type { CSSProperties, MouseEvent } from 'react'
+import { type CSSProperties, memo, type MouseEvent, type NamedExoticComponent } from 'react'
 import { resolveRowStyles } from '../../../lib'
 import { getSelectedFieldId, useFormStore } from '../../../store'
 import { CanvasFieldChip } from '../../molecules'
 import { RowZoneOverlay } from '../../molecules'
 import { RowToolbar } from '../RowToolbar'
 import type { CanvasRowProps } from './CanvasRow.types'
-import { getRowBorderClasses } from './CanvasRow.utils'
+import { getRowBorderClasses, sameRowProps } from './CanvasRow.utils'
 import { ENTER_ROW_CLASSES } from '../../../constants'
 
-export function CanvasRow({
+function CanvasRowBase({
   row,
   linkedLabels,
   offsetY = 0,
@@ -123,3 +123,7 @@ export function CanvasRow({
     </li>
   )
 }
+
+// Memo con comparacion propia (sameRowProps): al escribir en un campo, las demas filas del paso y
+// sus chips no se vuelven a pintar. Lo que lee del store (seleccion, arrastre) la repinta igual.
+export const CanvasRow: NamedExoticComponent<CanvasRowProps> = memo(CanvasRowBase, sameRowProps)
