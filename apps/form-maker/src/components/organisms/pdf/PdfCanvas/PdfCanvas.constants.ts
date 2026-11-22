@@ -3,7 +3,10 @@ import { PDF_CANVAS_CLASS as C } from '../../../../constants'
 // Estilos del shadow root del lienzo: los tokens (var) cruzan, las clases de Tailwind no. La
 // edicion usa sombras y outlines, que no ocupan espacio. Bajo rendimiento: .low-performance no
 // cruza el shadow root y :host-context no existe en Firefox ni Safari, asi que se usa
-// data-low-performance en .doc.
+// data-low-performance en .doc. El papel (data-paper en .doc) es solo vista: sepia tine la hoja y
+// oscuro invierte el contenido; el .html (buildPdfHtml) no los conoce. El filtro va en .content y no
+// en .paper: las guias, el aviso de hoja vacia y la leyenda quedan fuera. hue-rotate(180deg) devuelve
+// cada color a su tono (un rojo sigue rojo y solo cambia su claridad): invert solo seria un negativo.
 export const CANVAS_CSS: string = `
 @keyframes pdf-sheet-in { from { opacity: 0; translate: 0 12px; } }
 @keyframes pdf-select-in { from { box-shadow: inset 0 0 0 4px var(--color-brand, #f97316); } }
@@ -26,6 +29,10 @@ export const CANVAS_CSS: string = `
 .${C.html}:empty::before { content: 'Bloque HTML vacío'; color: #94a3b8; font: italic 12px system-ui, sans-serif; }
 .${C.html}.${C.selected} { outline: 2px solid var(--color-brand, #f97316); outline-offset: 1px; transition: outline-color 120ms ease-out; }
 .${C.variable} { background: rgba(59,130,246,.16); border-radius: 2px; }
+.${C.doc}[data-paper="sepia"] .${C.paper} { background: #f4ecd8; }
+.${C.doc}[data-paper="sepia"] .${C.content} { mix-blend-mode: multiply; }
+.${C.doc}[data-paper="dark"] .${C.paper} { background: #121212; }
+.${C.doc}[data-paper="dark"] .${C.content} { filter: invert(1) hue-rotate(180deg); }
 .${C.doc}[data-tool="hand"] { pointer-events: none; }
 .${C.doc}[data-tool="select"] { user-select: none; -webkit-user-select: none; }
 .${C.doc}[data-tool="select"] .${C.cell}, .${C.doc}[data-tool="select"] .${C.html} { cursor: cell; }

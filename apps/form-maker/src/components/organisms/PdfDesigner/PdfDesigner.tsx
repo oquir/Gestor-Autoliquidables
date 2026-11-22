@@ -11,6 +11,7 @@ import type { PdfTaxType } from '../../../types'
 import { Spinner, Tooltip } from '../../atoms'
 import { PdfCanvas } from '../pdf/PdfCanvas'
 import { PdfImportModal } from '../pdf/PdfImportModal'
+import { PdfPaperPicker } from '../pdf/PdfPaperPicker'
 import { PdfSidebar } from '../pdf/PdfSidebar'
 import { PdfToolbar } from '../pdf/PdfToolbar'
 import {
@@ -97,6 +98,8 @@ export function PdfDesigner() {
               {status.label}
             </span>
           </Tooltip>
+          {/* Los dos controles de como se ve, juntos: el papel de las hojas y el tema de la app. */}
+          {isReady && <PdfPaperPicker />}
           <Tooltip content={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}>
             <button
               type="button"

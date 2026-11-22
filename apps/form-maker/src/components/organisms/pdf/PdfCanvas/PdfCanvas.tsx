@@ -31,6 +31,7 @@ export function PdfCanvas() {
   const clearSelection = usePdfDesignStore((state) => state.clearSelection)
   const zoom = usePdfDesignStore((state) => state.zoom)
   const tool = usePdfDesignStore((state) => state.tool)
+  const paperTone = usePdfDesignStore((state) => state.paperTone)
   const isLowPerformance = useFormStore((state) => state.isLowPerformance)
   const dragRef = useRef<CellDrag | null>(null)
   // Tras un arrastre entre celdas el navegador manda un clic a la fila, que limpiaria la seleccion:
@@ -163,6 +164,7 @@ export function PdfCanvas() {
             <div
               className={PDF_CANVAS_CLASS.doc}
               data-tool={tool}
+              data-paper={paperTone}
               data-low-performance={isLowPerformance ? '' : undefined}
               onPointerDown={handleDocPointerDown}
               // Shift+clic: sin esto el navegador extiende tambien la seleccion de texto. El click

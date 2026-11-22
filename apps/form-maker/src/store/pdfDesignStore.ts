@@ -73,10 +73,14 @@ const createPdfDesignState: StateCreator<PdfDesignState> = (set, get) => ({
   setUploading: (isUploading) => set({ isUploading }),
   zoom: 1,
   tool: 'move',
+  paperTone: 'white',
   sidebarTab: 'selection',
   editingClass: null,
 
   setTool: (tool) => set((state) => (state.tool === tool ? state : { tool })),
+
+  setPaperTone: (paperTone) =>
+    set((state) => (state.paperTone === paperTone ? state : { paperTone })),
 
   setSidebarTab: (sidebarTab) =>
     set((state) => (state.sidebarTab === sidebarTab ? state : { sidebarTab })),
@@ -88,6 +92,8 @@ const createPdfDesignState: StateCreator<PdfDesignState> = (set, get) => ({
     }),
 
   openDesign: (taxType) => {
+    // Antes del retorno: el store sobrevive al cerrar y reabrir el disenador.
+    if (get().paperTone !== 'white') set({ paperTone: 'white' })
     if (get().design?.taxType === taxType) return
 
     // Sin nada guardado arranca con la plantilla de fabrica del impuesto, si tiene (hoy el ICA).

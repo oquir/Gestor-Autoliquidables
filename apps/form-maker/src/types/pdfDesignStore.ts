@@ -18,7 +18,10 @@ import type { CanvasTool } from './ui'
 
 export type PdfSidebarTab = 'selection' | 'document'
 
-// selection, zoom, tool, sidebarTab y editingClass son vista: no entran al historial ni se guardan.
+// El papel con que se ve la hoja en el disenador. Solo vista: el .html no lo sabe.
+export type PdfPaperTone = 'white' | 'sepia' | 'dark'
+
+// selection, zoom, tool, paperTone, sidebarTab y editingClass son vista: no entran al historial ni se guardan.
 export interface PdfDesignState {
   // null hasta abrir la plantilla de un impuesto.
   design: PdfDesign | null
@@ -37,6 +40,9 @@ export interface PdfDesignState {
   setZoom: (zoom: number) => void
   tool: CanvasTool
   setTool: (tool: CanvasTool) => void
+  // Siempre arranca en blanco: openDesign lo repone.
+  paperTone: PdfPaperTone
+  setPaperTone: (tone: PdfPaperTone) => void
   // Seleccionar pasa a 'selection'; abrir una clase, a 'document'.
   sidebarTab: PdfSidebarTab
   setSidebarTab: (tab: PdfSidebarTab) => void
