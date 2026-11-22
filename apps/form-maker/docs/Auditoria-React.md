@@ -240,7 +240,7 @@ por la causa (Fase 2).
       8,15 → 2,93 ms (−64 %), paso de color 8,30 → 3,84 ms (−54 %). Los chips no se memoizan: en la
       fila editada se repintan igual. Hilo principal completo (con estilos y layout), comparado con
       la medición de A3: tecla 12,6 → 5,3 ms y, con CPU ×4, 67,7 → 26,7 ms; paso de color con CPU ×4
-      62,6 → 25,8 ms y **0 cuadros lentos** (antes 120). Queda: 27 veces por tecla, 1,1 ms
+      62,6 → 25,8 ms y **0 cuadros lentos** (antes 120). Queda: `Tooltip` 27 veces por tecla, 1,1 ms
       de 2,9 ms de JS (T1).
 - [ ] T1 (nuevo) `Tooltip` perezoso: que un globo cerrado no corra floating-ui.
 - [ ] A4 memo de `PdfTableView`: el PDF ya cuesta la mitad por escritura; volver a medir antes.
