@@ -3,6 +3,7 @@ import { CheckCircle, Copy } from 'reicon-react'
 import { Tooltip } from '../Tooltip'
 import type { CopyIconButtonProps } from './CopyIconButton.types'
 import { ENTER_CHECK_CLASSES } from '../../../constants'
+import { copyTextOrWarn } from '../../../lib/clipboard/clipboard'
 
 export function CopyIconButton({ value, title = 'Copiar' }: CopyIconButtonProps) {
   const [copied, setCopied] = useState<boolean>(false)
@@ -15,7 +16,7 @@ export function CopyIconButton({ value, title = 'Copiar' }: CopyIconButtonProps)
   }, [])
 
   async function handleCopy(): Promise<void> {
-    await navigator.clipboard.writeText(value)
+    if (!(await copyTextOrWarn(value))) return
     setCopied(true)
 
     if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current)

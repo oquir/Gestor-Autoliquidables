@@ -194,6 +194,7 @@ Settled:
 - **Reveal is two-step**: scroll the row to the middle by arithmetic (it may not be painted yet), then, once painted, `scrollIntoView` the current `<mark>` with `block: 'nearest'` for the horizontal part (compiled scripts make lines of 2,000+ chars). Each request carries a `token`, handled once — a live JSON change with the bar open doesn't jump the view again.
 - **The search input's ref travels outside the `search` object** (`searchInputRef`): inside it, the compiler's `react-hooks/refs` rule treats the whole object as a ref and rejects reading anything from it during render.
 - **Copy is unaffected** (it copies the full string). Mouse selection and the browser's find only reach painted rows — accepted.
+- **Every copy button goes through `copyTextOrWarn`** (`lib/clipboard`, 2026-11-22, audit B4): the JSON and Payload views' Copiar and the schema's `CopyIconButton` in Validaciones. `navigator.clipboard` is missing outside a secure context and `writeText` rejects without permission or focus; before, the rejection went unhandled and the button said nothing. Now: "Copiado" only if it copied, otherwise a sonner error toast with a fixed id (`clipboard-error`). Verified in Chrome by replacing `writeText` in the page (reject → toast, no exception; accept → the same text as before).
 
 ## Canvas tools and floating toolbar (`canvasTool`, `CanvasToolbar`)
 

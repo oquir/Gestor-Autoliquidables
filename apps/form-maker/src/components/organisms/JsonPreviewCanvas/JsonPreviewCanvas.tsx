@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { CheckCircle, Copy } from 'reicon-react'
-import { buildFormExport } from '../../../lib'
+import { buildFormExport, copyTextOrWarn } from '../../../lib'
 import { useFormStore } from '../../../store'
 import { JsonCode } from '../../molecules'
 
@@ -17,7 +17,7 @@ export function JsonPreviewCanvas() {
   )
 
   const handleCopy = async (): Promise<void> => {
-    await navigator.clipboard.writeText(json)
+    if (!(await copyTextOrWarn(json))) return
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
   }

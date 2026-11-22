@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { CONCEPTS_PAYLOAD_KEY, PAYLOAD_SCHEMA } from '../../constants'
-import { isPresentationalField } from '../../lib'
+import { copyTextOrWarn, isPresentationalField } from '../../lib'
 import { buildMappingTree, findOrphanBindings, summarizeConcepts, toPlainSummary } from '../../lib'
 import { getAllFields, useFormStore } from '../../store'
 import type { CanvasField } from '../../types'
@@ -44,7 +44,7 @@ export function usePayloadPreviewCanvas(): UsePayloadPreviewCanvasResult {
   }, [formSteps, introSteps])
 
   const handleCopy = async (): Promise<void> => {
-    await navigator.clipboard.writeText(summaryJson)
+    if (!(await copyTextOrWarn(summaryJson))) return
     setCopied(true)
 
     if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current)
