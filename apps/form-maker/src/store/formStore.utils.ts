@@ -160,30 +160,61 @@ export function buildInitialIntroSteps(formType: FormType, stepCount: number): I
   })
 }
 
-// En los dos lienzos sin averiguar en cual esta: recorrer de mas es barato y evita ramificar.
+// Pasa las filas de cada paso de los dos lienzos por mapRows y conserva lo que no cambio: un paso,
+// el arreglo de pasos o el modal sin cambios siguen siendo el mismo objeto, y si nada cambio vuelve
+// el mismo slice (con el estado, set no avisa a nadie). Sin esto cada edicion rehacia todos los
+// pasos y filas y ningun memo del lienzo podia saltarse nada.
+function mapStepsEverywhere(
+  slice: StateSlice,
+  mapRows: (rows: CanvasRow[]) => CanvasRow[],
+): StateSlice {
+  const mapSteps = <T extends { rows: CanvasRow[] }>(steps: T[]): T[] => {
+    let changed: boolean = false
+    const next: T[] = steps.map((step) => {
+      const rows: CanvasRow[] = mapRows(step.rows)
+      if (rows === step.rows) return step
+      changed = true
+      return { ...step, rows }
+    })
+    return changed ? next : steps
+  }
+
+  const formSteps: FormStep[] = mapSteps(slice.formSteps)
+  const introSteps: IntroModalStep[] = mapSteps(slice.introModal.steps)
+  if (formSteps === slice.formSteps && introSteps === slice.introModal.steps) return slice
+
+  return {
+    formSteps,
+    introModal: introSteps === slice.introModal.steps ? slice.introModal : { steps: introSteps },
+  }
+}
+
+// Si alguna clave del parche trae otro valor. undefined contra ausente cuenta como igual, como en
+// sameDocument: un parche asi no es un cambio.
+export function patchChanges<T extends object>(target: T, patch: Partial<T>): boolean {
+  const current: Record<string, unknown> = target as Record<string, unknown>
+  return Object.entries(patch).some(([key, value]) => !Object.is(current[key], value))
+}
+
+// En los dos lienzos sin averiguar en cual esta: recorrer de mas es barato y evita ramificar. Si el
+// updater devuelve el mismo campo, nada cambia.
 export function mapFieldEverywhere(
   slice: StateSlice,
   fieldId: string,
   updater: (field: CanvasField) => CanvasField,
 ): StateSlice {
-  const applyTo = (rows: CanvasRow[]) =>
-    rows.map((row) => ({
-      ...row,
-      fields: row.fields.map((field) => (field.id === fieldId ? updater(field) : field)),
-    }))
-
-  return {
-    formSteps: slice.formSteps.map((step) => ({
-      ...step,
-      rows: applyTo(step.rows),
-    })),
-    introModal: {
-      steps: slice.introModal.steps.map((step) => ({
-        ...step,
-        rows: applyTo(step.rows),
-      })),
-    },
-  }
+  return mapStepsEverywhere(slice, (rows) => {
+    let changed: boolean = false
+    const next: CanvasRow[] = rows.map((row) => {
+      const index: number = row.fields.findIndex((field) => field.id === fieldId)
+      if (index === -1) return row
+      const updated: CanvasField = updater(row.fields[index])
+      if (updated === row.fields[index]) return row
+      changed = true
+      return { ...row, fields: row.fields.map((field, i) => (i === index ? updated : field)) }
+    })
+    return changed ? next : rows
+  })
 }
 
 // Borra los campos y limpia lo que les apuntaba (condiciones, reglas, validaciones condicionales,
@@ -235,25 +266,22 @@ export function createOptions(optionCount: number): FieldOption[] {
   }))
 }
 
+// Como mapFieldEverywhere: si el updater devuelve la misma fila, nada cambia.
 export function mapRowEverywhere(
   slice: StateSlice,
   rowId: string,
   updater: (row: CanvasRow) => CanvasRow,
 ): StateSlice {
-  const applyTo = (rows: CanvasRow[]) => rows.map((row) => (row.id === rowId ? updater(row) : row))
-
-  return {
-    formSteps: slice.formSteps.map((step) => ({
-      ...step,
-      rows: applyTo(step.rows),
-    })),
-    introModal: {
-      steps: slice.introModal.steps.map((step) => ({
-        ...step,
-        rows: applyTo(step.rows),
-      })),
-    },
-  }
+  return mapStepsEverywhere(slice, (rows) => {
+    let changed: boolean = false
+    const next: CanvasRow[] = rows.map((row) => {
+      if (row.id !== rowId) return row
+      const updated: CanvasRow = updater(row)
+      if (updated !== row) changed = true
+      return updated
+    })
+    return changed ? next : rows
+  })
 }
 
 export function createEmptyRow(): CanvasRow {

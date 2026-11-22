@@ -69,6 +69,7 @@ import {
   getInitialLowPerformance,
   mapFieldEverywhere,
   mapRowEverywhere,
+  patchChanges,
   reconcileViewAfterHistory,
   removeFieldsEverywhere,
   rowsAcrossFrom,
@@ -779,8 +780,11 @@ const createFormState: StateCreator<FormState, [['temporal', unknown]], []> = (s
     ),
   updateField: (fieldId, updates) =>
     set((state) => {
+      // Un parche que no cambia nada devuelve el mismo campo, y con eso el mismo estado.
       if (updates.colSpan === undefined) {
-        return mapFieldEverywhere(state, fieldId, (field) => ({ ...field, ...updates }))
+        return mapFieldEverywhere(state, fieldId, (field) =>
+          patchChanges(field, updates) ? { ...field, ...updates } : field,
+        )
       }
       const row = findRowContainingField(state, fieldId)
       if (!row) return state
@@ -788,11 +792,13 @@ const createFormState: StateCreator<FormState, [['temporal', unknown]], []> = (s
         getFreeRuns(row.fields, row.columns, fieldId),
         row.fields.find((f) => f.id === fieldId)?.colStart ?? 1,
       )
-      return mapFieldEverywhere(state, fieldId, (field) => ({
-        ...field,
-        ...updates,
-        colSpan: Math.max(1, Math.min(updates.colSpan ?? field.colSpan, maxSpan)),
-      }))
+      return mapFieldEverywhere(state, fieldId, (field) => {
+        const patch: Partial<CanvasField> = {
+          ...updates,
+          colSpan: Math.max(1, Math.min(updates.colSpan ?? field.colSpan, maxSpan)),
+        }
+        return patchChanges(field, patch) ? { ...field, ...patch } : field
+      })
     }),
   updateFieldValidations: (fieldId, updates) =>
     set((state) =>
@@ -844,10 +850,11 @@ const createFormState: StateCreator<FormState, [['temporal', unknown]], []> = (s
     ),
   updateFieldStyles: (fieldId, updates) =>
     set((state) =>
-      mapFieldEverywhere(state, fieldId, (field) => ({
-        ...field,
-        styles: { ...field.styles, ...updates },
-      })),
+      mapFieldEverywhere(state, fieldId, (field) =>
+        patchChanges(field.styles, updates)
+          ? { ...field, styles: { ...field.styles, ...updates } }
+          : field,
+      ),
     ),
   // Un script en blanco se guarda como ausente: el export no lleva la clave.
   setFieldScript: (fieldId, script) =>

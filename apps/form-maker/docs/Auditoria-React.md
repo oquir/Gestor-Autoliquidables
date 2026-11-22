@@ -150,7 +150,7 @@ Contexto técnico: React 19.2 con StrictMode, Zustand 5 + zundo, sin React Compi
 - **Solución:** que `saveDraft` devuelva un resultado (`ok` o error), como `savePdfDesign`. Los tres
   sitios marcan "Guardado" solo si salió bien; si no, un toast de error con `id` fijo.
 
-### [ ] A6 · MEDIA-BAJA (estructural) · Las ediciones del formulario no comparten estructura
+### [x] ~~A6 · MEDIA-BAJA (estructural) · Las ediciones del formulario no comparten estructura~~ (2026-11-22, «Hace que las ediciones del formulario compartan estructura»)
 
 - **Dónde:** `store/formStore.utils.ts:164` (`mapFieldEverywhere`) y `:238` (`mapRowEverywhere`).
 - **Causa:** crean objetos nuevos para **todos** los pasos y **todas** las filas de los dos lienzos
@@ -234,8 +234,10 @@ por la causa (Fase 2).
 - [x] ~~Perfilar primero una tecla en Etiqueta y un paso de color (formulario y PDF).~~ (2026-11-22)
       Ver "Perfil de la Fase 2" abajo. Orden propuesto según el perfil, **pendiente de que el
       usuario lo confirme**:
-- [ ] A6 helpers que comparten estructura + O1 (memo de filas y chips del lienzo): la pantalla
-      más pesada; arreglan a la vez escribir y arrastrar el color (A3).
+- [x] ~~A6 helpers que comparten estructura.~~ (2026-11-22) Solo no cambia el costo por tecla: es
+      el requisito de O1.
+- [ ] O1 memo de filas y chips del lienzo: la pantalla más pesada; arregla a la vez escribir y
+      arrastrar el color (A3). **Siguiente.**
 - [ ] T1 (nuevo) `Tooltip` perezoso: que un globo cerrado no corra floating-ui.
 - [ ] A4 memo de `PdfTableView`: el PDF ya cuesta la mitad por escritura; volver a medir antes.
 - [ ] B1, B2 y B3.
