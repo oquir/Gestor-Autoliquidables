@@ -297,6 +297,12 @@ export function useDragAndDrop(): DragAndDropReturn {
     }
   }
 
+  // dnd-kit cancela con Escape, pointercancel, cambio de pestana o resize, y entonces llama solo a
+  // onDragCancel: sin esto quedaban vivos el estado del arrastre y los listeners de arriba.
+  function handleDragCancel(): void {
+    resetDragState()
+  }
+
   return {
     sensors,
     activeDrag,
@@ -309,5 +315,6 @@ export function useDragAndDrop(): DragAndDropReturn {
     handleDragStart,
     handleDragMove,
     handleDragEnd,
+    handleDragCancel,
   }
 }

@@ -17,4 +17,5 @@ export interface DragAndDropReturn {
   handleDragStart: (event: DragStartEvent) => void
   handleDragMove: (event: DragMoveEvent) => void
   handleDragEnd: (event: DragEndEvent) => void
+  handleDragCancel: () => void
 }

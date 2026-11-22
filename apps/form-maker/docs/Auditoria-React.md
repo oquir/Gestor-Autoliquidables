@@ -31,7 +31,14 @@ Contexto técnico: React 19.2 con StrictMode, Zustand 5 + zundo, sin React Compi
 
 ## A. Problemas reales
 
-### [ ] A1 · ALTA · Cancelar un arrastre deja el editor en un "arrastre fantasma"
+### [x] ~~A1 · ALTA · Cancelar un arrastre deja el editor en un "arrastre fantasma"~~ (2026-11-21, «Limpia el estado del arrastre al cancelarlo»)
+
+> **Hecho.** Reproducido antes del cambio en Chrome (fila y campo × Escape, `resize` y
+> `visibilitychange`: Pasos forzado, una fila desplazada, Ctrl+→ bloqueado) y limpio después;
+> soltar sigue moviendo la fila. Al cancelar, el overlay vuelve al origen con la animación por
+> defecto, igual que al soltar. **Hallazgo nuevo, sin tocar:** el `dropAnimation={null}` de
+> `FormBuilder` para filas no tiene efecto (cuando dnd-kit lo lee, `activeDrag` ya es `null`), así
+> que soltar una fila también anima.
 
 - **Dónde:** `components/organisms/FormBuilder/FormBuilder.tsx:66-71` (`DndContext`) y
   `hooks/useDragAndDrop/useDragAndDrop.ts:206` (`resetDragState`).
@@ -176,7 +183,7 @@ y verificar la anterior. Cada corrección deja su nota en `docs/Decisiones.md`.
 
 **Fase 1: bugs y arreglos baratos sin riesgo**
 
-- [ ] A1 `onDragCancel`.
+- [x] ~~A1 `onDragCancel`.~~ (2026-11-21)
 - [ ] A2 caché de schemas.
 - [ ] A3 escritura del color limitada a una por cuadro.
 - [ ] A5 resultado de `saveDraft` y toast.

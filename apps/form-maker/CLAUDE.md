@@ -74,6 +74,7 @@ Guidance for Claude Code in this app (FormMaker, formerly "Form Orchestrator"): 
 - **Field refs are `{{campo}}`**; `fieldRefText(name)` is the one place that writes the syntax. An unknown `{{x}}` is an error. Never move rule logic (sanción, intereses) out of `logic.script` into code or the prelude.
 - **Never in the draft or export**: the simulator banks (catalogs, fechas, UVT), the PDF design (own `localStorage` key per tax), `canvasZoom`, `canvasTool`, panel state.
 - **Never store rich text/PDF HTML as raw HTML**; the serializer/sanitizer is the barrier, `safeHref` runs at insert, serialize and draft load.
+- **The `DndContext` needs `onDragCancel` → `resetDragState`**: dnd-kit cancels on Escape, `pointercancel`, tab switch and resize and then never calls `onDragEnd`; without it the drag state and the window listeners survive the drag.
 - **Equality for undo is `sameDocument`** — selection, zoom, tool and drag state never create a history step. Edits that change nothing must return the same reference.
 - **Rounding/negatives/decimals change the value, not just display**; the formatted text never leaves the input (state holds a real `number`).
 - Nothing in the collapsed right chip's container may set `transform`/`filter`/`backdrop-filter`/`will-change`/`container-type` (breaks `ModalShell`). That's why the floating bar's `@container` lives in its own layer inside `CanvasToolbar`.

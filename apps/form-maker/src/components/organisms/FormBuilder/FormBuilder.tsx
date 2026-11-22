@@ -36,6 +36,7 @@ export function FormBuilder() {
     handleDragStart,
     handleDragMove,
     handleDragEnd,
+    handleDragCancel,
   } = useDragAndDrop()
   const isSimulatorOpen = useFormStore((state) => state.isSimulatorOpen)
   const isPdfDesignerOpen = useFormStore((state) => state.isPdfDesignerOpen)
@@ -69,6 +70,7 @@ export function FormBuilder() {
       onDragStart={handleDragStart}
       onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
     >
       <AppLayout
         sidebar={<Sidebar />}
