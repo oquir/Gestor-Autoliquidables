@@ -231,12 +231,39 @@ por la causa (Fase 2).
 
 **Fase 2: rendimiento del PDF y estructura del store**
 
-- [ ] Perfilar primero una tecla en Etiqueta y un paso de color (formulario y PDF): qué
-      componentes se llevan los ~12 ms por escritura. Con eso se ordena lo que sigue.
-- [ ] A4 memo de `PdfTableView` + `onSelectCell` y `selectedIds` estables.
-- [ ] A6 helpers que comparten estructura + O1 (memo de filas y chips del lienzo), si el perfil lo
-      confirma: arreglan a la vez escribir y arrastrar el color (A3).
+- [x] ~~Perfilar primero una tecla en Etiqueta y un paso de color (formulario y PDF).~~ (2026-11-22)
+      Ver "Perfil de la Fase 2" abajo. Orden propuesto según el perfil, **pendiente de que el
+      usuario lo confirme**:
+- [ ] A6 helpers que comparten estructura + O1 (memo de filas y chips del lienzo): la pantalla
+      más pesada; arreglan a la vez escribir y arrastrar el color (A3).
+- [ ] T1 (nuevo) `Tooltip` perezoso: que un globo cerrado no corra floating-ui.
+- [ ] A4 memo de `PdfTableView`: el PDF ya cuesta la mitad por escritura; volver a medir antes.
 - [ ] B1, B2 y B3.
+
+### Perfil de la Fase 2 (2026-11-22)
+
+Compilación de producción **sin minificar** (para leer los nombres), Chrome headless por el
+protocolo de DevTools: perfil de CPU por muestreo (0,1 ms) para el tiempo, y cobertura con conteo
+de llamadas, en otra pasada, para saber cuántas veces se renderiza cada componente. Plantilla ICA,
+paso 1 (16 campos en 7 filas). JS por escritura, CPU normal:
+
+| Escritura            | JS     | Render | Commit | `Tooltip` por escritura | Lienzo que se repinta          |
+| -------------------- | ------ | ------ | ------ | ----------------------- | ------------------------------ |
+| Tecla en Etiqueta    | 8,5 ms | 5,0 ms | 2,6 ms | 97 veces, 3,7 ms (43 %) | 16 chips y 7 filas enteros     |
+| Paso de color (form) | 9,1 ms | 5,4 ms | 2,8 ms | 105 veces, 3,7 ms       | igual                          |
+| Tecla en celda (PDF) | 4,8 ms | 2,5 ms | 1,5 ms | 21 veces, 0,8 ms        | las 5 tablas; `setProp` 0,9 ms |
+| Paso de color (PDF)  | 4,6 ms | 2,0 ms | 1,7 ms | 23 veces, 0,7 ms        | igual                          |
+
+- **El formulario cuesta el doble que el PDF**, y casi todo es el lienzo: en cada tecla se
+  repintan los 16 chips y las 7 filas con sus asas, menús e íconos (135 componentes), contra 22 del
+  panel izquierdo y 16 del derecho.
+- **`Tooltip` es el mayor costo individual (T1, hallazgo nuevo):** cada instancia corre todos los
+  hooks de floating-ui en cada render aunque esté cerrada (`useFloating` con `deepEqual` del
+  middleware, `useEffectEvent`, cinco hooks de interacción). Unos 75 de los 97 por tecla están en
+  el lienzo (24 `IconButton`, 16 `FieldTypeBadge`, 14 menús de fila, ~21 en los chips).
+- En el commit, `setProp` (1,7 ms en el formulario, 0,9 ms en el PDF) reescribe propiedades de
+  elementos que no cambiaron, porque todo el árbol se volvió a renderizar.
+- El saneador de HTML del PDF (A4) no aparece entre los costos: con el ICA de fábrica pesa poco.
 
 **Fase 3: solo con evidencia del Profiler**
 
