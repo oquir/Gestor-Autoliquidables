@@ -175,6 +175,14 @@ export default function LoginCredentials() {
               Ingresar
             </Button>
           </form>
+          <div className="mt-3 text-center">
+            <button
+              type="button"
+              className="text-[14px] font-medium text-blue-900 hover:underline transition-colors cursor-pointer"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
 
           {/* Nota de credenciales demo */}
           <div className="mt-5 flex items-center gap-2 rounded-lg border border-border bg-brand-surface px-3 py-2.5 text-xs text-fg-muted">
