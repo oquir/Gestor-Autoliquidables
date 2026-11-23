@@ -16,7 +16,7 @@ export default function Login() {
   const enter = (id: string) => navigate(`/login/${id}`)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-brand-surface to-surface-sunken px-4 py-12">
+    <div className="min-h-screen bg-linear-to-b from-brand-surface to-surface-sunken px-4 py-12">
       <div className="mx-auto max-w-5xl">
         <div className="mb-10 flex items-center gap-3">
           <span className="flex size-11 items-center justify-center rounded-xl bg-brand text-on-brand">
