@@ -116,6 +116,7 @@ export function PdfDesigner() {
                 <button
                   type="button"
                   onClick={() => setImportOpen(true)}
+                  disabled={isUploading}
                   className={OPEN_BUTTON_CLASSES}
                 >
                   <FolderOpen size={14} />

@@ -16,7 +16,8 @@ export const UPLOAD_BUTTON_CLASSES: string = ACTION_TIER_CLASSES.primary.regular
 
 export const DOWNLOAD_BUTTON_CLASSES: string = ACTION_TIER_CLASSES.secondary.regular
 
-export const OPEN_BUTTON_CLASSES: string = ACTION_TIER_CLASSES.tertiary.regular
+// Apagado mientras Subir espera: abrir otro archivo cambiaria la version que la respuesta marca.
+export const OPEN_BUTTON_CLASSES: string = `${ACTION_TIER_CLASSES.tertiary.regular} disabled:cursor-wait disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-fg-muted dark:disabled:hover:bg-transparent`
 
 // Con borde y separado del titulo por una raya (el usuario, 2026-11-21): sin borde se leia como parte
 // del titulo.
