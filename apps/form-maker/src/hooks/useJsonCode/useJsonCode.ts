@@ -26,6 +26,16 @@ export function useJsonCode(json: string, captureFind: boolean): UseJsonCodeResu
   const inputRef = useRef<HTMLInputElement>(null)
   const model: JsonModel = useMemo(() => buildJsonModel(json), [json])
   const [collapsed, setCollapsed] = useState<Set<number>>(() => new Set())
+  // Lo plegado se guarda por numero de linea: si el JSON gana o pierde lineas sin salir de la vista
+  // (Ctrl+Z, una opcion nueva), esos numeros caen en otros nodos, asi que se abre todo. Durante el
+  // render, como pide React para estado que sigue a una prop: un efecto pintaria antes un cuadro
+  // con los plegados corridos.
+  const lineCount: number = model.lines.length
+  const [foldedLineCount, setFoldedLineCount] = useState<number>(lineCount)
+  if (foldedLineCount !== lineCount) {
+    setFoldedLineCount(lineCount)
+    setCollapsed((prev) => (prev.size === 0 ? prev : new Set()))
+  }
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [query, setQueryState] = useState<string>('')
   const [currentIndex, setCurrentIndex] = useState<number>(0)
