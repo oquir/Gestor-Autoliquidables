@@ -25,7 +25,7 @@ export function StepTitleEditor() {
       ? formSteps.find((s) => s.stepId === activeCanvas.stepId)
       : introSteps.find((s) => s.stepId === activeCanvas.stepId)
 
-  // Solo un paso del formulario se puede ocultar: el modal de entrada no se navega igual.
+  // Solo un paso del formulario se puede ocultar.
   const formStep: FormStep | undefined =
     activeCanvas.type === 'formStep'
       ? formSteps.find((s) => s.stepId === activeCanvas.stepId)
@@ -37,7 +37,7 @@ export function StepTitleEditor() {
     <div className="flex flex-col gap-3">
       <LabeledInput
         id="step-title"
-        label="Título del step"
+        label="Título del paso"
         required
         value={step.title}
         onChange={(event) =>
@@ -49,7 +49,7 @@ export function StepTitleEditor() {
       />
       <LabeledInput
         id="step-subtitle"
-        label="Subtítulo del step (opcional)"
+        label="Subtítulo del paso (opcional)"
         value={step.subtitle ?? ''}
         onChange={(event) =>
           activeCanvas.type === 'formStep'
@@ -71,7 +71,7 @@ export function StepTitleEditor() {
               <InfoHint text={HIDDEN_STEP_DESCRIPTION} label="Ayuda sobre Ocultar este paso" />
             </div>
           </div>
-          {formStep.hidden && <p className="text-xs text-fg-subtle">{HIDDEN_STEP_NOTE}</p>}
+          {formStep.hidden && <p className="text-xs text-fg-muted">{HIDDEN_STEP_NOTE}</p>}
         </div>
       )}
     </div>

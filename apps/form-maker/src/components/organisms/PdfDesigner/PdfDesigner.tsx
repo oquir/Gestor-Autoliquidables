@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react'
-import { ArrowLeft, DirectSend2, FolderOpen, Moon, Sun } from 'reicon-react'
+import { useEffect, useMemo, useState } from 'react'
+import { ArrowLeft, CloudUpload, DocumentDownload2, FolderOpen, Moon, Sun } from 'reicon-react'
 import { useCanvasPan } from '../../../hooks'
 import { usePdfDesignAutosave } from '../../../hooks/usePdfDesignAutosave'
 import { usePdfDesignerShortcuts } from '../../../hooks/usePdfDesignerShortcuts'
@@ -8,26 +8,26 @@ import { readPdfEntryParams, resolvePdfTaxType, taxTypeLabel } from '../../../li
 import { useFormStore } from '../../../store'
 import { usePdfDesignStore } from '../../../store/pdfDesignStore'
 import type { PdfTaxType } from '../../../types'
-import { Tooltip } from '../../atoms'
-// Por la carpeta y no por el indice de moleculas: arrastra sonner, que solo debe cargar este chunk.
-import { Toaster } from '../../molecules/Toaster'
+import { Spinner, Tooltip } from '../../atoms'
 import { PdfCanvas } from '../pdf/PdfCanvas'
-import { PdfFileNotice } from '../pdf/PdfFileNotice'
+import { PdfImportModal } from '../pdf/PdfImportModal'
+import { PdfPaperPicker } from '../pdf/PdfPaperPicker'
 import { PdfSidebar } from '../pdf/PdfSidebar'
 import { PdfToolbar } from '../pdf/PdfToolbar'
 import {
-  EXIT_BUTTON_CLASSES,
+  BACK_BUTTON_CLASSES,
+  BACK_DIVIDER_CLASSES,
+  DOWNLOAD_BUTTON_CLASSES,
   HAND_CURSOR_CLASSES,
-  ICON_BUTTON_CLASSES,
-  PUBLISH_BUTTON_CLASSES,
+  OPEN_BUTTON_CLASSES,
   STATUS_DOT_CLASSES,
+  THEME_BUTTON_CLASSES,
+  UPLOAD_BUTTON_CLASSES,
 } from './PdfDesigner.constants'
 import { savedStatus } from './PdfDesigner.utils'
 
-// El diseñador del PDF de la declaracion, a pantalla completa como el simulador y cargado aparte
-// con React.lazy: la barra lateral a la izquierda, las hojas a la derecha. La plantilla es la del
-// impuesto: la que diga la URL (?impuesto=…) si es uno conocido, o si no la del formulario abierto.
-// Ver docs/Pendientes-PDF.md.
+// A pantalla completa y en su propio chunk. La plantilla es la del impuesto de la URL (?impuesto=)
+// o, si no, la del formulario abierto.
 export function PdfDesigner() {
   const formType = useFormStore((state) => state.setupConfig.formType)
   const setPdfDesignerOpen = useFormStore((state) => state.setPdfDesignerOpen)
@@ -38,11 +38,11 @@ export function PdfDesigner() {
   const saveError = usePdfDesignStore((state) => state.saveError)
   const publishedVersion = usePdfDesignStore((state) => state.publishedVersion)
   const openDesign = usePdfDesignStore((state) => state.openDesign)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const { notice, dismissNotice, publish, openFiles } = usePdfFile()
+  const [isImportOpen, setImportOpen] = useState<boolean>(false)
+  const { isUploading, upload, download } = usePdfFile()
   const tool = usePdfDesignStore((state) => state.tool)
 
-  // La URL se lee una vez al montar: no cambia mientras el diseñador esta abierto.
+  // La URL se lee una vez al montar.
   const taxType: PdfTaxType | null = useMemo(
     () => resolvePdfTaxType(formType, readPdfEntryParams(window.location.search)),
     [formType],
@@ -58,25 +58,38 @@ export function PdfDesigner() {
   const status = savedStatus(lastSavedAt, saveError)
   const isReady: boolean = design !== null && design.taxType === taxType
 
-  // La mano desplaza el <main> (el puerto, que lleva data-canvas-scroll). Solo con las hojas montadas.
+  // La mano desplaza el <main> (data-canvas-scroll), solo con las hojas montadas.
   useCanvasPan(isReady && tool === 'hand')
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-surface-sunken text-fg">
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-6 py-2">
-        <div className="min-w-0">
-          <h1 className="text-base font-semibold text-fg-strong">Diseñar PDF</h1>
-          <p className="truncate text-xs text-fg-muted">
-            {taxType ? `${taxTypeLabel(taxType)} · ` : ''}Carta · 5 mm de margen del back ·{' '}
-            {publishedVersion ? `Última versión: ${publishedVersion}` : 'Sin publicar'}
-          </p>
+        <div className="flex min-w-0 items-center gap-5">
+          <Tooltip content="Volver al formulario">
+            <button
+              type="button"
+              onClick={() => setPdfDesignerOpen(false)}
+              className={BACK_BUTTON_CLASSES}
+            >
+              <ArrowLeft size={14} />
+              Volver
+            </button>
+          </Tooltip>
+          <span aria-hidden className={BACK_DIVIDER_CLASSES} />
+          <div className="min-w-0">
+            <h1 className="text-base font-semibold text-fg-strong">Diseñar PDF</h1>
+            <p className="truncate text-xs text-fg-muted">
+              {taxType ? `${taxTypeLabel(taxType)} · ` : ''}Carta · 5 mm de margen del back ·{' '}
+              {publishedVersion ? `Última versión subida: ${publishedVersion}` : 'Sin subir'}
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
           <Tooltip content={saveError ?? status.label}>
             <span
               className={`flex items-center gap-1.5 text-[11px] ${
-                status.tone === 'error' ? 'text-danger' : 'text-fg-subtle'
+                status.tone === 'error' ? 'text-danger' : 'text-fg-muted'
               }`}
             >
               <span
@@ -85,63 +98,61 @@ export function PdfDesigner() {
               {status.label}
             </span>
           </Tooltip>
-          {isReady && (
-            <div className="flex items-center gap-1.5">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".html,.htm,text/html"
-                multiple
-                className="hidden"
-                onChange={(event) => {
-                  const input: HTMLInputElement = event.currentTarget
-                  void openFiles(input.files).finally(() => {
-                    input.value = ''
-                  })
-                }}
-              />
-              <Tooltip content="Abre un .html de FormMaker o una plantilla hecha a mano. Con varios, vale el de versión más alta.">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className={EXIT_BUTTON_CLASSES}
-                >
-                  <FolderOpen size={14} />
-                  Abrir…
-                </button>
-              </Tooltip>
-              <Tooltip content="Descarga el .html con el número de versión siguiente">
-                <button type="button" onClick={publish} className={PUBLISH_BUTTON_CLASSES}>
-                  <DirectSend2 size={13} />
-                  Publicar v{(publishedVersion ?? 0) + 1}
-                </button>
-              </Tooltip>
-            </div>
-          )}
+          {/* Los dos controles de como se ve, juntos: el papel de las hojas y el tema de la app. */}
+          {isReady && <PdfPaperPicker />}
           <Tooltip content={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}>
             <button
               type="button"
               onClick={toggleDarkMode}
               aria-label={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}
-              className={ICON_BUTTON_CLASSES}
+              className={THEME_BUTTON_CLASSES}
             >
               {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           </Tooltip>
-          <button
-            type="button"
-            onClick={() => setPdfDesignerOpen(false)}
-            className={EXIT_BUTTON_CLASSES}
-          >
-            <ArrowLeft size={14} />
-            Volver al formulario
-          </button>
+          {isReady && (
+            <div className="flex items-center gap-1.5">
+              <Tooltip content="Abre un .html de FormMaker o una plantilla hecha a mano. Con varios, vale el de versión más alta.">
+                <button
+                  type="button"
+                  onClick={() => setImportOpen(true)}
+                  disabled={isUploading}
+                  className={OPEN_BUTTON_CLASSES}
+                >
+                  <FolderOpen size={14} />
+                  Abrir…
+                </button>
+              </Tooltip>
+              <Tooltip content="Descarga una copia del .html del diseño actual. No gasta versión.">
+                <button type="button" onClick={download} className={DOWNLOAD_BUTTON_CLASSES}>
+                  <DocumentDownload2 size={14} />
+                  Descargar HTML
+                </button>
+              </Tooltip>
+              <Tooltip
+                content={
+                  isUploading
+                    ? 'Subiendo la plantilla…'
+                    : `Sube el .html a la API como versión ${(publishedVersion ?? 0) + 1}`
+                }
+              >
+                <button
+                  type="button"
+                  onClick={upload}
+                  disabled={isUploading}
+                  aria-busy={isUploading}
+                  className={UPLOAD_BUTTON_CLASSES}
+                >
+                  {isUploading ? <Spinner className="size-[13px]" /> : <CloudUpload size={13} />}
+                  Subir v{(publishedVersion ?? 0) + 1}
+                </button>
+              </Tooltip>
+            </div>
+          )}
         </div>
       </header>
 
-      <Toaster />
-
-      {notice && <PdfFileNotice notice={notice} onDismiss={dismissNotice} />}
+      {isImportOpen && <PdfImportModal onClose={() => setImportOpen(false)} />}
 
       {!taxType && (
         <p className="mx-auto mt-16 max-w-md px-6 text-center text-sm text-fg-muted">
@@ -155,8 +166,8 @@ export function PdfDesigner() {
           <aside className="w-80 shrink-0 overflow-y-auto border-r border-border bg-surface">
             <PdfSidebar />
           </aside>
-          {/* La barra cuelga de este contenedor y no del <main>, que es el que hace scroll: asi
-              queda quieta sobre las hojas. */}
+          {/* La barra cuelga de este contenedor y no del <main> que hace scroll: queda quieta
+              sobre las hojas. */}
           <div className="relative flex min-w-0 flex-1 flex-col">
             <main
               data-canvas-scroll

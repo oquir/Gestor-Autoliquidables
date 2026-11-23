@@ -1,4 +1,35 @@
+import { fieldKey } from '../../lib/runtimeValidation/runtimeValidation.utils'
 import type { PreviewState, RuntimeModel, RuntimeValues } from '../../types'
+
+// Quitar una repeticion sube un lugar las de abajo: sus errores revelados suben con ellas y los de
+// la quitada se van. Sin esto, la que queda en el lugar de otra hereda sus errores en rojo. Las
+// claves de grupo son grupo:indice:campo (fieldKey).
+export function removeRevealedItem(
+  revealed: Record<string, boolean>,
+  groupId: string,
+  index: number,
+): Record<string, boolean> {
+  const prefix: string = `${groupId}:`
+  const next: Record<string, boolean> = {}
+  let changed: boolean = false
+
+  for (const [key, value] of Object.entries(revealed)) {
+    const match: RegExpExecArray | null = key.startsWith(prefix)
+      ? /^(\d+):(.+)$/.exec(key.slice(prefix.length))
+      : null
+    const position: number = match ? Number(match[1]) : -1
+
+    if (!match || position < index) {
+      next[key] = value
+      continue
+    }
+
+    changed = true
+    if (position > index) next[fieldKey(match[2], groupId, position - 1)] = value
+  }
+
+  return changed ? next : revealed
+}
 
 export function emptyGroupItem(model: RuntimeModel, groupId: string): RuntimeValues {
   const item: RuntimeValues = {}
@@ -8,8 +39,7 @@ export function emptyGroupItem(model: RuntimeModel, groupId: string): RuntimeVal
   return item
 }
 
-// El modelo se reconstruye en cada edicion del lienzo. Si aparece o desaparece un grupo hay que
-// acomodar el estado sin perder lo que el usuario ya escribio.
+// El modelo se rehace en cada edicion: acomoda grupos nuevos o borrados sin perder lo escrito.
 export function reconcileState(model: RuntimeModel, state: PreviewState): PreviewState {
   const groups: Record<string, RuntimeValues[]> = {}
   let changed = false
@@ -27,7 +57,6 @@ export function reconcileState(model: RuntimeModel, state: PreviewState): Previe
 
   if (Object.keys(groups).length !== Object.keys(state.groups).length) changed = true
 
-  // Se devuelve el mismo objeto si nada cambio: un state nuevo en cada render dispararia el
-  // efecto otra vez y entraria en bucle.
+  // El mismo objeto si nada cambio: si no, el efecto entraria en bucle.
   return changed ? { ...state, groups } : state
 }

@@ -1,14 +1,12 @@
 export { ADD_LINK_CLASSES, HINT_CLASSES, WARNING_CLASSES } from '../../../constants/uiClasses'
 
-// La tarjeta es la de las filas del calculo sin codigo (CalcTermRow): en oscuro un velo negro la
-// deja apenas mas oscura que el modal, en claro va slate-100.
 export const CARD_CLASSES: string =
   'flex flex-col rounded-lg border border-border bg-surface-raised dark:bg-black/25'
 
 export const HEADER_CLASSES: string = 'flex items-center gap-3 border-b border-border px-4 py-3'
 
 export const NUMBER_BADGE_CLASSES: string =
-  'flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-surface text-[11px] font-semibold tabular-nums text-brand-fg'
+  'flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-surface text-[11px] font-semibold tabular-nums text-brand-strong'
 
 export const NAME_INPUT_CLASSES: string =
   'min-w-0 flex-1 rounded-md border border-border bg-field px-2 py-1 text-xs text-fg outline-none focus:border-brand-border'

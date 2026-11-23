@@ -13,8 +13,7 @@ import { PanelSection } from '../../../molecules'
 import { PdfNumberField } from '../PdfNumberField'
 import { MARGIN_SIDES } from './PdfDocumentPanel.constants'
 
-// Lo que vale para todo el PDF: la letra y el margen. El margen que se escribe aca es el EXTRA; el
-// total real (5 mm del back + el extra) se muestra al lado para que nadie tenga que sumar.
+// El margen que se escribe es el extra; el total (5 mm del back + extra) se muestra al lado.
 export function PdfDocumentPanel() {
   const design = usePdfDesignStore((state) => state.design)
   const setMargins = usePdfDesignStore((state) => state.setMargins)
@@ -25,7 +24,7 @@ export function PdfDocumentPanel() {
 
   return (
     <>
-      <PanelSection title="Letra">
+      <PanelSection title="Letra del documento">
         <div className="grid grid-cols-[1fr_88px] gap-2">
           <div className="min-w-0">
             <Label htmlFor="pdf-font-family" className="text-[11px]">
@@ -57,7 +56,7 @@ export function PdfDocumentPanel() {
             onChange={(value) => value !== undefined && setFontSize(value)}
           />
         </div>
-        <p className="text-[11px] text-fg-subtle">
+        <p className="text-[11px] text-fg-muted">
           Solo fuentes básicas: el servidor que arma el PDF tiene que tenerlas.
         </p>
       </PanelSection>
@@ -78,7 +77,7 @@ export function PdfDocumentPanel() {
                 suffix="mm"
                 onChange={(value) => setMargins({ [side]: value ?? 0 } as Partial<PdfMargins>)}
               />
-              <p className="mt-0.5 text-[10px] text-fg-subtle tabular-nums">
+              <p className="mt-0.5 text-[10px] text-fg-muted tabular-nums">
                 Total: {formatMm(PDF_BACK_MARGIN_MM + design.margins[side])} mm
               </p>
             </div>

@@ -1,22 +1,20 @@
 import { useEffect } from 'react'
-import { saveDraft } from '../../lib'
+import { saveDraftOrWarn } from '../../lib'
 import { useFormStore } from '../../store'
 import { AUTOSAVE_INTERVAL_MS } from './useAutosave.constants'
 
-// Guarda el borrador cada cierto tiempo. Vive en App, por encima de FormBuilder, para que siga
-// corriendo mientras el simulador ocupa la pantalla completa.
+// Guarda el borrador cada cierto tiempo. Vive en App para seguir corriendo con el simulador
+// abierto.
 export function useAutosave() {
   useEffect(() => {
     const intervalId = setInterval(() => {
-      // Se lee con getState y no con un selector: suscribirse volveria a montar el intervalo en
-      // cada tecla que el usuario escriba en el lienzo.
+      // getState y no selector: suscribirse reiniciaria el intervalo en cada tecla.
       const { formSteps, introModal, formScript, setupConfig, markSaved } = useFormStore.getState()
 
       // Antes de terminar el asistente no hay nada que valga la pena guardar.
       if (!setupConfig.isComplete) return
 
-      saveDraft({ formSteps, introModal, formScript, setupConfig })
-      markSaved()
+      saveDraftOrWarn({ formSteps, introModal, formScript, setupConfig }, markSaved)
     }, AUTOSAVE_INTERVAL_MS)
 
     return () => clearInterval(intervalId)

@@ -11,8 +11,7 @@ import { collectRequires } from '../formRequires/formRequires'
 import { buildDraftPayload } from '../persistence/persistence'
 import { buildNameIndex, mapFormStep, mapRows } from './exportForm.utils'
 
-// El JSON que se lleva el consumidor: todo lo que hace falta para dibujar y validar el formulario.
-// Es la frontera del proyecto, asi que lo que no salga de aca no existe para el aplicativo.
+// El JSON que se lleva el consumidor: lo que no salga de aca no existe para el aplicativo.
 
 export function buildFormExport(
   formSteps: FormStep[],
@@ -20,15 +19,14 @@ export function buildFormExport(
   introModalSteps: IntroModalStep[],
   formScript: string,
 ): FormExport {
-  // El indice cubre los dos lienzos a la vez porque los ids se traducen a nombres al salir:
-  // hacia afuera un campo se identifica por su nombre tecnico, nunca por su uuid.
+  // Indice de los dos lienzos: hacia afuera un campo se identifica por su nombre, nunca por su
+  // uuid.
   const allRows: CanvasRow[] = [
     ...formSteps.flatMap((step) => step.rows),
     ...introModalSteps.flatMap((step) => step.rows),
   ]
   const names: Map<string, string> = buildNameIndex(allRows)
-  // El compilador del script necesita saber que nombres existen para decidir que {{x}} es un campo
-  // y cual no existe. Se arma una vez y baja a cada paso.
+  // Los nombres existentes, para que el compilador decida que {{x}} es un campo; se arma una vez.
   const knownNames: Set<string> = new Set(names.values())
   const prelude: string = formScript.trim()
 
@@ -57,11 +55,30 @@ export function buildFormExport(
       formType: setupConfig.formType,
       version: '1.0.0',
       createdAt: new Date().toISOString(),
-      // Al final, porque se calcula sobre lo que ya quedo armado: juzga lo que viaja.
+      // Al final: juzga lo que de verdad viaja.
       requires: collectRequires(exportedSetup, formSchema),
     },
     setupConfig: exportedSetup,
     formSchema,
+  }
+}
+
+// El archivo que se descarga y el que se sube: el contrato mas la copia del borrador para reabrir el
+// proyecto (lo compilado no alcanza para reeditar). El simulador y la vista JSON no la traen.
+export function buildFormExportFile(
+  formSteps: FormStep[],
+  setupConfig: SetupConfig,
+  introModalSteps: IntroModalStep[],
+  formScript: string,
+): FormExportFile {
+  return {
+    ...buildFormExport(formSteps, setupConfig, introModalSteps, formScript),
+    builderDraft: buildDraftPayload({
+      formSteps,
+      introModal: { steps: introModalSteps },
+      formScript,
+      setupConfig,
+    }),
   }
 }
 
@@ -71,19 +88,12 @@ export function downloadFormExport(
   introModalSteps: IntroModalStep[],
   formScript: string,
 ): void {
-  // El archivo lleva, ademas del contrato, la copia del borrador con la que se vuelve a abrir el
-  // proyecto: lo compilado no alcanza para reeditar, porque las validaciones salen como texto
-  // Zod, los estilos fusionados y las comprobaciones apagadas no viajan. Va solo en la descarga:
-  // el simulador y la vista JSON leen buildFormExport, que no la trae.
-  const data: FormExportFile = {
-    ...buildFormExport(formSteps, setupConfig, introModalSteps, formScript),
-    builderDraft: buildDraftPayload({
-      formSteps,
-      introModal: { steps: introModalSteps },
-      formScript,
-      setupConfig,
-    }),
-  }
+  const data: FormExportFile = buildFormExportFile(
+    formSteps,
+    setupConfig,
+    introModalSteps,
+    formScript,
+  )
   const blob: Blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const anchor: HTMLAnchorElement = document.createElement('a')

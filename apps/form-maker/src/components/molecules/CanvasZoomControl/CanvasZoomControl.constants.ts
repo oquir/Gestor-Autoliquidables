@@ -1,5 +1,4 @@
-// Los saltos que ofrece el menu. Todos caen dentro de [ZOOM_MIN, ZOOM_MAX]: si alguno se saliera,
-// clampZoom lo recortaria y el menu mostraria un porcentaje que al elegirlo da otro.
+// Dentro de [ZOOM_MIN, ZOOM_MAX]: si no, clampZoom aplicaria otro porcentaje que el del menu.
 export const ZOOM_PRESETS: number[] = [0.5, 0.75, 1, 1.25, 1.5]
 
 export const ZOOM_TRIGGER_CLASSES: string =
@@ -8,4 +7,4 @@ export const ZOOM_TRIGGER_CLASSES: string =
 export const ZOOM_ITEM_CLASSES: string =
   'flex items-center justify-between gap-4 px-2.5 py-1.5 text-left text-xs text-fg-soft transition-colors hover:bg-surface-raised hover:cursor-pointer disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:cursor-not-allowed'
 
-export const ZOOM_SHORTCUT_CLASSES: string = 'text-[10px] tabular-nums text-fg-subtle'
+export const ZOOM_SHORTCUT_CLASSES: string = 'text-[10px] tabular-nums text-fg-muted'

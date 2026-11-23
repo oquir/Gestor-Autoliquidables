@@ -1,6 +1,6 @@
-// Organismos: secciones completas del builder. FormSimulator, preview/, PdfDesigner y pdf/ no
-// estan: se cargan con React.lazy y reexportarlos aca los meteria en el chunk inicial. Entre
-// organismos se importa por la ruta, no desde este indice.
+// Organismos. FormSimulator, preview/, PdfDesigner y pdf/ no estan: van con React.lazy y
+// reexportarlos los meteria en el chunk inicial.
+export * from './ActiveStepLabel'
 export * from './AppCrashScreen'
 export * from './Canvas'
 export * from './CanvasRow'
@@ -22,6 +22,7 @@ export * from './MoveToStepMenu'
 export * from './PayloadPreviewCanvas'
 export * from './PdfDesignerButton'
 export * from './PdfDesignerCrashScreen'
+export * from './PdfPreviewBlock'
 export * from './ProjectImportModal'
 export * from './RepeatableGroupBand'
 export * from './RightSidebar'
@@ -35,3 +36,4 @@ export * from './SimpleCalcModal'
 export * from './SimulatorButton'
 export * from './SimulatorCrashScreen'
 export * from './StepTitleEditor'
+export * from './UploadButton'

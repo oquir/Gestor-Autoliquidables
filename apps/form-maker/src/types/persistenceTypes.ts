@@ -16,9 +16,11 @@ export interface FieldRename {
   label: string
 }
 
-// "vacio" y "invalido" se separan porque no son lo mismo: no haber guardado nunca es normal, y un
-// borrador que no valida es algo que hay que borrar y contar. Antes los dos devolvian null.
+// vacio es normal; invalido hay que borrarlo y avisarlo.
 export type DraftLoad =
   | { status: 'empty' }
   | { status: 'invalid' }
   | { status: 'ok'; draft: DraftPayload; renamed: FieldRename[] }
+
+// Guardar el borrador no lanza: quien llama marca "Guardado" o avisa.
+export type DraftSaveResult = { ok: true } | { ok: false; error: string }

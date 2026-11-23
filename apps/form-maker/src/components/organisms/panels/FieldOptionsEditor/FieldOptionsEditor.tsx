@@ -36,8 +36,8 @@ export function FieldOptionsEditor({ field }: FieldOptionsEditorProps) {
       />
 
       <fieldset className="m-0 border-0 p-0">
-        {/* El rotulo de la seccion ya dice "Opciones": visible seria decirlo dos veces, pero el
-            fieldset necesita su legend para que el lector de pantalla agrupe las entradas. */}
+        {/* Legend oculto: el rotulo de la seccion ya lo dice, pero el lector de pantalla lo
+            necesita. */}
         <legend className="sr-only">Opciones</legend>
         <ul className="flex list-none flex-col gap-2">
           {options.map((option, index) => (
@@ -73,13 +73,13 @@ export function FieldOptionsEditor({ field }: FieldOptionsEditorProps) {
         <button
           type="button"
           onClick={() => addFieldOption(field.id)}
-          className="mt-2 text-xs font-medium text-brand-fg hover:cursor-pointer hover:text-brand-hover"
+          className="mt-2 text-xs font-medium text-brand-strong hover:cursor-pointer hover:underline"
         >
           + Agregar opción
         </button>
       </fieldset>
 
-      <p className="text-xs text-fg-subtle">
+      <p className="text-xs text-fg-muted">
         {getOptionsHint(field.type, Boolean(field.validations.required))}
       </p>
     </PanelSection>

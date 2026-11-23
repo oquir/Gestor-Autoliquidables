@@ -61,6 +61,7 @@ import {
   FILE_ATTR,
   FILE_COMMENT,
   MESSAGES,
+  PDF_DRAFT_FILE_SUFFIX,
   PDF_FILE_FORMAT_VERSION,
   PRINT_CSS,
   PRINT_FRAME_TIMEOUT_MS,
@@ -83,24 +84,21 @@ import {
   versionFromFileName,
 } from './pdfFile.utils'
 
-// El .html del PDF: lo genera para publicar y lo lee para abrir (docs/Pendientes-PDF.md §3.5). Es
-// la unica fuente del diseño: no hay un JSON aparte, y lo que hace falta para reabrirlo viaja en
-// atributos data-fm-*, que SelectPdf ignora.
-//
-// El generador pinta lo mismo que el lienzo: las mismas funciones de estilo (tableStyleMap,
-// cellStyleMap, documentStyleMap) y el mismo HTML libre, saneado y con sus etiquetas cerradas.
-// Solo tablas y bloques: ni scripts, ni flex, ni grid. Sin React ni store, y fuera de lib/index.ts:
-// solo lo usa el diseñador, que se carga con React.lazy.
+// El .html del PDF: se genera para subir, descargar o imprimir y se lee para abrir. Es la unica fuente del diseno; lo
+// que hace falta para reabrir viaja en data-fm-*, que SelectPdf ignora. Pinta lo mismo que el
+// lienzo con las mismas funciones. Fuera de lib/index.ts.
 
-export function pdfFileName(taxType: PdfTaxType, version: number): string {
-  return `${taxType}_v${version}.html`
+// version null: un diseno que nunca se subio.
+export function pdfFileName(taxType: PdfTaxType, version: number | null): string {
+  return version === null
+    ? `${taxType}_${PDF_DRAFT_FILE_SUFFIX}.html`
+    : `${taxType}_v${version}.html`
 }
 
-// renderVerticalText dibuja el PNG del texto vertical: necesita un <canvas>, que esta lib no toca
-// (lib/pdfVerticalText lo hace en el navegador). Sin el, el texto vertical sale con writing-mode.
+// renderVerticalText necesita un <canvas> (lo pone lib/pdfVerticalText); sin el, writing-mode.
 export function buildPdfHtml(
   design: PdfDesign,
-  version: number,
+  version: number | null,
   renderVerticalText: PdfVerticalTextRenderer = () => null,
 ): string {
   const ctx: PdfComponentContext = {
@@ -119,7 +117,7 @@ export function buildPdfHtml(
   const rootAttributes: string = attrs([
     [FILE_ATTR.design, String(PDF_FILE_FORMAT_VERSION)],
     [FILE_ATTR.tax, design.taxType],
-    [FILE_ATTR.version, String(version)],
+    [FILE_ATTR.version, version === null ? null : String(version)],
     [FILE_ATTR.font, design.fontFamily],
     [FILE_ATTR.fontSize, String(design.fontSize)],
     [FILE_ATTR.margins, `${top} ${right} ${bottom} ${left}`],
@@ -132,7 +130,7 @@ export function buildPdfHtml(
     '<html lang="es">',
     '<head>',
     '<meta charset="utf-8">',
-    `<title>${escapePdfText(taxTypeLabel(design.taxType))} v${version}</title>`,
+    `<title>${escapePdfText(taxTypeLabel(design.taxType))}${version === null ? '' : ` v${version}`}</title>`,
     `<style>\n${BASE_CSS}\n${pdfStyleSheet(design)}\n</style>`,
     '</head>',
     '<body>',
@@ -146,9 +144,8 @@ export function buildPdfHtml(
   ].join('\n')
 }
 
-// Un archivo FormMaker se reabre tal cual; cualquier otro .html es una plantilla vieja y entra entera
-// en la hoja 1 (§2.1, "Plantillas viejas al importar"). Un archivo de FormMaker de otro impuesto no
-// se abre: cada impuesto tiene su plantilla. Nunca lanza.
+// Un archivo FormMaker se reabre tal cual; otro .html entra entero en la hoja 1. Uno de otro
+// impuesto no se abre. Nunca lanza.
 export function readPdfFile(text: string, taxType: PdfTaxType, fileName: string = ''): PdfFileRead {
   const nodes: PdfHtmlNode[] = parsePdfHtml(sanitizePdfHtml(text))
   const warnings: string[] = UNSAFE_INPUT.test(text) ? [MESSAGES.unsafe] : []
@@ -162,8 +159,7 @@ export function readPdfFile(text: string, taxType: PdfTaxType, fileName: string 
     : readLegacyFile(nodes, taxType, nameVersion, warnings)
 }
 
-// De varios archivos, el que vale: el de N mas alta entre los que se pudieron leer (§3.5). -1 si
-// ninguno sirve. A igual N, el primero.
+// El de N mas alta entre los legibles; -1 si ninguno. A igual N, el primero.
 export function pickLatestPdfFile(reads: PdfFileRead[]): number {
   let best: number = -1
   reads.forEach((read, index) => {
@@ -186,8 +182,7 @@ export function downloadPdfHtml(html: string, fileName: string): void {
   URL.revokeObjectURL(url)
 }
 
-// Imprime el mismo .html que se publica, en un iframe oculto: Ctrl+P saca el PDF y no la app (lienzo
-// con zoom, barras y marcos de seleccion). Solo uno a la vez.
+// Imprime el mismo .html en un iframe oculto: Ctrl+P saca el PDF y no la app.
 let printFrame: HTMLIFrameElement | null = null
 
 export function printPdfHtml(html: string): void {
@@ -221,10 +216,7 @@ export function printPdfHtml(html: string): void {
   document.body.appendChild(frame)
 }
 
-// --- Generador ---
-
-// Cada hoja lleva su relleno arriba y abajo; desde la segunda, un salto de pagina antes (§2.1,
-// "Hojas"). Los lados son del contenedor y valen para todas.
+// Desde la segunda hoja, un salto de pagina antes; los lados son del contenedor.
 function writeSheet(
   sheet: PdfSheet,
   index: number,
@@ -282,8 +274,7 @@ function writeCell(cell: PdfCell, ctx: PdfComponentContext): string {
   const props: Record<string, unknown> = {}
   for (const key of CELL_PROP_KEYS) if (cell[key] !== undefined) props[key] = cell[key]
 
-  // Solo lo que la celda tiene propio: lo comun va en sus clases y en el <style>. El texto, que es lo
-  // mas frecuente, no se marca (el lector lo da por defecto).
+  // Solo lo propio de la celda; el texto, lo mas frecuente, no se marca.
   const className: string = pdfClassTokens(cell.className).join(' ')
   const opening: string = `<td${attrs([
     ['colspan', cell.colSpan > 1 ? String(cell.colSpan) : null],
@@ -298,8 +289,7 @@ function writeCell(cell: PdfCell, ctx: PdfComponentContext): string {
   return `${opening}${writeCellContent(cell.content, ctx)}</td>`
 }
 
-// Igual que el lienzo: una celda vacia lleva un espacio duro, o la fila se aplasta. El componente
-// pasa por el mismo saneo que el HTML libre: un src que no es seguro se cae ahi.
+// Una celda vacia lleva un espacio duro, como en el lienzo. El componente pasa por el saneo.
 function writeCellContent(content: PdfCellContent, ctx: PdfComponentContext): string {
   if (content.kind === 'table') return `\n${writeTable(content.table, ctx)}\n`
   if (content.kind === 'component') {
@@ -308,8 +298,6 @@ function writeCellContent(content: PdfCellContent, ctx: PdfComponentContext): st
   if (content.kind === 'html') return normalizePdfHtml(content.html) || '&nbsp;'
   return content.text === '' ? '&nbsp;' : escapePdfText(content.text)
 }
-
-// --- Lector de archivos de FormMaker ---
 
 function readFormMakerFile(
   root: PdfHtmlElement,
@@ -380,8 +368,7 @@ function readSheet(element: PdfHtmlElement, onStray: () => void): PdfSheet {
   return { id: uuidv4(), blocks }
 }
 
-// Lee filas y columnas como vengan (con o sin <tbody>) y deja la tabla sana con normalizeTable:
-// una celda agregada o borrada a mano se arregla igual que en el lienzo.
+// Filas y columnas como vengan (con o sin <tbody>); normalizeTable arregla lo editado a mano.
 function readTable(element: PdfHtmlElement, depth: number): PdfTable {
   const columns: PdfColumn[] = []
   const rows: PdfRow[] = []
@@ -443,8 +430,8 @@ function readCell(element: PdfHtmlElement, depth: number): PdfCell {
   return cell
 }
 
-// Lo que dice data-fm-cell, con una salida para lo editado a mano: una celda de texto que ahora trae
-// etiquetas pasa a HTML (no se pierden), y una tabla mas honda que el tope queda como HTML.
+// Salidas para lo editado a mano: texto con etiquetas pasa a HTML, y una tabla mas honda que el
+// tope queda como HTML.
 function readCellContent(element: PdfHtmlElement, depth: number): PdfCellContent {
   const kind: string | null = pdfHtmlAttribute(element, FILE_ATTR.cell)
 
@@ -471,9 +458,8 @@ function readCellContent(element: PdfHtmlElement, depth: number): PdfCellContent
   return { kind: 'text', text: text === ' ' ? '' : text }
 }
 
-// El tipo y la configuracion salen de los data-fm-* del elemento de afuera del componente; la imagen
-// (imagen y sello), del primer <img>, que es donde va el base64 una sola vez. Lo de adentro no se
-// lee: se vuelve a generar, asi que un cambio a mano dentro de un componente no sobrevive.
+// Tipo y configuracion de los data-fm-*; la imagen del primer <img>. Lo de adentro se regenera: un
+// cambio a mano ahi no sobrevive.
 function readComponent(cell: PdfHtmlElement): PdfComponent | null {
   const root: PdfHtmlElement | null = findElement(cell.children, (child) =>
     hasAttribute(child, PDF_COMPONENT_ATTRIBUTE.type),
@@ -506,8 +492,7 @@ function readFontSize(value: string | null, warnings: string[]): number {
   return PDF_DEFAULT_FONT_SIZE
 }
 
-// Las clases salen de data-fm-classes, no del <style> del <head>: ese lo vuelve a escribir el
-// generador, asi que un cambio a mano ahi no sobrevive (igual que el style de una celda).
+// Las clases salen de data-fm-classes; el <style> del <head> se regenera.
 function readClasses(value: string | null, warnings: string[]): PdfClass[] {
   if (!value) return []
   let raw: unknown
@@ -527,12 +512,8 @@ function readMargins(value: string | null): PdfMargins {
   return normalizeMargins({ top, right, bottom, left })
 }
 
-// --- Lector de plantillas viejas ---
-
-// Entra entera en la hoja 1, sin adivinar donde cortar: cada tabla de primer nivel es su bloque, y
-// lo que hay entre tablas, otro. Asi se puede partir en hojas bajando bloques (moveBlock pasa a la
-// hoja siguiente en el borde). Se pinta como venia, porque pasarla a tablas del editor cambiaria lo
-// que se ve: el CSS de sus clases perderia contra los estilos en linea del diseñador.
+// Entra entera en la hoja 1: cada tabla de primer nivel es un bloque, para partirla en hojas
+// bajando bloques. Se pinta como venia (pasarla a tablas del editor cambiaria lo que se ve).
 function readLegacyFile(
   nodes: PdfHtmlNode[],
   taxType: PdfTaxType,

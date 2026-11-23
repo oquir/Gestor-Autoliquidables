@@ -38,8 +38,7 @@ export function ValoresAnualesEditor() {
   const isCustom: boolean = usesCustomValores(valores)
   const cargadas: number = valores.custom?.length ?? 0
 
-  // El ano en curso es el que usan uvt() y smmlv() cuando no se les pasa ninguno, asi que es el
-  // unico que merece un aviso propio si falta.
+  // El ano en curso es el que usan uvt() y smmlv() sin argumento: es el unico que avisa si falta.
   const anioActual: number = new Date().getFullYear()
   const actual: ValorAnual | null = buscarValores(enUso, anioActual)
 
@@ -103,7 +102,7 @@ export function ValoresAnualesEditor() {
           )}
 
           <div className="max-h-40 overflow-y-auto">
-            <div className={`${ROW_CLASSES} font-semibold text-fg-subtle`}>
+            <div className={`${ROW_CLASSES} font-semibold text-fg-muted`}>
               <span>Año</span>
               <span className="text-right">UVT</span>
               <span className="text-right">SMMLV</span>

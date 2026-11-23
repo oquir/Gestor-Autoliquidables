@@ -1,2 +1,4 @@
-export const EXPORT_BUTTON_CLASSES: string =
-  'flex items-center gap-1.5 rounded-md bg-brand px-2.5 py-1 text-xs font-medium text-on-brand press hover:bg-brand-hover hover:cursor-pointer'
+import { ACTION_TIER_CLASSES } from '../../../constants'
+
+// Terciario: la otra cara de Abrir (el mismo archivo), no una accion principal.
+export const EXPORT_BUTTON_CLASSES: string = ACTION_TIER_CLASSES.tertiary.compact

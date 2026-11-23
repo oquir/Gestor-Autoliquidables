@@ -1,14 +1,12 @@
 import { PDF_CANVAS_CLASS as C } from '../../../../constants'
 
-// La hoja de estilos del shadow root del lienzo. Los tokens de la app (--color-brand…) si cruzan al
-// shadow root, porque las variables CSS se heredan; las clases de Tailwind no. Cada var() trae su
-// color de respaldo por si el token cambia de nombre. Lo que dibuja la edicion (seleccion, hover,
-// guias) usa sombras y outlines, que no ocupan espacio: el contenido mide lo mismo que en el PDF.
-// El padding de abajo (96px) deja la leyenda de la ultima hoja por encima de la barra flotante.
-//
-// Modo de bajo rendimiento: la regla global .low-performance de index.css no cruza el shadow root,
-// y :host-context no existe en Firefox ni Safari. Por eso PdfCanvas pone data-low-performance en
-// el .doc y la ultima regla de abajo apaga las animaciones y transiciones de las hojas.
+// Estilos del shadow root del lienzo: los tokens (var) cruzan, las clases de Tailwind no. La
+// edicion usa sombras y outlines, que no ocupan espacio. Bajo rendimiento: .low-performance no
+// cruza el shadow root y :host-context no existe en Firefox ni Safari, asi que se usa
+// data-low-performance en .doc. El papel (data-paper en .doc) es solo vista: sepia tine la hoja y
+// oscuro invierte el contenido; el .html (buildPdfHtml) no los conoce. El filtro va en .content y no
+// en .paper: las guias, el aviso de hoja vacia y la leyenda quedan fuera. hue-rotate(180deg) devuelve
+// cada color a su tono (un rojo sigue rojo y solo cambia su claridad): invert solo seria un negativo.
 export const CANVAS_CSS: string = `
 @keyframes pdf-sheet-in { from { opacity: 0; translate: 0 12px; } }
 @keyframes pdf-select-in { from { box-shadow: inset 0 0 0 4px var(--color-brand, #f97316); } }
@@ -22,7 +20,7 @@ export const CANVAS_CSS: string = `
 .${C.content}.${C.extra} { outline: 1px dashed rgba(249,115,22,.6); }
 .${C.content}.${C.overflow} { outline: 2px solid var(--color-danger, #dc2626); }
 .${C.empty} { position: absolute; inset: 0; margin: 0; display: flex; align-items: center; justify-content: center; font: 13px system-ui, sans-serif; color: #94a3b8; pointer-events: none; }
-.${C.caption} { margin: 0; font: 11px/1.4 system-ui, sans-serif; color: var(--color-fg-subtle, #64748b); font-variant-numeric: tabular-nums; }
+.${C.caption} { margin: 0; font: 11px/1.4 system-ui, sans-serif; color: var(--color-fg-muted, #64748b); font-variant-numeric: tabular-nums; }
 .${C.warning} { color: var(--color-danger, #dc2626); font-weight: 600; }
 .${C.cell} { cursor: pointer; }
 .${C.cell}:hover { box-shadow: inset 0 0 0 1px rgba(249,115,22,.45); }
@@ -30,7 +28,11 @@ export const CANVAS_CSS: string = `
 .${C.html} { cursor: pointer; min-height: 14px; }
 .${C.html}:empty::before { content: 'Bloque HTML vacío'; color: #94a3b8; font: italic 12px system-ui, sans-serif; }
 .${C.html}.${C.selected} { outline: 2px solid var(--color-brand, #f97316); outline-offset: 1px; transition: outline-color 120ms ease-out; }
-.${C.variable} { background: rgba(249,115,22,.14); border-radius: 2px; }
+.${C.variable} { background: rgba(59,130,246,.16); border-radius: 2px; }
+.${C.doc}[data-paper="sepia"] .${C.paper} { background: #f4ecd8; }
+.${C.doc}[data-paper="sepia"] .${C.content} { mix-blend-mode: multiply; }
+.${C.doc}[data-paper="dark"] .${C.paper} { background: #121212; }
+.${C.doc}[data-paper="dark"] .${C.content} { filter: invert(1) hue-rotate(180deg); }
 .${C.doc}[data-tool="hand"] { pointer-events: none; }
 .${C.doc}[data-tool="select"] { user-select: none; -webkit-user-select: none; }
 .${C.doc}[data-tool="select"] .${C.cell}, .${C.doc}[data-tool="select"] .${C.html} { cursor: cell; }

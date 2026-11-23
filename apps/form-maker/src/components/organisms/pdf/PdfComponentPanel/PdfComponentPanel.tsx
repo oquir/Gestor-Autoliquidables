@@ -17,9 +17,6 @@ import { PdfTextField } from '../PdfTextField'
 import type { PdfComponentPanelProps } from './PdfComponentPanel.types'
 import { DIRECTIONS, DOCUMENT_FONT, HAS_VARIABLE } from './PdfComponentPanel.constants'
 
-// El componente de la celda: arriba cual (cambiarlo empieza el nuevo con lo de siempre; Ctrl+Z
-// devuelve el anterior), abajo lo suyo. Lo que llena el back (codigo de barras, QR) solo pide el
-// nombre de la variable; en el lienzo se ve una muestra del mismo tamaño.
 export function PdfComponentPanel({ cellId, component }: PdfComponentPanelProps) {
   const setCellComponent = usePdfDesignStore((state) => state.setCellComponent)
   const update = (next: PdfComponent): void => setCellComponent(cellId, next)
@@ -73,7 +70,7 @@ export function PdfComponentPanel({ cellId, component }: PdfComponentPanelProps)
               onChange={(height) => update(withOptional(component, 'height', height))}
             />
           </div>
-          <p className="text-[11px] text-fg-subtle">
+          <p className="text-[11px] text-fg-muted">
             Con una sola medida, la otra sale de la proporción de la imagen.
           </p>
           <PdfTextField
@@ -158,7 +155,7 @@ export function PdfComponentPanel({ cellId, component }: PdfComponentPanelProps)
               N
             </button>
           </div>
-          <p className="text-[11px] text-fg-subtle">
+          <p className="text-[11px] text-fg-muted">
             Sale como imagen PNG, porque el convertidor del back no pinta bien el texto girado. El
             mismo PNG se ve en la hoja.
           </p>
@@ -223,7 +220,7 @@ export function PdfComponentPanel({ cellId, component }: PdfComponentPanelProps)
               onChange={(height) => height && update({ ...component, height })}
             />
           </div>
-          <p className="text-[11px] text-fg-subtle">
+          <p className="text-[11px] text-fg-muted">
             El back arma el código (GS1-128) y pone su imagen en esa variable. Se puede achatar a lo
             alto; a lo ancho, mejor no: se lee a lo ancho.
           </p>
@@ -248,7 +245,7 @@ export function PdfComponentPanel({ cellId, component }: PdfComponentPanelProps)
             suffix="px"
             onChange={(size) => size && update({ ...component, size })}
           />
-          <p className="text-[11px] text-fg-subtle">
+          <p className="text-[11px] text-fg-muted">
             Qué codifica lo define el back con cada municipio; aquí solo se reserva el lugar.
           </p>
         </>
@@ -330,8 +327,7 @@ export function PdfComponentPanel({ cellId, component }: PdfComponentPanelProps)
   )
 }
 
-// Un valor opcional del componente: undefined borra la clave, para que el JSON del .html no lleve
-// "width": null ni una clave vacia.
+// undefined borra la clave: el JSON del .html no lleva nulls ni claves vacias.
 function withOptional<T extends PdfComponent, K extends keyof T>(
   component: T,
   key: K,

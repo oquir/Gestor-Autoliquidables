@@ -6,8 +6,7 @@ import { toPxAmount } from './PxInput.utils'
 export function PxInput({ id, label, value, onChange }: PxInputProps) {
   const amount: string | null = toPxAmount(value)
 
-  // Con otra unidad se edita como texto libre: el sufijo fijo diria "px" al lado de un "1rem" y el
-  // numero de al lado seria mentira.
+  // Con otra unidad se edita como texto libre: el sufijo px mentiria.
   if (amount === null) {
     return (
       <div>
@@ -29,7 +28,7 @@ export function PxInput({ id, label, value, onChange }: PxInputProps) {
           onChange={(event) => onChange(event.target.value === '' ? '' : `${event.target.value}px`)}
           className="w-full min-w-0 rounded-md bg-transparent px-2.5 py-1.5 text-sm text-slate-700 outline-none dark:text-neutral-200"
         />
-        <span className="shrink-0 text-xs text-fg-subtle">px</span>
+        <span className="shrink-0 text-xs text-fg-muted">px</span>
       </div>
     </div>
   )

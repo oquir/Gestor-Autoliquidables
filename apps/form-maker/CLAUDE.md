@@ -10,12 +10,15 @@ Guidance for Claude Code in this app (FormMaker, formerly "Form Orchestrator"): 
 - `docs/Dominio-ICA.md` — **read before working on the `industria_comercio`, `retencion_industria_comercio` or `autorretencion` templates, renglones, scripts, sanctions or deadlines.** ⏳ marks data that expires (UVT, bases, deadlines, rates): re-verify only those.
 - `docs/Pendientes-PDF.md` — **read before any work on a declaration's PDF** ("Diseñar PDF", its templates, the `{Variable}` placeholders). Tick items off there as they land (`[x]`, strikethrough, date, commit).
 - `docs/Plan-PDF-UX-P1.md` / `docs/Plan-PDF-UX-P2.md` (Spanish) — fix plans from the 2026-11-19 UI critique, **PDF designer only** (not the form builder). Read before touching the designer's UI; tick items there.
+- `docs/Auditoria-React.md` (Spanish) — the 2026-11-21 React render/state audit: prioritized findings (A real problems, B low, O opportunities to do only with Profiler evidence) and its three-phase fix plan. Read before touching re-renders, store helpers or any item it lists; tick items there.
+- `docs/Plan-Form-UX-P1.md` / `docs/Plan-Form-UX-P2.md` (Spanish) — fix plans from the 2026-11-20 UI critique of the **form editor** (canvas, both panels, floating bar), with the user's decisions (a click on a field does NOT switch the left panel; a palette click adds the field; the palette goes all-Spanish). Read before touching the editor's UI; tick items there.
 
 ## Where to read (section in `docs/Decisiones.md`)
 
 | Area                                                                                     | Section                                                                    |
 | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | Right panel, collapsed chip, tabs, zoom control                                          | `The right panel (RightSidebar)`                                           |
+| PDF preview image at the bottom of Proyecto (`PdfPreviewBlock`, `lib/pdfThumbnail`)      | `The right panel (RightSidebar)` → `The PDF preview`                       |
 | Crash screens                                                                            | `Render errors (ErrorBoundary)`                                            |
 | Hidden steps                                                                             | `Hidden steps (step.hidden)`                                               |
 | Ctrl+←/→                                                                                 | `Step navigation shortcut`                                                 |
@@ -41,12 +44,16 @@ Guidance for Claude Code in this app (FormMaker, formerly "Form Orchestrator"): 
 | `validations.overrides`, `visibleWhen`/`enableWhen`                                      | `Conditional validations`, `Conditions`                                    |
 | Open an exported file                                                                    | `Opening an exported form (builderDraft)`                                  |
 | Export review                                                                            | `Export review (diagnoseForm)`                                             |
+| Button hierarchy (primary/secondary/tertiary), action row, chip order                    | `Button hierarchy (actionTiers)`                                           |
+| Subir (upload, fake request), toasts in the builder                                      | `Subir (upload to the API)`                                                |
 | `projectMeta.requires`                                                                   | `What a form requires`                                                     |
 | Pieces / persistence / output                                                            | `Architecture` → `Pieces`                                                  |
 
 ## Known gaps
 
 - **The consumer (`FrontAutoliquidable`) has drifted from the builder silently**: it copied the runtime on 2026-08-26 and lacks `fieldDate`, `dateFormat`, `dateBound`, `fieldAffix`, `fieldContact` (and drops `datalist` suggestions). The ICA template already uses them. Plan: port the modules; the export already declares `projectMeta.requires`, the consumer must refuse forms asking for words it lacks (both go together). Sharing the runtime as a package is postponed by the user. `pnpm verify` in the consumer runs the real JSON through its runtime.
+- **The consumer must also stack rows on a narrow form**: the simulator does it under 40rem of form width (container query, see `Simulador (FormSimulator)`); the JSON doesn't carry it, so `FrontAutoliquidable` has to copy the rule by hand.
+- **Responsive scope**: the form editor and the PDF designer go down to 1280×720 and no further — phones, tablets and touch are the last item of all (the user's call, 2026-11-20). The canvas squashing fields in proportion (the narrow DV) is accepted as is. Only the simulator targets phones.
 - **No test runner yet.** Vitest planned for the end of development, stable core only (number/date rules, a golden test of the ICA template through `resolveRuntime`, draft migrations). Until then: throwaway `pnpm exec tsx` scripts in the scratchpad.
 - `logic.script` exports **compiled JS**, run by the consumer with `new Function` — the trust boundary (a JSON from someone else = code execution).
 - Zod validates _shape_, not coherence (`colSpan: -999`, a `dataSource` on a `text` field pass).
@@ -67,9 +74,12 @@ Guidance for Claude Code in this app (FormMaker, formerly "Form Orchestrator"): 
 - **Field refs are `{{campo}}`**; `fieldRefText(name)` is the one place that writes the syntax. An unknown `{{x}}` is an error. Never move rule logic (sanción, intereses) out of `logic.script` into code or the prelude.
 - **Never in the draft or export**: the simulator banks (catalogs, fechas, UVT), the PDF design (own `localStorage` key per tax), `canvasZoom`, `canvasTool`, panel state.
 - **Never store rich text/PDF HTML as raw HTML**; the serializer/sanitizer is the barrier, `safeHref` runs at insert, serialize and draft load.
-- **Equality for undo is `sameDocument`** — selection, zoom, tool and drag state never create a history step. Edits that change nothing must return the same reference.
+- **The `DndContext` needs `onDragCancel` → `resetDragState`**: dnd-kit cancels on Escape, `pointercancel`, tab switch and resize and then never calls `onDragEnd`; without it the drag state and the window listeners survive the drag.
+- **Save the draft through `saveDraftOrWarn`** (`lib/draftSave`), never `saveDraft` + `markSaved` by hand: `saveDraft` returns ok/error (full `localStorage`), and only `saveDraftOrWarn` marks "Guardado" or shows the error toast.
+- **Equality for undo is `sameDocument`** — selection, zoom, tool and drag state never create a history step. Edits that change nothing must return the same reference: `mapFieldEverywhere`/`mapRowEverywhere` keep every untouched step and row, so an updater must return the **same** object when nothing changes (`patchChanges`).
 - **Rounding/negatives/decimals change the value, not just display**; the formatted text never leaves the input (state holds a real `number`).
-- Nothing in the collapsed right chip's container may set `transform`/`filter`/`backdrop-filter`/`will-change` (breaks `ModalShell`).
+- Nothing in the collapsed right chip's container may set `transform`/`filter`/`backdrop-filter`/`will-change`/`container-type` (breaks `ModalShell`). That's why the floating bar's `@container` lives in its own layer inside `CanvasToolbar`.
+- **Action buttons take their look from `constants/actionTiers`** (`ACTION_TIER_CLASSES`): primary / secondary / tertiary / quiet. The only filled orange is Subir; don't hand-write a new border or fill for a button.
 - Every UI hint uses `atoms/Tooltip`, never native `title=` (handles dnd-kit owns are the exception). Every new surface needs `dark:` variants.
 
 ## Commit conventions
@@ -83,6 +93,8 @@ Guidance for Claude Code in this app (FormMaker, formerly "Form Orchestrator"): 
 
 Package manager is **pnpm** (never npm/yarn/bun).
 
+- **A dependency only the lazy chunks import goes in `optimizeDeps.include`** (`vite.config.ts`: `@codemirror/*`, `@lezer/highlight`; `sonner` left it when the builder started using it). Without it, the first open of the Lógica tab failed in dev with "Failed to fetch dynamically imported module" (504 Outdated Optimize Dep). **Never run `vite --force` while a dev server is up**: it deletes `node_modules/.vite` before binding the port, under the live server.
+
 - `pnpm dev` / `pnpm build` (typecheck `tsc -b` + build; may exceed the 2-min tool timeout, exit 143 = harness kill, re-run longer) / `pnpm lint` / `pnpm format` / `pnpm preview`
 - `pnpm exec tsx <script>.ts` — throwaway verification. **Run from the project root**, never from inside the scratchpad (pnpm 11 would try to `pnpm install` over the junctioned `node_modules`). Scratchpad needs `package.json` `{"type":"module"}`, absolute imports as `file:///C:/...`, a `node_modules` junction, and a `localStorage` stub installed _before_ a dynamic `import()` of the store.
 - ESLint + Prettier are shared with the dashboard at the monorepo root (2 spaces, single quotes, no semicolons, 100 cols). `reicon-react` is pinned to exact `1.1.2`. `pnpm-workspace.yaml` carries `allowBuilds`.
@@ -91,7 +103,7 @@ Package manager is **pnpm** (never npm/yarn/bun).
 
 - Atomic design: `src/components/atoms|molecules|organisms/` + `layout/`; panels in `organisms/panels/`. Each component/hook gets **its own folder** with co-located `X.tsx`/`X.types.ts`/`X.constants.ts`/`X.utils.ts` (only what's needed) and an `index.ts` (`export * from './X'`). Hooks `src/hooks/useX/useX.ts`; libs `src/lib/<name>/<name>.ts`.
 - Import a component by its folder; across levels go through the level `index.ts`, **within a level import by folder, never the level index** (cycle). No upward imports (atom → molecule).
-- `hooks/`, `constants/`, `types/`, `lib/`, `store/` have an `index.ts` too; code outside imports through it. **Left out of the indices on purpose** (imported by folder, from behind the lazy boundary): `useFormPreview`, `usePreviewNavigation`, `usePreviewSearchSelect`, `usePdfDesignAutosave`, `usePdfDesignerShortcuts`, `usePdfFile`, `usePdfImageCheck`, `usePdfOverflowToast`; `molecules/Toaster` (sonner, only the PDF designer mounts it); libs `catalogFill`, `formRuntime`, `mockCatalog`, `pdf*`, `runtimeCondition|Derived|Payload|Validation`, `scriptDates`, `scriptRuntime`, `scriptValores`, `zodHydrate`; `store/pdfDesignStore.ts`, `banksSlice`. Libs import each other by folder, never through `lib/index.ts`.
+- `hooks/`, `constants/`, `types/`, `lib/`, `store/` have an `index.ts` too; code outside imports through it. **Left out of the indices on purpose** (imported by folder, from behind the lazy boundary): `useFormPreview`, `usePreviewNavigation`, `usePreviewSearchSelect`, `usePdfDesignAutosave`, `usePdfDesignerShortcuts`, `usePdfFile`, `usePdfImageCheck`, `usePdfImport`, `usePdfOverflowToast`; libs `catalogFill`, `formRuntime`, `mockCatalog`, `pdf*`, `runtimeCondition|Derived|Payload|Validation`, `scriptDates`, `scriptRuntime`, `scriptValores`, `zodHydrate`; `store/pdfDesignStore.ts`, `banksSlice`. Libs import each other by folder, never through `lib/index.ts`.
 - A co-located `X.types.ts`/`X.constants.ts` is private to its folder; once something outside imports it, it moves to `src/types/` / `src/constants/` (whole file, not split). A new file there needs its line in the index.
 - `X.ts` is the module's public API — helpers/constants/types go in co-located files.
 

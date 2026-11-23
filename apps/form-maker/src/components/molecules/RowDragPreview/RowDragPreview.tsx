@@ -2,19 +2,14 @@ import { FieldTypeBadge } from '../../atoms'
 import { FieldPreviewControl } from '../FieldPreviewControl'
 import type { RowDragPreviewProps } from './RowDragPreview.types'
 
-// Replica de la fila, no un chip: se dibuja al ancho real que se midio al empezar el arrastre para
-// que uno vea que lleva la seccion entera. Es una copia simplificada a proposito -sin tirador, sin
-// menu de columnas, sin redimensionar- porque nada de eso se puede usar mientras vuela.
 export function RowDragPreview({ row, width, scale }: RowDragPreviewProps) {
   return (
     <div
       style={{
         width,
         gridTemplateColumns: `repeat(${row.columns}, minmax(0, 1fr))`,
-        // El overlay vive fuera del contenedor escalado, asi que la replica se escala sola. Va con
-        // el ancho de maquetacion que midio measureRow: ancho visual y escala a la vez seria
-        // aplicar el zoom dos veces. `rotate-1` no estorba, Tailwind v4 lo compila a la propiedad
-        // `rotate` suelta y no a `transform`.
+        // El overlay vive fuera del contenedor escalado: la replica se escala sola, con el ancho de
+        // maquetacion de measureRow (con el visual el zoom se aplicaria dos veces).
         transform: scale === 1 ? undefined : `scale(${scale})`,
         transformOrigin: 'top left',
       }}
@@ -23,7 +18,7 @@ export function RowDragPreview({ row, width, scale }: RowDragPreviewProps) {
       {row.fields.length === 0 && (
         <div
           style={{ gridColumn: `span ${row.columns} / span ${row.columns}` }}
-          className="flex h-16 items-center justify-center text-sm text-slate-300 dark:text-neutral-600"
+          className="flex h-16 items-center justify-center text-sm text-fg-muted"
         >
           Fila vacía
         </div>

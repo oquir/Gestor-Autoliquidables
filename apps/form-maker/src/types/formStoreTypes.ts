@@ -36,13 +36,11 @@ export interface OptionsSetup {
 export interface FormState extends BanksSlice {
   formSteps: FormStep[]
   introModal: IntroModalState
-  // Preludio: funciones y constantes que todos los scripts de campo ven en ambito. No lee campos
-  // -- {{campo}} no vale aca -- porque fuera de todo ambito, y sobre todo dentro de un grupo
-  // repetible, esa pregunta no tiene una respuesta unica.
+  // Preludio compartido por todos los scripts. Sin {{campo}}: fuera de un ambito (y en un grupo
+  // repetible) no tiene respuesta unica.
   formScript: string
   activeCanvas: CanvasTarget
-  // Siempre dentro del paso activo: cambiar de paso la vacia. Que haya exactamente uno -- lo unico
-  // que los paneles saben editar -- se deduce con getSelectedFieldId, nunca se guarda aparte.
+  // Dentro del paso activo; cambiar de paso la vacia. El campo unico sale de getSelectedFieldId.
   selectedFieldIds: string[]
   canvasTool: CanvasTool
   setupConfig: SetupConfig
@@ -55,10 +53,11 @@ export interface FormState extends BanksSlice {
   sidebarTab: SidebarTab
   rightSidebarTab: RightSidebarTab
   isDarkMode: boolean
-  // Modo de bajo rendimiento: sin animaciones ni transiciones, la rueda del zoom redibuja una vez
-  // por cuadro y la fila se arrastra como una ficha. Ver usePerformanceClass.
+  // Ver usePerformanceClass.
   isLowPerformance: boolean
   lastSavedAt: string | null
+  // Una subida a la API en curso: bloquea otra. Vive aca porque el panel y el chip se turnan.
+  isUploadingForm: boolean
   dragPlacement: DragPlacement | null
   rowDropTarget: RowDropTarget | null
   rowDrag: RowDragState | null
@@ -83,6 +82,7 @@ export interface FormState extends BanksSlice {
   toggleDarkMode: () => void
   toggleLowPerformance: () => void
   markSaved: () => void
+  setUploadingForm: (uploading: boolean) => void
   selectFieldAndEdit: (fieldId: string, tab: SidebarTab) => void
   completeSetup: (config: {
     formType: FormType
@@ -111,12 +111,13 @@ export interface FormState extends BanksSlice {
   updateRowColumns: (rowId: string, columns: number) => void
   updateRowStyles: (rowId: string, updates: Partial<RowStyles>) => void
   addFieldToRow: (rowId: string, fieldType: FieldTypeDef, requested?: FieldPlacement) => void
+  appendFieldToActiveCanvas: (fieldType: FieldTypeDef) => void
   removeFields: (fieldIds: string[]) => void
   moveField: (fieldId: string, targetRowId: string, requested?: FieldPlacement) => void
   selectField: (fieldId: string | null) => void
   toggleFieldSelection: (fieldId: string) => void
   setFieldSelection: (fieldIds: string[]) => void
-  // Deshacer y rehacer sobre el historial de zundo (useFormStore.temporal). Ver lib/history.
+  // Sobre useFormStore.temporal (zundo). Ver lib/history.
   undo: () => void
   redo: () => void
   updateField: (
@@ -161,7 +162,7 @@ export interface FormState extends BanksSlice {
   setFieldAffix: (fieldId: string, side: AffixSide, text: string) => void
   setFieldPhoneKind: (fieldId: string, kind: PhoneKind) => void
   setFieldPlaceholder: (fieldId: string, text: string) => void
-  // El texto del panel, una sugerencia por linea.
+  // Una sugerencia por linea.
   setFieldSuggestions: (fieldId: string, text: string) => void
   setFieldInlineOptions: (fieldId: string, inline: boolean) => void
   setFieldDateRange: (fieldId: string, range: boolean) => void

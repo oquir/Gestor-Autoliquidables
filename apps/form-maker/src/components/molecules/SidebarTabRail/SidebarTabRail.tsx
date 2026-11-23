@@ -1,14 +1,21 @@
-﻿import { Moon, Sun } from 'reicon-react'
+﻿import { Fragment } from 'react'
+import { Moon, Sun } from 'reicon-react'
 import { Tooltip } from '../../atoms'
+import {
+  RAIL_DIVIDER_CLASSES,
+  RAIL_TAB_ACTIVE_CLASSES,
+  RAIL_TAB_BASE_CLASSES,
+  RAIL_TAB_INACTIVE_CLASSES,
+} from './SidebarTabRail.constants'
 import type { SidebarTabRailProps } from './SidebarTabRail.types'
 
 export function SidebarTabRail({
   tabs,
+  dividerBefore = [],
   activeTab,
   onSelect,
   isDarkMode,
   onToggleDarkMode,
-  isCollapsed,
 }: SidebarTabRailProps) {
   const themeLabel: string = isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'
 
@@ -17,25 +24,30 @@ export function SidebarTabRail({
       {tabs.map((tab) => {
         const Icon = tab.icon
         return (
-          // Con el panel abierto el encabezado ya nombra la pestana: el globo solo sale contraido.
-          <Tooltip key={tab.id} content={tab.label} placement="right" disabled={!isCollapsed}>
-            <button
-              type="button"
-              onClick={() => onSelect(tab.id)}
-              aria-label={tab.label}
-              className={`flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:cursor-pointer ${
-                activeTab === tab.id
-                  ? 'bg-brand text-on-brand'
-                  : 'text-slate-500 hover:bg-slate-200 dark:text-neutral-400 dark:hover:bg-neutral-800'
-              }`}
-            >
-              <Icon size={20} />
-            </button>
-          </Tooltip>
+          <Fragment key={tab.id}>
+            {dividerBefore.includes(tab.id) && (
+              <span aria-hidden className={RAIL_DIVIDER_CLASSES} />
+            )}
+            {/* Tooltip siempre: con el panel abierto solo la pestana activa tiene nombre
+                visible. */}
+            <Tooltip content={tab.label} placement="right">
+              <button
+                type="button"
+                onClick={() => onSelect(tab.id)}
+                aria-label={tab.label}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
+                className={`${RAIL_TAB_BASE_CLASSES} ${
+                  activeTab === tab.id ? RAIL_TAB_ACTIVE_CLASSES : RAIL_TAB_INACTIVE_CLASSES
+                }`}
+              >
+                <Icon size={20} />
+              </button>
+            </Tooltip>
+          </Fragment>
         )
       })}
 
-      <Tooltip content={themeLabel} placement="right" disabled={!isCollapsed}>
+      <Tooltip content={themeLabel} placement="right">
         <button
           type="button"
           onClick={onToggleDarkMode}

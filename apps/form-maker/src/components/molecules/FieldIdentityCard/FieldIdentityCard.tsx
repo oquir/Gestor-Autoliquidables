@@ -2,9 +2,6 @@ import { FIELD_TYPE_ICONS } from '../../../constants'
 import { FIELD_TYPES } from '../../../constants'
 import type { FieldIdentityCardProps } from './FieldIdentityCard.types'
 
-// Ancla del panel: contra que campo se esta trabajando. El encabezado ya dice el nombre tecnico,
-// asi que aca va la otra mitad -el texto que ve el contribuyente y el tipo-, y por eso absorbe el
-// campo "Tipo" que antes era una entrada deshabilitada sin nada que editar.
 export function FieldIdentityCard({ field, linkedLabel }: FieldIdentityCardProps) {
   const Icon = FIELD_TYPE_ICONS[field.type]
   const typeLabel: string =
@@ -21,9 +18,9 @@ export function FieldIdentityCard({ field, linkedLabel }: FieldIdentityCardProps
 
       <div className="min-w-0 flex-1">
         <p className="wrap-break-word text-sm font-medium leading-snug text-fg-strong">
-          {visibleLabel || <span className="italic text-fg-subtle">Sin texto</span>}
+          {visibleLabel || <span className="italic text-fg-muted">Sin texto</span>}
         </p>
-        <p className="mt-0.5 text-[11px] text-fg-muted">
+        <p className="mt-0.5 text-[11px] text-fg-soft">
           {typeLabel}
           {linkedLabel && ' · el texto lo aporta una etiqueta ligada'}
         </p>

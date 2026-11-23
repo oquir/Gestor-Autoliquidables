@@ -18,26 +18,32 @@ import type {
 import { NO_HIGHLIGHTS, NO_MATCHES, NO_SEARCH_INDEX } from './useJsonCode.constants'
 import type { UseJsonCodeResult } from './useJsonCode.types'
 
-// Estado de la vista JSON: que contenedores estan plegados y el buscador propio. Lo que necesita el
-// DOM -que filas se pintan, llevar la vista hasta una linea- vive en useJsonViewport.
-//
-// El buscador existe porque la vista solo pinta las lineas que se ven: el Ctrl+F del navegador no
-// encuentra lo que no esta en el DOM. Por eso Ctrl+F abre este y no el del navegador. Busca sobre
-// el JSON entero, tambien dentro de lo plegado, y saltar a una coincidencia escondida abre lo que la
-// tapa. El boton Copiar de las vistas no pasa por aca: copia el texto completo, no lo pintado.
+// Estado de la vista JSON: plegados y buscador propio (lo del DOM vive en useJsonViewport). El
+// buscador existe porque solo se pintan las lineas visibles y el Ctrl+F del navegador no las
+// encuentra; busca en todo el JSON y abre lo plegado. Copiar no pasa por aca.
 export function useJsonCode(json: string, captureFind: boolean): UseJsonCodeResult {
   const rootRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const model: JsonModel = useMemo(() => buildJsonModel(json), [json])
   const [collapsed, setCollapsed] = useState<Set<number>>(() => new Set())
+  // Lo plegado se guarda por numero de linea: si el JSON gana o pierde lineas sin salir de la vista
+  // (Ctrl+Z, una opcion nueva), esos numeros caen en otros nodos, asi que se abre todo. Durante el
+  // render, como pide React para estado que sigue a una prop: un efecto pintaria antes un cuadro
+  // con los plegados corridos.
+  const lineCount: number = model.lines.length
+  const [foldedLineCount, setFoldedLineCount] = useState<number>(lineCount)
+  if (foldedLineCount !== lineCount) {
+    setFoldedLineCount(lineCount)
+    setCollapsed((prev) => (prev.size === 0 ? prev : new Set()))
+  }
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [query, setQueryState] = useState<string>('')
   const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [reveal, setReveal] = useState<JsonRevealRequest | null>(null)
   const [focusRequest, setFocusRequest] = useState<number>(0)
 
-  // El indice plegado cuesta un recorrido del JSON entero: solo se arma con el buscador abierto, y
-  // se rehace con cada cambio del JSON para que las coincidencias sigan en vivo como la vista.
+  // El indice cuesta un recorrido del JSON: solo con el buscador abierto, y se rehace con cada
+  // cambio.
   const searchIndex: string[] = useMemo(
     () => (isOpen ? buildJsonSearchIndex(model) : NO_SEARCH_INDEX),
     [isOpen, model],
@@ -72,8 +78,7 @@ export function useJsonCode(json: string, captureFind: boolean): UseJsonCodeResu
     })
   }, [])
 
-  // Las tres escrituras van en el mismo evento, asi el render que sigue ya tiene las filas abiertas
-  // y revealIndex apunta a la fila correcta.
+  // Las tres escrituras en el mismo evento: el render siguiente ya tiene las filas abiertas.
   function goTo(list: JsonMatch[], index: number): void {
     const match: JsonMatch | undefined = list[index]
     setCurrentIndex(index)

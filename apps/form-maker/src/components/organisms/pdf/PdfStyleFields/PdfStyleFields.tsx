@@ -1,19 +1,20 @@
 import { PANEL_BUTTON_CLASSES, PANEL_BUTTON_ON_CLASSES } from '../../../../constants'
 import { ALL_BORDERS } from '../../../../lib/pdfTable'
 import type { PdfCellBorders } from '../../../../types'
-import { ColorPickerField, PanelSection } from '../../../molecules'
+import { ColorPickerField } from '../../../molecules'
 import { PdfNumberField } from '../PdfNumberField'
 import type { PdfStyleFieldsProps } from './PdfStyleFields.types'
 import {
   BORDER_SIDES,
+  GROUP_CLASSES,
+  GROUP_TITLE_CLASSES,
   HORIZONTAL_ALIGNS,
   NO_BORDERS,
   VERTICAL_ALIGNS,
 } from './PdfStyleFields.constants'
 
-// Letra, alineacion, bordes y fondo: lo mismo para una celda que para una clase. Cada boton muestra
-// lo que de verdad tiene (lo propio o, si no, lo de sus clases), y elegir lo que ya da la clase
-// borra lo propio en vez de repetirlo: asi el .html no vuelve a llenarse de estilos sueltos.
+// Lo mismo para una celda que para una clase. Cada boton muestra lo que la celda tiene de verdad
+// (propio o de sus clases), y elegir lo que ya da la clase borra lo propio.
 export function PdfStyleFields({
   idPrefix,
   value,
@@ -28,14 +29,15 @@ export function PdfStyleFields({
   const inheritedBorders: PdfCellBorders = inherited.borders ?? NO_BORDERS
   const borders: PdfCellBorders = value.borders ?? inheritedBorders
 
-  // Un valor igual al heredado no se guarda: undefined vuelve a heredar.
+  // Igual al heredado no se guarda: undefined vuelve a heredar.
   function own<T>(next: T, base: T): T | undefined {
     return JSON.stringify(next) === JSON.stringify(base) ? undefined : next
   }
 
   return (
     <>
-      <PanelSection title="Letra">
+      <div className={GROUP_CLASSES}>
+        <p className={GROUP_TITLE_CLASSES}>Letra</p>
         <div className="grid grid-cols-[88px_1fr] items-end gap-2">
           <PdfNumberField
             id={`${idPrefix}-font-size`}
@@ -67,9 +69,10 @@ export function PdfStyleFields({
             </button>
           </div>
         </div>
-      </PanelSection>
+      </div>
 
-      <PanelSection title="Alineación">
+      <div className={GROUP_CLASSES}>
+        <p className={GROUP_TITLE_CLASSES}>Alineación</p>
         <div className="grid grid-cols-3 gap-1.5">
           {HORIZONTAL_ALIGNS.map((option) => (
             <button
@@ -96,9 +99,10 @@ export function PdfStyleFields({
             </button>
           ))}
         </div>
-      </PanelSection>
+      </div>
 
-      <PanelSection title="Bordes">
+      <div className={GROUP_CLASSES}>
+        <p className={GROUP_TITLE_CLASSES}>Bordes</p>
         <div className="grid grid-cols-4 gap-1.5">
           {BORDER_SIDES.map(({ side, label }) => (
             <button
@@ -130,22 +134,21 @@ export function PdfStyleFields({
             Ninguno
           </button>
         </div>
-      </PanelSection>
+      </div>
 
-      <PanelSection
-        title="Fondo"
-        aside={
-          value.backgroundColor ? (
+      <div className={GROUP_CLASSES}>
+        <div className="flex items-center justify-between gap-2">
+          <p className={GROUP_TITLE_CLASSES}>Fondo</p>
+          {value.backgroundColor && (
             <button
               type="button"
               onClick={() => onChange({ backgroundColor: undefined })}
-              className="text-[11px] font-medium text-fg-subtle hover:cursor-pointer hover:text-fg-strong"
+              className="text-[11px] font-medium text-fg-muted hover:cursor-pointer hover:text-fg-strong"
             >
               Quitar
             </button>
-          ) : undefined
-        }
-      >
+          )}
+        </div>
         <ColorPickerField
           id={`${idPrefix}-background`}
           label="Color"
@@ -156,7 +159,7 @@ export function PdfStyleFields({
             onChange({ backgroundColor: backgroundColor || undefined })
           }
         />
-      </PanelSection>
+      </div>
     </>
   )
 }

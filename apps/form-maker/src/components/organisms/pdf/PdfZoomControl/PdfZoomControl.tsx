@@ -7,8 +7,8 @@ import {
   PDF_ZOOM_PRESETS,
 } from '../../../../constants'
 import { useClickOutside } from '../../../../hooks'
-import { formatZoom } from '../../../../lib'
-import { stepPdfZoom } from '../../../../lib/pdfDesign'
+import { formatZoom, getCanvasScrollPort } from '../../../../lib'
+import { fitPdfZoom, stepPdfZoom } from '../../../../lib/pdfDesign'
 import { usePdfDesignStore } from '../../../../store/pdfDesignStore'
 import { Tooltip } from '../../../atoms'
 import {
@@ -18,9 +18,8 @@ import {
   ZOOM_TRIGGER_CLASSES,
 } from './PdfZoomControl.constants'
 
-// El zoom del lienzo del PDF, dentro de la barra flotante: − y + a la vista (el usuario no
-// encontraba como acercar) y, en el porcentaje, un menu con saltos fijos que se abre hacia arriba.
-// Ctrl + rueda y Ctrl + / - / 0 hacen lo mismo.
+// − y + a la vista (el usuario no encontraba como acercar) y en el porcentaje un menu de saltos
+// fijos.
 export function PdfZoomControl() {
   const zoom = usePdfDesignStore((state) => state.zoom)
   const setZoom = usePdfDesignStore((state) => state.setZoom)
@@ -28,6 +27,11 @@ export function PdfZoomControl() {
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   useClickOutside(containerRef, () => setIsOpen(false), isOpen)
+
+  function fitWidth(): void {
+    const port: HTMLElement | null = getCanvasScrollPort()
+    if (port) apply(fitPdfZoom(port.clientWidth))
+  }
 
   function apply(value: number): void {
     setZoom(value)
@@ -79,6 +83,10 @@ export function PdfZoomControl() {
 
       {isOpen && (
         <div role="menu" className={MENU_CLASSES}>
+          <button type="button" role="menuitem" onClick={fitWidth} className={ZOOM_ITEM_CLASSES}>
+            Ajustar al ancho
+          </button>
+          <div className="my-1 border-t border-border-subtle" />
           {PDF_ZOOM_PRESETS.map((preset) => (
             <button
               key={preset}
@@ -95,7 +103,7 @@ export function PdfZoomControl() {
               ) : null}
             </button>
           ))}
-          <p className="border-t border-border-subtle px-2.5 pt-1.5 pb-1 text-[10px] text-fg-subtle">
+          <p className="border-t border-border-subtle px-2.5 pt-1.5 pb-1 text-[10px] text-fg-muted">
             También con Ctrl + rueda del mouse.
           </p>
         </div>

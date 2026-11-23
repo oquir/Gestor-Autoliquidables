@@ -3,13 +3,12 @@ export { ERROR_CLASSES, HINT_CLASSES, WARNING_BANNER_CLASSES } from '../../../co
 export const SECTION_TITLE_CLASSES: string =
   'text-[11px] font-semibold uppercase tracking-wider text-fg-soft'
 
-export const SECTION_COUNT_CLASSES: string = 'text-[11px] tabular-nums text-fg-subtle'
+export const SECTION_COUNT_CLASSES: string = 'text-[11px] tabular-nums text-fg-muted'
 
 export const ADD_TERM_CLASSES: string =
   'flex w-full items-center justify-center gap-2 border-border-strong py-2.5 text-fg-soft hover:border-brand-border hover:bg-brand-surface hover:text-brand-fg'
 
-// Las opciones van en tarjetas como las filas (CalcTermRow): el mismo velo en oscuro, slate-100 en
-// claro. Van lado a lado y el control baja al pie con mt-auto, asi quedan a la misma altura.
+// Lado a lado; el control baja al pie con mt-auto para quedar a la misma altura.
 export const OPTION_CARD_CLASSES: string =
   'flex flex-col gap-3 rounded-lg border border-border bg-surface-raised p-4 dark:bg-black/25'
 
@@ -18,7 +17,7 @@ export const OPTION_TITLE_CLASSES: string = 'text-sm font-semibold text-fg-stron
 export const OPTION_HINT_CLASSES: string = 'text-xs leading-relaxed text-fg-muted'
 
 export const INLINE_CODE_CLASSES: string =
-  'rounded border border-border bg-field px-1 font-mono text-[11px] text-brand-fg'
+  'rounded border border-border bg-field px-1 font-mono text-[11px] text-brand-strong'
 
 export const MULTIPLIER_INPUT_CLASSES: string =
   'h-9 min-w-0 flex-1 rounded-l-md border border-border bg-field px-3 font-mono text-sm text-fg outline-none transition-colors hover:border-border-strong focus:border-brand-border'
@@ -27,7 +26,7 @@ export const MULTIPLIER_ADDON_CLASSES: string =
   'flex items-center rounded-r-md border border-l-0 border-border bg-surface-sunken px-3 text-xs font-medium text-fg-muted'
 
 export const FLOOR_TIP_CLASSES: string =
-  'mt-auto flex items-center gap-1.5 border-t border-border pt-3 text-[11px] text-fg-subtle'
+  'mt-auto flex items-center gap-1.5 border-t border-border pt-3 text-[11px] text-fg-muted'
 
 export const CODE_DETAILS_CLASSES: string =
   'group/code rounded-lg border border-border bg-surface-raised dark:bg-black/25'

@@ -13,7 +13,12 @@ export const TABS: SidebarTabItem[] = [
   { id: 'fechas', label: 'Fechas', icon: Calendar },
 ]
 
-// Las pestanas que editan el campo seleccionado, a diferencia de Campos, Catalogos y Fechas.
+// Los bancos del simulador: no dependen del campo seleccionado ni viajan en el export.
+export const BANK_TABS: SidebarTab[] = ['catalogs', 'fechas']
+
+// Una raya antes de cada grupo de pestanas (paleta, campo, bancos).
+export const RAIL_DIVIDER_BEFORE: SidebarTab[] = ['attributes', 'catalogs']
+
 export const FIELD_TABS: SidebarTab[] = [
   'attributes',
   'validations',

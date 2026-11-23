@@ -1,5 +1,10 @@
 import { type CSSProperties, useEffect, useRef, useState } from 'react'
-import { PDF_CANVAS_CLASS } from '../../../../constants'
+import {
+  PDF_BACK_MARGIN_PX,
+  PDF_CANVAS_CLASS,
+  PDF_PAPER_HEIGHT_PX,
+  PDF_PAPER_WIDTH_PX,
+} from '../../../../constants'
 import { contentBox, documentStyleMap, mmToPx, sheetEdgeStyleMap } from '../../../../lib/pdfDesign'
 import { usePdfOverflowToast } from '../../../../hooks/usePdfOverflowToast'
 import { sanitizePdfHtml } from '../../../../lib/pdfHtml'
@@ -7,20 +12,10 @@ import type { PdfContentBox } from '../../../../types'
 import { PdfTableView } from '../PdfTableView'
 import type { PdfSheetViewProps, SheetOverflow } from './PdfSheetView.types'
 import { measureSheetOverflow } from './PdfSheetView.utils'
-import {
-  BACK_MARGIN_PX,
-  NO_OVERFLOW,
-  PAPER_HEIGHT_PX,
-  PAPER_SIZE,
-  PAPER_WIDTH_PX,
-} from './PdfSheetView.constants'
+import { NO_OVERFLOW, PAPER_SIZE } from './PdfSheetView.constants'
 
-// Una hoja de carta tal como la pondra el back, dentro del shadow root del lienzo (sus clases las
-// define PdfCanvas). El papel es blanco y la letra negra tambien en modo oscuro: es papel. Dos
-// guias: la gris son los 5 mm fijos del back; la naranja, el margen extra del diseño.
-//
-// Lo que no cabe NO pasa a la hoja siguiente: se recorta en la guia y la hoja avisa cuanto sobra,
-// para que el autor lo mueva a otra hoja. Se mide el contenido con un ResizeObserver.
+// Hoja de carta como la pondra el back; papel blanco tambien en oscuro. Guias: gris los 5 mm del
+// back, naranja el margen extra. Lo que no cabe no pasa a la siguiente hoja: se recorta y se avisa.
 export function PdfSheetView({
   sheet,
   design,
@@ -73,21 +68,20 @@ export function PdfSheetView({
     .filter(Boolean)
     .join(' ')
 
-  // El zoom escala el papel con transform, que no cambia sus medidas: el aviso de "No cabe" sigue
-  // midiendo px de verdad. La caja de afuera si toma el tamaño escalado, para que el scroll y la
-  // separacion entre hojas acompañen. A 100 % no se emite transform (crearia un contexto propio).
+  // El zoom escala con transform, que no cambia medidas: "No cabe" sigue midiendo px reales. A 100%
+  // no se emite transform.
   const paperStyle: CSSProperties =
     zoom === 1 ? PAPER_SIZE : { ...PAPER_SIZE, transform: `scale(${zoom})`, transformOrigin: '0 0' }
 
   return (
     <section className={PDF_CANVAS_CLASS.sheet}>
-      <div style={{ width: PAPER_WIDTH_PX * zoom, height: PAPER_HEIGHT_PX * zoom }}>
+      <div style={{ width: PDF_PAPER_WIDTH_PX * zoom, height: PDF_PAPER_HEIGHT_PX * zoom }}>
         <div
-          className={`${PDF_CANVAS_CLASS.paper} ${isActive ? PDF_CANVAS_CLASS.active : ''}`}
+          className={`${PDF_CANVAS_CLASS.paper} ${isActive && total > 1 ? PDF_CANVAS_CLASS.active : ''}`}
           style={paperStyle}
           onClick={onActivate}
         >
-          <div className={PDF_CANVAS_CLASS.back} style={{ inset: BACK_MARGIN_PX }}>
+          <div className={PDF_CANVAS_CLASS.back} style={{ inset: PDF_BACK_MARGIN_PX }}>
             <div className={contentClass} style={contentStyle}>
               <div ref={flowRef} className={PDF_CANVAS_CLASS.flow} style={sheetEdgeStyleMap()}>
                 {sheet.blocks.map((block) =>

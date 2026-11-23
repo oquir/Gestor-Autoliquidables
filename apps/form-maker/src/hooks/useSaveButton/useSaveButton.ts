@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { saveDraft } from '../../lib'
+import { saveDraftOrWarn } from '../../lib'
 import { useFormStore } from '../../store'
 import { JUST_SAVED_DURATION_MS } from './useSaveButton.constants'
 import type { UseSaveButtonResult } from './useSaveButton.types'
 
-// El boton avisa "guardado" tambien cuando guarda el autoguardado, no solo al pulsarlo: por eso
-// observa lastSavedAt en vez de encender el aviso dentro de handleSave.
+// Avisa "guardado" tambien con el autoguardado: observa lastSavedAt.
 export function useSaveButton(): UseSaveButtonResult {
   const markSaved = useFormStore((state) => state.markSaved)
   const lastSavedAt = useFormStore((state) => state.lastSavedAt)
@@ -15,8 +14,7 @@ export function useSaveButton(): UseSaveButtonResult {
 
   function handleSave(): void {
     const { formSteps, introModal, formScript, setupConfig } = useFormStore.getState()
-    saveDraft({ formSteps, introModal, formScript, setupConfig })
-    markSaved()
+    saveDraftOrWarn({ formSteps, introModal, formScript, setupConfig }, markSaved)
   }
 
   useEffect(() => {

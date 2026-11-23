@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { CheckCircle, Copy } from 'reicon-react'
-import { buildFormExport } from '../../../lib'
+import { buildFormExport, copyTextOrWarn } from '../../../lib'
 import { useFormStore } from '../../../store'
 import { JsonCode } from '../../molecules'
 
@@ -17,7 +17,7 @@ export function JsonPreviewCanvas() {
   )
 
   const handleCopy = async (): Promise<void> => {
-    await navigator.clipboard.writeText(json)
+    if (!(await copyTextOrWarn(json))) return
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
   }
@@ -25,7 +25,7 @@ export function JsonPreviewCanvas() {
   return (
     <div className="flex min-h-[70vh] flex-col gap-3 rounded-lg border-2 border-dashed border-slate-300 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-400 dark:text-neutral-500">
+        <p className="text-xs text-fg-muted">
           Se actualiza en vivo con cada cambio del formulario. Ctrl+F busca en todo el JSON.
         </p>
         <button

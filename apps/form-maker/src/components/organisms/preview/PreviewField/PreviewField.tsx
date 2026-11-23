@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { PREVIEW_FIELD_STACK_CLASSES } from '../../../../constants'
 import { isPresentationalField } from '../../../../lib/fieldKind/fieldKind'
 import { isSimulatedCatalog } from '../../../../lib/mockCatalog/mockCatalog'
 import { isRequiredBySchema } from '../../../../lib/runtimeValidation/runtimeValidation.utils'
@@ -15,12 +16,11 @@ export function PreviewField({
   error,
   onChange,
 }: PreviewFieldProps) {
-  // Precedencia del contrato: si visibleWhen da falso el campo no se dibuja ni se valida.
+  // Si visibleWhen da falso, el campo no se dibuja ni se valida.
   if (!scope.visible[field.name]) return null
 
-  // Los estilos ya llegan resueltos a CSS plano desde el export (ver lib/cssStyles); aca solo se
-  // completa con la posicion en el grid, y va al final para que gane sobre cualquier CSS libre
-  // que el autor haya escrito.
+  // Los estilos llegan resueltos desde el export; la posicion en el grid va al final para ganarle
+  // al CSS libre.
   const style: CSSProperties = {
     ...(field.styles as CSSProperties),
     gridColumn: `${field.colStart} / span ${field.colSpan}`,
@@ -29,7 +29,10 @@ export function PreviewField({
 
   if (field.type === 'label') {
     return (
-      <div style={style} className="flex min-w-0 items-center gap-1 self-end pb-1.5">
+      <div
+        style={style}
+        className={`flex min-w-0 items-center gap-1 self-end pb-1.5 ${PREVIEW_FIELD_STACK_CLASSES}`}
+      >
         <label
           htmlFor={field.labelFor ? `preview-${field.labelFor}` : undefined}
           className="text-sm font-medium text-fg"
@@ -43,7 +46,7 @@ export function PreviewField({
 
   if (isPresentationalField(field.type)) {
     return (
-      <div style={style} className="min-w-0">
+      <div style={style} className={`min-w-0 ${PREVIEW_FIELD_STACK_CLASSES}`}>
         <PreviewFieldControl
           field={field}
           value={undefined}
@@ -62,7 +65,7 @@ export function PreviewField({
   const showLabel: boolean = externalLabel === undefined
 
   return (
-    <div style={style} className="flex min-w-0 flex-col gap-1">
+    <div style={style} className={`flex min-w-0 flex-col gap-1 ${PREVIEW_FIELD_STACK_CLASSES}`}>
       {showLabel && (
         <div className="flex items-center gap-1">
           <label
