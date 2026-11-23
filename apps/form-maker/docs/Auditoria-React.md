@@ -246,7 +246,11 @@ por la causa (Fase 2).
       la medición de A3: tecla 12,6 → 5,3 ms y, con CPU ×4, 67,7 → 26,7 ms; paso de color con CPU ×4
       62,6 → 25,8 ms y **0 cuadros lentos** (antes 120). Queda: `Tooltip` 27 veces por tecla, 1,1 ms
       de 2,9 ms de JS (T1).
-- [ ] T1 (nuevo) `Tooltip` perezoso: que un globo cerrado no corra floating-ui.
+- [x] ~~T1 (nuevo) `Tooltip` perezoso: que un globo cerrado no corra floating-ui.~~ (2026-11-22,
+      «Evita que un Tooltip cerrado recalcule floating-ui en cada render») Con otro diseño: floating-ui
+      en un hijo memoizado, no un globo dormido (habría que repetir el foco del teclado). `Tooltip` por
+      tecla ~1,0 → ~0,2 ms: formulario 2,84 → 2,18 ms (−23 %), PDF 2,37 → 2,00 ms (−16 %). Montar un
+      paso cuesta igual.
 - [x] ~~A4 memo de `PdfTableView`.~~ (2026-11-22) Por fila: tecla −34 %, zoom −75 %.
 - [ ] B1, B2 y B3.
 

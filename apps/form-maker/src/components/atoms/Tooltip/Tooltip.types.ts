@@ -1,5 +1,5 @@
-import type { Placement } from '@floating-ui/react'
-import type { ReactElement, ReactNode } from 'react'
+import type { Placement, UseInteractionsReturn } from '@floating-ui/react'
+import type { Dispatch, ReactElement, ReactNode, SetStateAction } from 'react'
 
 export interface TooltipProps {
   content: ReactNode
@@ -8,4 +8,19 @@ export interface TooltipProps {
   placement?: Placement
   className?: string
   disabled?: boolean
+}
+
+// Los manejadores que floating-ui pone en el hijo. En un objeto: una funcion suelta en useState se
+// tomaria como actualizador.
+export interface TooltipReferenceProps {
+  get: UseInteractionsReturn['getReferenceProps']
+}
+
+export interface TooltipFloatingProps {
+  reference: Element | null
+  content: ReactNode
+  placement: Placement
+  className: string
+  isEnabled: boolean
+  onReferenceProps: Dispatch<SetStateAction<TooltipReferenceProps | null>>
 }
