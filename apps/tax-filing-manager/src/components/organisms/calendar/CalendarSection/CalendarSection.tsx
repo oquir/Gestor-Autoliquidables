@@ -1,6 +1,6 @@
 import { DocumentText, Plus, Xmark } from 'reicon-react'
 import { useState } from 'react'
-import { FISCAL_YEAR_INFO, ONGOING_YEAR } from '../../../../constants'
+import { FISCAL_YEAR_INFO } from '../../../../constants'
 import { newCalendar, taxLabel, formatDate, TAXES, calendarBlob } from '../../../../lib'
 import { useData } from '../../../../store'
 import type { FiscalYearCalendar } from '../../../../types'
@@ -28,18 +28,13 @@ export default function CalendarSection({
   errors,
   taxes,
   config,
+  fiscalYear,
+  onFiscalYear,
 }: CalendarSectionProps) {
   const declarations = useData((s) => s.declarations)
   const municipality = useData((s) => s.municipalities.find((m) => m.id === b.municipalityId))
   const calendars = b.taxCalendar.byFiscalYear
   const fiscalYears = calendars.map((c) => c.fiscalYear).sort((x, y) => y - x)
-  const [picked, setPicked] = useState<number>()
-  const fiscalYear =
-    picked !== undefined && fiscalYears.includes(picked)
-      ? picked
-      : fiscalYears.includes(ONGOING_YEAR)
-        ? ONGOING_YEAR
-        : fiscalYears[0]
   const cal = calendars.find((c) => c.fiscalYear === fiscalYear)
 
   // Lo que se guardó, no el borrador: el PDF es del calendario guardado del año que se ve.
@@ -63,16 +58,24 @@ export default function CalendarSection({
     if (newValue === undefined) return
     const base = nearestCalendar(calendars, newValue)
     changeList([...calendars, newCalendar(newValue, base)])
-    setPicked(newValue)
+    onFiscalYear(newValue)
     setNotice(addedText(newValue, base))
   }
   const removeItem = () => {
     changeList(calendars.filter((c) => c.fiscalYear !== fiscalYear))
-    setPicked(undefined)
+    change({
+      earlyPayment: {
+        ...b.earlyPayment,
+        byFiscalYear: b.earlyPayment.byFiscalYear.filter((v) => v.fiscalYear !== fiscalYear),
+      },
+    })
+    onFiscalYear(undefined)
     setNotice(undefined)
   }
   const withErrors = (v: number) =>
-    Object.keys(errors).some((key) => key.startsWith(`calendario-${v}-`))
+    Object.keys(errors).some(
+      (key) => key.startsWith(`calendario-${v}-`) || key.startsWith(`pronto-${v}-`),
+    )
 
   return (
     <>
@@ -97,7 +100,7 @@ export default function CalendarSection({
                   <Select
                     value={fiscalYear}
                     onChange={(e) => {
-                      setPicked(Number(e.target.value))
+                      onFiscalYear(Number(e.target.value))
                       setNotice(undefined)
                     }}
                   >

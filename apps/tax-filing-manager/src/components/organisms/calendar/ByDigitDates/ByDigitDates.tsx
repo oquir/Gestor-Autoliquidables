@@ -44,7 +44,9 @@ export default function ByDigitDates({ value, onChange, editable, errors }: ByDi
 
       <div className="space-y-2">
         <div className={HEADER_COLUMNS[periods.length]}>
-          <span className="justify-self-center whitespace-nowrap text-center text-[13px] font-medium text-fg">Último dígito (sin DV)</span>
+          <span className="justify-self-center whitespace-nowrap text-center text-[13px] font-medium text-fg">
+            Último dígito (sin DV)
+          </span>
           {periods.map((p) => (
             <span key={p.period} className="text-center text-[13px] font-medium text-fg">
               {names[p.period - 1]}
@@ -68,7 +70,7 @@ export default function ByDigitDates({ value, onChange, editable, errors }: ByDi
                   aria-label={`${names[p.period - 1]}, último dígito ${d}`}
                   disabled={!editable}
                   value={p.dates[d] ?? ''}
-                  className= 'mx-auto max-w-60'
+                  className="mx-auto max-w-60"
                   onChange={(e) => onChange(withDate(value, p.period, d, e.target.value))}
                 />
               ))}

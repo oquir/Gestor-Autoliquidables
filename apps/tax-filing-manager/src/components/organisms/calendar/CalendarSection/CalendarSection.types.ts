@@ -5,4 +5,8 @@ export interface CalendarSectionProps extends SettingsEdit {
   taxes: Record<Tax, boolean>
   /** Configuración guardada, sin los cambios del borrador: de ahí sale el PDF. */
   config: MunicipalityConfig
+  /** Año gravable que se ve */
+  fiscalYear: number
+  /** Cambia el año gravable de toda la sección de Calendario. */
+  onFiscalYear: (year: number | undefined) => void
 }

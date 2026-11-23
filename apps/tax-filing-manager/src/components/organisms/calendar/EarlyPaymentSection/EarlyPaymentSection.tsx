@@ -1,72 +1,46 @@
-import { Plus, Xmark } from 'reicon-react'
-import { useState } from 'react'
-import { FISCAL_YEAR_INFO, ONGOING_YEAR } from '../../../../constants'
-import { number, newTier } from '../../../../lib'
-import type { SettingsEdit, EarlyPaymentTier } from '../../../../types'
-import { shiftYears } from '../../../../utils'
-import { Button, Input, Select } from '../../../atoms'
-import { Field, Toggle, Section } from '../../../molecules'
+import { Xmark } from 'reicon-react'
+import { number } from '../../../../lib'
+import type { EarlyPaymentTier } from '../../../../types'
+import { Button, Input } from '../../../atoms'
+import { Toggle, Section } from '../../../molecules'
 import { TIER_COLUMNS } from './EarlyPaymentSection.constants'
+import type { EarlyPaymentSectionProps } from './EarlyPaymentSection.types'
 
-/** Si el municipio da descuento por pronto pago en el ICA anual y, si lo da, sus tramos en cada año gravable. */
-export default function EarlyPaymentSection({ b, change, editable, errors }: SettingsEdit) {
+export default function EarlyPaymentSection({
+  b,
+  change,
+  editable,
+  errors,
+  fiscalYear,
+}: EarlyPaymentSectionProps) {
   const value = b.earlyPayment
-  const fiscalYears = value.byFiscalYear.map((v) => v.fiscalYear).sort((x, y) => y - x)
-  const [picked, setPicked] = useState<number>()
-  // Por defecto, el año gravable que se está declarando.
-  const fiscalYear =
-    picked !== undefined && fiscalYears.includes(picked)
-      ? picked
-      : fiscalYears.includes(ONGOING_YEAR - 1)
-        ? ONGOING_YEAR - 1
-        : fiscalYears[0]
   const tiers = value.byFiscalYear.find((v) => v.fiscalYear === fiscalYear)?.tiers ?? []
-  const withErrors = (v: number) =>
-    Object.keys(errors).some((key) => key.startsWith(`pronto-${v}-`))
 
-  const changeTiers = (newOnes: EarlyPaymentTier[]) =>
+  const changeTiers = (newOnes: EarlyPaymentTier[]) => {
+    if (fiscalYear === undefined) return
+    // Si el año todavía no tiene tramos (se agregó en Vencimientos o se activó el descuento después),
+    // el primer tramo lo crea: antes hacía falta el botón "Agregar año gravable" de aquí.
+    const exists = value.byFiscalYear.some((v) => v.fiscalYear === fiscalYear)
     change({
       earlyPayment: {
         ...value,
-        byFiscalYear: value.byFiscalYear.map((v) =>
-          v.fiscalYear === fiscalYear ? { ...v, tiers: newOnes } : v,
-        ),
+        byFiscalYear: exists
+          ? value.byFiscalYear.map((v) =>
+              v.fiscalYear === fiscalYear ? { ...v, tiers: newOnes } : v,
+            )
+          : [...value.byFiscalYear, { fiscalYear, tiers: newOnes }],
       },
     })
+  }
   const changeTier = (i: number, partial: Partial<EarlyPaymentTier>) =>
     changeTiers(tiers.map((t, j) => (j === i ? { ...t, ...partial } : t)))
 
-  // El año nuevo copia los tramos del último, corridos un año: los concejos suelen repetir el esquema.
-  const addFiscalYear = () => {
-    const lastOne = fiscalYears[0]
-    const newItem = lastOne === undefined ? ONGOING_YEAR - 1 : lastOne + 1
-    const copy = (value.byFiscalYear.find((v) => v.fiscalYear === lastOne)?.tiers ?? []).map(
-      (t) => ({
-        ...t,
-        from: shiftYears(t.from, 1),
-        to: shiftYears(t.to, 1),
-      }),
-    )
-    change({
-      earlyPayment: {
-        ...value,
-        byFiscalYear: [
-          ...value.byFiscalYear,
-          { fiscalYear: newItem, tiers: copy.length > 0 ? copy : [newTier(newItem, [])] },
-        ],
-      },
-    })
-    setPicked(newItem)
-  }
-  const removeFiscalYear = () => {
-    change({
-      earlyPayment: {
-        ...value,
-        byFiscalYear: value.byFiscalYear.filter((v) => v.fiscalYear !== fiscalYear),
-      },
-    })
-    setPicked(undefined)
-  }
+  console.log('EarlyPayment debug:', {
+    isActive: value.isActive,
+    fiscalYear,
+    byFiscalYear: value.byFiscalYear,
+    tiers,
+  })
 
   return (
     <Section
@@ -84,33 +58,10 @@ export default function EarlyPaymentSection({ b, change, editable, errors }: Set
       </div>
       {value.isActive && (
         <div className="space-y-4 sm:col-span-2">
-          <div className="flex flex-wrap items-end gap-3">
-            {fiscalYear !== undefined && (
-              <Field label="Año gravable" info={FISCAL_YEAR_INFO}>
-                <Select value={fiscalYear} onChange={(e) => setPicked(Number(e.target.value))}>
-                  {fiscalYears.map((v) => (
-                    <option key={v} value={v}>
-                      Año gravable {v}
-                      {withErrors(v) ? ' (revisar)' : ''}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-            )}
-            {editable && (
-              <Button onClick={addFiscalYear}>
-                <Plus className="size-4" aria-hidden /> Agregar año gravable
-              </Button>
-            )}
-            {editable && fiscalYear !== undefined && (
-              <Button variant="ghost" onClick={removeFiscalYear}>
-                <Xmark className="size-4" aria-hidden /> Quitar {fiscalYear}
-              </Button>
-            )}
-          </div>
-
           {fiscalYear === undefined ? (
-            <p className="text-sm text-fg-muted">Aún no hay años gravables con descuento.</p>
+            <p className="text-sm text-fg-muted">
+              Agrega un año gravable en Vencimientos para poner sus tramos.
+            </p>
           ) : (
             <div className="space-y-2">
               <p className="text-xs text-fg-muted">
@@ -171,9 +122,15 @@ export default function EarlyPaymentSection({ b, change, editable, errors }: Set
                   </div>
                 )
               })}
+
               {editable && (
-                <Button onClick={() => changeTiers([...tiers, newTier(fiscalYear, tiers)])}>
-                  <Plus className="size-4" aria-hidden /> Agregar tramo
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="mt-2"
+                  onClick={() => changeTiers([...tiers, { from: '', to: '', percentage: 0 }])}
+                >
+                  + Agregar tramo
                 </Button>
               )}
             </div>

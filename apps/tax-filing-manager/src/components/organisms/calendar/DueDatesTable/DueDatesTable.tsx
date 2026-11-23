@@ -1,7 +1,7 @@
 //import { PERIOD_NAMES } from '../../../../constants'
-import {  withFrequency, withByDigit, frequencyLabel } from '../../../../lib'
+import { withFrequency, withByDigit, frequencyLabel } from '../../../../lib'
 import type { Frequency } from '../../../../types'
-import {  Select } from '../../../atoms'
+import { Select } from '../../../atoms'
 import { Notice, Field, Toggle } from '../../../molecules'
 import ByDigitDates from '../ByDigitDates'
 import SingleDates from '../SingleDates'
@@ -22,8 +22,6 @@ export default function DueDatesTable({
   errors,
   frequencyNotice,
 }: DueDatesTableProps) {
-
-
   return (
     <div className="space-y-4 rounded-lg border border-border p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -82,7 +80,7 @@ export default function DueDatesTable({
           />
         </div>
       ) : (
-         <SingleDates value={value} onChange={onChange} editable={editable} errors={errors} />
+        <SingleDates value={value} onChange={onChange} editable={editable} errors={errors} />
       )}
     </div>
   )

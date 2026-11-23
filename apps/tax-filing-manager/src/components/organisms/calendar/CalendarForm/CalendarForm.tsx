@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { ALL_ACTIVE } from '../../../../constants'
+import { ALL_ACTIVE, ONGOING_YEAR } from '../../../../constants'
 import { withUploads, calendarErrors, fullName, useSession, TAXES } from '../../../../lib'
 import { useData } from '../../../../store'
 import type { MunicipalityConfig, FiscalYearCalendar } from '../../../../types'
 import { today } from '../../../../utils'
-import { SaveBar, ReasonModal  } from '../../../molecules'
+import { SaveBar, ReasonModal } from '../../../molecules'
 import CalendarSection from '../CalendarSection'
 import EarlyPaymentSection from '../EarlyPaymentSection'
 import type { CalendarFormProps } from './CalendarForm.types'
@@ -22,6 +22,16 @@ export default function CalendarForm({ config, editable }: CalendarFormProps) {
     useData((s) => s.municipalities.find((m) => m.id === config.municipalityId)?.taxes) ??
     ALL_ACTIVE
   const [b, setB] = useState(config)
+  /** Año gravable que lo decide Vencimientos y lo comparten las dos tarjetas. */
+  const [picked, setPicked] = useState<number>()
+  const fiscalYears = b.taxCalendar.byFiscalYear.map((c) => c.fiscalYear).sort((x, y) => y - x)
+  // Si el elegido ya no existe (se quitó), se cae al año en curso o al más reciente.
+  const fiscalYear =
+    picked !== undefined && fiscalYears.includes(picked)
+      ? picked
+      : fiscalYears.includes(ONGOING_YEAR)
+        ? ONGOING_YEAR
+        : fiscalYears[0]
   /** Ventana del motivo: solo se abre al guardar un calendario que ya tenía fechas guardadas. */
   const [asking, setAsking] = useState(false)
   const change = (partial: Partial<MunicipalityConfig>) => {
@@ -61,9 +71,15 @@ export default function CalendarForm({ config, editable }: CalendarFormProps) {
 
   return (
     <div className="space-y-6">
-      <CalendarSection {...editing} taxes={taxes} config={config} />
+      <CalendarSection
+        {...editing}
+        taxes={taxes}
+        config={config}
+        fiscalYear={fiscalYear}
+        onFiscalYear={setPicked}
+      />
       {/* El pronto pago es del ICA anual: sin ese impuesto activo no hay descuento que poner. */}
-      {taxes.ica && <EarlyPaymentSection {...editing} />}
+      {taxes.ica && <EarlyPaymentSection {...editing} fiscalYear={fiscalYear} />}
 
       {editable && (
         <SaveBar
@@ -73,7 +89,7 @@ export default function CalendarForm({ config, editable }: CalendarFormProps) {
           onSave={() => (asksReason ? setAsking(true) : save())}
         />
       )}
-       {asking && (
+      {asking && (
         <ReasonModal
           title="Guardar cambios en el calendario"
           description="Estás modificando un calendario que ya tenía datos guardados. Indica el motivo del cambio o el nuevo decreto para dejar registro."
