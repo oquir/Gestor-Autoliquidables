@@ -18,7 +18,7 @@ export type ApprovalFilter = FilterValue<ApprovalStatus | 'not_applicable'>
 export type CorrectionFilter = FilterValue<'all' | 'direct' | CorrectionStatus>
 
 /** Páginas que piden un rango de fechas antes de mostrar los datos. */
-export type DateQueryPage = 'registrations' | 'declarations'
+export type DateQueryPage = 'registrations' | 'declarations' | 'declarants'
 
 /** Rango de fechas consultado en una página, con el municipio que se estaba viendo (null = todos, solo 1cero1). */
 export interface DateQuery {

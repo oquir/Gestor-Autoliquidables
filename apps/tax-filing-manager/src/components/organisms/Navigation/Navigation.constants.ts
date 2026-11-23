@@ -2,6 +2,7 @@ import {
   City,
   Calendar,
   ChartSquare,
+  AddressBook,
   AddressCard,
   Briefcase,
   Category,
@@ -16,6 +17,7 @@ import type { NavigationLink } from './Navigation.types'
 export const NAVIGATION: NavigationLink[] = [
   { a: '/', text: 'Inicio', icon: Category },
   { a: '/rit', text: 'Inscripciones', icon: AddressCard },
+  { a: '/declarantes', text: 'Declarantes', icon: AddressBook },
   { a: '/declaraciones', text: 'Declaraciones', icon: Industry },
   { a: '/pagos', text: 'Pagos', icon: Wallet },
   { a: '/reportes', text: 'Reportes', icon: ChartSquare, permission: 'canSeeReports' },

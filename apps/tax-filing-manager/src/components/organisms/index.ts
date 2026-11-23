@@ -44,6 +44,7 @@ export { default as UpcomingDueDates } from './home/UpcomingDueDates'
 export { default as AnnualCollection } from './home/AnnualCollection'
 export { default as PendingApplications } from './home/PendingApplications'
 
+export { default as DeclarantsTable } from './declarants/DeclarantsTable/index'
 export { default as MissingDeclarations } from './registrations/MissingDeclarations'
 export { default as FiledDeclarations } from './registrations/FiledDeclarations'
 export { default as ApplicationHeader } from './registrations/ApplicationHeader'

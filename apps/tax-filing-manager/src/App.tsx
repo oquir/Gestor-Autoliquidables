@@ -8,6 +8,7 @@ import Calendar from './pages/Calendar'
 import Settings from './pages/Settings'
 import DeclarationDetail from './pages/DeclarationDetail'
 import Declarations from './pages/Declarations'
+import Declarants from './pages/Declarants'
 import RegistrationDetail from './pages/RegistrationDetail'
 import Registrations from './pages/Registrations'
 import Home from './pages/Home'
@@ -28,6 +29,7 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="rit" element={<Registrations />} />
           <Route path="rit/:id" element={<RegistrationDetail />} />
+          <Route path="declarantes" element={<Declarants />} />
           <Route path="declaraciones" element={<Declarations />} />
           <Route path="declaraciones/:id" element={<DeclarationDetail />} />
           <Route
