@@ -18,7 +18,7 @@ import type {
   RuntimeSnapshot,
   RuntimeValues,
 } from '../../types'
-import { emptyGroupItem, reconcileState } from './useFormPreview.utils'
+import { emptyGroupItem, reconcileState, removeRevealedItem } from './useFormPreview.utils'
 
 // Unico contacto del simulador con el store, solo para buildFormExport. Las respuestas viven en el
 // arbol, nunca en el store.
@@ -124,6 +124,7 @@ export function useFormPreview(): FormPreviewApi {
         [groupId]: (previous.groups[groupId] ?? []).filter((_, position) => position !== index),
       },
     }))
+    setRevealed((previous) => removeRevealedItem(previous, groupId, index))
   }, [])
 
   const validateKeys = useCallback(
