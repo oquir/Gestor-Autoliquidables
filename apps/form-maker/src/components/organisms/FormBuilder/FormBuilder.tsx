@@ -33,6 +33,7 @@ export function FormBuilder() {
     activeDrag,
     collisionDetection,
     overlayModifiers,
+    dropAnimation,
     handleDragStart,
     handleDragMove,
     handleDragEnd,
@@ -84,12 +85,7 @@ export function FormBuilder() {
         }
         rightSidebar={<RightSidebar />}
       />
-      {/* Sin animacion de caida para una fila: dnd-kit la devolveria al sitio de origen. */}
-      <DragOverlay
-        modifiers={overlayModifiers}
-        style={OVERLAY_STYLE}
-        dropAnimation={activeDrag?.source === 'canvas-row' ? null : undefined}
-      >
+      <DragOverlay modifiers={overlayModifiers} style={OVERLAY_STYLE} dropAnimation={dropAnimation}>
         {activeDrag ? <DragPreview activeDrag={activeDrag} /> : null}
       </DragOverlay>
     </DndContext>
