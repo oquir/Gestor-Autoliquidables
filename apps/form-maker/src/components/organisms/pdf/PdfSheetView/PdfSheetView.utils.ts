@@ -1,5 +1,5 @@
 import { PDF_EDGE_GUARD_PX } from '../../../../constants'
-import { sanitizePdfHtml } from '../../../../lib/pdfHtml'
+import { sanitizePdfCanvasHtml } from '../../../../lib/pdfHtml'
 import type { PdfHtmlBlock } from '../../../../types'
 import type { SheetOverflow } from './PdfSheetView.types'
 
@@ -10,7 +10,7 @@ const BLOCK_HTML: WeakMap<PdfHtmlBlock, { __html: string }> = new WeakMap()
 export function blockHtml(block: PdfHtmlBlock): { __html: string } {
   let html: { __html: string } | undefined = BLOCK_HTML.get(block)
   if (!html) {
-    html = { __html: sanitizePdfHtml(block.html) }
+    html = { __html: sanitizePdfCanvasHtml(block.html) }
     BLOCK_HTML.set(block, html)
   }
   return html

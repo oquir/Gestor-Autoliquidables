@@ -7,7 +7,7 @@ import {
 } from '../../../../constants'
 import { pdfComponentHtml } from '../../../../lib/pdfComponents'
 import { cellStyleMap, tableStyleMap } from '../../../../lib/pdfDesign'
-import { sanitizePdfHtml } from '../../../../lib/pdfHtml'
+import { sanitizePdfCanvasHtml, sanitizePdfHtml } from '../../../../lib/pdfHtml'
 import { renderVerticalTextPng } from '../../../../lib/pdfVerticalText'
 import type { PdfCell, PdfCellContent, PdfFontFamily } from '../../../../types'
 import type { CellHtml, PdfTableRowProps, PdfTableViewProps } from './PdfTableView.types'
@@ -140,7 +140,7 @@ function buildCellHtml(
   content: Extract<PdfCellContent, { kind: 'html' | 'component' }>,
   fontFamily: PdfFontFamily,
 ): string {
-  if (content.kind === 'html') return sanitizePdfHtml(content.html) || '&nbsp;'
+  if (content.kind === 'html') return sanitizePdfCanvasHtml(content.html) || '&nbsp;'
   const html: string = pdfComponentHtml(content.component, {
     mode: 'canvas',
     fontFamily,
