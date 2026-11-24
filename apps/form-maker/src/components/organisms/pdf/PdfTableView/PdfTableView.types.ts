@@ -8,6 +8,11 @@ export interface PdfTableViewProps {
   onSelectCell: (tableId: string, cellId: string, extend: boolean) => void
 }
 
+// Lo que recibe dangerouslySetInnerHTML; se reusa mientras no cambie el contenido.
+export interface CellHtml {
+  __html: string
+}
+
 export interface PdfTableRowProps {
   row: PdfRow
   tableId: string
