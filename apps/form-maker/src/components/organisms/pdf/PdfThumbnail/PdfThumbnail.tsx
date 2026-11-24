@@ -15,7 +15,8 @@ import {
 } from './PdfThumbnail.constants'
 
 // La hoja 1 de la plantilla, sin valores: los {Variables} a la vista ayudan a reconocerla. Se lee
-// al montar; el panel se remonta al volver del disenador, que guarda lo pendiente al cerrarse.
+// al montar; el panel se remonta al volver del disenador, cuyo Volver guarda lo pendiente antes de
+// cerrar (este render corre antes que el desmontaje del disenador).
 export function PdfThumbnail() {
   const formType = useFormStore((state) => state.setupConfig.formType)
   const setPdfDesignerOpen = useFormStore((state) => state.setPdfDesignerOpen)

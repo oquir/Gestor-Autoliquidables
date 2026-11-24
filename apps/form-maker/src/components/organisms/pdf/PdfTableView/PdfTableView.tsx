@@ -7,10 +7,10 @@ import {
 } from '../../../../constants'
 import { pdfComponentHtml } from '../../../../lib/pdfComponents'
 import { cellStyleMap, tableStyleMap } from '../../../../lib/pdfDesign'
-import { sanitizePdfHtml } from '../../../../lib/pdfHtml'
+import { sanitizePdfCanvasHtml, sanitizePdfHtml } from '../../../../lib/pdfHtml'
 import { renderVerticalTextPng } from '../../../../lib/pdfVerticalText'
 import type { PdfCell, PdfCellContent, PdfFontFamily } from '../../../../types'
-import type { PdfTableRowProps, PdfTableViewProps } from './PdfTableView.types'
+import type { CellHtml, PdfTableRowProps, PdfTableViewProps } from './PdfTableView.types'
 
 // Se llama a si misma para las tablas anidadas; el clic de una celda de adentro no sube a la de
 // afuera.
@@ -65,7 +65,7 @@ function PdfTableRowBase({
           .join(' ')
 
         // Saneado y dentro del shadow root: su <style> no alcanza a la app.
-        const html: string | null = cellHtml(cell.content, fontFamily)
+        const html: CellHtml | null = cellHtml(cell.content, fontFamily)
         if (html !== null) {
           return (
             <td
@@ -76,7 +76,7 @@ function PdfTableRowBase({
               className={className}
               style={cellStyleMap(cell)}
               onClick={(event) => handleClick(event, cell)}
-              dangerouslySetInnerHTML={{ __html: html }}
+              dangerouslySetInnerHTML={html}
             />
           )
         }
@@ -117,18 +117,36 @@ const PdfTableRow: NamedExoticComponent<PdfTableRowProps> = memo(PdfTableRowBase
 // repintan.
 export const PdfTableView: NamedExoticComponent<PdfTableViewProps> = memo(PdfTableViewBase)
 
+// React 19 compara dangerouslySetInnerHTML por identidad: un {__html} nuevo en cada render reescribe
+// el innerHTML aunque el texto sea el mismo, y cada clic de seleccion (repinta todas las filas)
+// volvia a crear todas las imagenes del documento. Uno por contenido: el store conserva los que no
+// cambian.
+const CELL_HTML: WeakMap<PdfCellContent, { fontFamily: PdfFontFamily; html: CellHtml }> =
+  new WeakMap()
+
 // HTML libre o de componente, saneado igual que al publicar.
-function cellHtml(content: PdfCellContent, fontFamily: PdfFontFamily): string | null {
-  if (content.kind === 'html') return sanitizePdfHtml(content.html) || '&nbsp;'
-  if (content.kind === 'component') {
-    const html: string = pdfComponentHtml(content.component, {
-      mode: 'canvas',
-      fontFamily,
-      renderVerticalText: renderVerticalTextPng,
-    })
-    return sanitizePdfHtml(html) || '&nbsp;'
-  }
-  return null
+function cellHtml(content: PdfCellContent, fontFamily: PdfFontFamily): CellHtml | null {
+  if (content.kind !== 'html' && content.kind !== 'component') return null
+
+  const cached: { fontFamily: PdfFontFamily; html: CellHtml } | undefined = CELL_HTML.get(content)
+  if (cached && cached.fontFamily === fontFamily) return cached.html
+
+  const html: CellHtml = { __html: buildCellHtml(content, fontFamily) }
+  CELL_HTML.set(content, { fontFamily, html })
+  return html
+}
+
+function buildCellHtml(
+  content: Extract<PdfCellContent, { kind: 'html' | 'component' }>,
+  fontFamily: PdfFontFamily,
+): string {
+  if (content.kind === 'html') return sanitizePdfCanvasHtml(content.html) || '&nbsp;'
+  const html: string = pdfComponentHtml(content.component, {
+    mode: 'canvas',
+    fontFamily,
+    renderVerticalText: renderVerticalTextPng,
+  })
+  return sanitizePdfHtml(html) || '&nbsp;'
 }
 
 // Lo que lee el arrastre para saber en que celda esta el puntero.

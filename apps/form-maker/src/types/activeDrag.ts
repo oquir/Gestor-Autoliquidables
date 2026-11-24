@@ -6,3 +6,5 @@ export type ActiveDrag =
   | { source: 'palette'; fieldType: FieldTypeDef }
   | { source: 'canvas-field'; field: CanvasField }
   | { source: 'canvas-row'; row: CanvasRow }
+
+export type DragSource = ActiveDrag['source']

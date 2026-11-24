@@ -29,10 +29,14 @@ export function buildFormExport(
   // Los nombres existentes, para que el compilador decida que {{x}} es un campo; se arma una vez.
   const knownNames: Set<string> = new Set(names.values())
   const prelude: string = formScript.trim()
+  // Por sus pasos y no por setupConfig.hasIntroModal, una copia que el store sincroniza a mano: un
+  // archivo editado a mano la desfasaba, y el modal se perdia aunque sus campos siguieran en el
+  // indice de nombres (auditoria B6).
+  const hasIntroModal: boolean = introModalSteps.length > 0
 
   const exportedSetup: ExportedSetupConfig = {
-    hasIntroModal: setupConfig.hasIntroModal,
-    introModal: setupConfig.hasIntroModal
+    hasIntroModal,
+    introModal: hasIntroModal
       ? {
           steps: introModalSteps.map((step) => ({
             stepId: step.stepId,

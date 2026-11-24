@@ -1,5 +1,5 @@
 import { DndContext, DragOverlay } from '@dnd-kit/core'
-import { lazy, Suspense } from 'react'
+import { lazy, type ReactElement, Suspense, useMemo } from 'react'
 import { useDragAndDrop } from '../../../hooks/useDragAndDrop/useDragAndDrop'
 import { useFormStore } from '../../../store/formStore'
 import { ErrorBoundary } from '../../atoms/ErrorBoundary/ErrorBoundary'
@@ -33,6 +33,7 @@ export function FormBuilder() {
     activeDrag,
     collisionDetection,
     overlayModifiers,
+    dropAnimation,
     handleDragStart,
     handleDragMove,
     handleDragEnd,
@@ -40,6 +41,25 @@ export function FormBuilder() {
   } = useDragAndDrop()
   const isSimulatorOpen = useFormStore((state) => state.isSimulatorOpen)
   const isPdfDesignerOpen = useFormStore((state) => state.isPdfDesignerOpen)
+  // El mismo elemento en cada render: FormBuilder se repinta al empezar y al terminar cada arrastre
+  // (activeDrag) y, con uno nuevo, repintaba la app entera (auditoria O2).
+  const layout: ReactElement = useMemo(
+    () => (
+      <AppLayout
+        sidebar={<Sidebar />}
+        canvas={<Canvas />}
+        canvasOverlay={
+          <>
+            <ActiveStepLabel />
+            <CanvasToolbar />
+            <CollapsedRightSidebar />
+          </>
+        }
+        rightSidebar={<RightSidebar />}
+      />
+    ),
+    [],
+  )
 
   // El simulador ocupa la pantalla y tiene su propia frontera de errores: si falla, se vuelve al
   // editor sin recargar.
@@ -72,24 +92,8 @@ export function FormBuilder() {
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <AppLayout
-        sidebar={<Sidebar />}
-        canvas={<Canvas />}
-        canvasOverlay={
-          <>
-            <ActiveStepLabel />
-            <CanvasToolbar />
-            <CollapsedRightSidebar />
-          </>
-        }
-        rightSidebar={<RightSidebar />}
-      />
-      {/* Sin animacion de caida para una fila: dnd-kit la devolveria al sitio de origen. */}
-      <DragOverlay
-        modifiers={overlayModifiers}
-        style={OVERLAY_STYLE}
-        dropAnimation={activeDrag?.source === 'canvas-row' ? null : undefined}
-      >
+      {layout}
+      <DragOverlay modifiers={overlayModifiers} style={OVERLAY_STYLE} dropAnimation={dropAnimation}>
         {activeDrag ? <DragPreview activeDrag={activeDrag} /> : null}
       </DragOverlay>
     </DndContext>

@@ -7,11 +7,10 @@ import {
 } from '../../../../constants'
 import { contentBox, documentStyleMap, mmToPx, sheetEdgeStyleMap } from '../../../../lib/pdfDesign'
 import { usePdfOverflowToast } from '../../../../hooks/usePdfOverflowToast'
-import { sanitizePdfHtml } from '../../../../lib/pdfHtml'
 import type { PdfContentBox } from '../../../../types'
 import { PdfTableView } from '../PdfTableView'
 import type { PdfSheetViewProps, SheetOverflow } from './PdfSheetView.types'
-import { measureSheetOverflow } from './PdfSheetView.utils'
+import { blockHtml, measureSheetOverflow } from './PdfSheetView.utils'
 import { NO_OVERFLOW, PAPER_SIZE } from './PdfSheetView.constants'
 
 // Hoja de carta como la pondra el back; papel blanco tambien en oscuro. Guias: gris los 5 mm del
@@ -103,7 +102,7 @@ export function PdfSheetView({
                         event.stopPropagation()
                         onSelectBlock(block.id)
                       }}
-                      dangerouslySetInnerHTML={{ __html: sanitizePdfHtml(block.html) }}
+                      dangerouslySetInnerHTML={blockHtml(block)}
                     />
                   ),
                 )}

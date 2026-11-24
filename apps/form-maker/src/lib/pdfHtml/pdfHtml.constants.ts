@@ -147,6 +147,15 @@ export const DATA_FM_ATTRIBUTE: RegExp = /^data-fm-[a-z0-9-]+$/
 // Una variable sola, como src="{Code}": la imagen la pone el back al reemplazar.
 export const VARIABLE_ONLY: RegExp = /^\{[^{}\s]+\}$/
 
+// En el HTML ya saneado (atributos con comillas dobles): el src de un <img> que es solo una variable.
+export const CANVAS_VARIABLE_SRC: RegExp = /(<img\b[^>]*?\ssrc=")\s*\{[^{}\s"]+\}\s*"/g
+
+// La muestra del lienzo: 80 × 40 si el autor no le dio tamano (como el componente imagen), y
+// preserveAspectRatio none para llenar el que le dio.
+export const CANVAS_VARIABLE_IMAGE: string = `data:image/svg+xml,${encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40' preserveAspectRatio='none'><rect x='.5' y='.5' width='79' height='39' fill='#f1f5f9' stroke='#94a3b8' stroke-dasharray='3 2' vector-effect='non-scaling-stroke'/></svg>",
+)}`
+
 export const SAFE_IMAGE_URL: RegExp =
   /^(https?:\/\/|data:image\/(png|jpe?g|gif|webp|bmp|svg\+xml)[;,])/i
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, type NamedExoticComponent, useState } from 'react'
 import { Trash6 } from 'reicon-react'
 import { CHROME_ON_ROW_CLASSES, CHROME_PINNED_CLASSES } from '../../../constants'
 import { useFormStore } from '../../../store'
@@ -9,7 +9,7 @@ import { RowStylesMenu } from '../RowStylesMenu'
 import { ROW_TOOLBAR_CLASSES, ROW_TOOLBAR_DANGER_ITEM_CLASSES } from './RowToolbar.constants'
 import type { RowToolbarMenu, RowToolbarProps } from './RowToolbar.types'
 
-export function RowToolbar({ row, listeners, attributes, pinned }: RowToolbarProps) {
+function RowToolbarBase({ row, listeners, attributes, pinned }: RowToolbarProps) {
   const removeRow = useFormStore((state) => state.removeRow)
   // El estado de los menus vive aca: son excluyentes y la barra no se desvanece mientras hay uno
   // abierto.
@@ -54,3 +54,7 @@ export function RowToolbar({ row, listeners, attributes, pinned }: RowToolbarPro
     </div>
   )
 }
+
+// Memo: durante un arrastre la fila se repinta en cada cambio de estado de dnd-kit, y la barra (asa,
+// dos menus y borrar) no depende de eso (auditoria O2).
+export const RowToolbar: NamedExoticComponent<RowToolbarProps> = memo(RowToolbarBase)

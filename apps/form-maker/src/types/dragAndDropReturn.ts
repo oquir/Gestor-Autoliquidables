@@ -3,6 +3,7 @@ import type {
   DragEndEvent,
   DragMoveEvent,
   DragStartEvent,
+  DropAnimation,
   Modifier,
   SensorDescriptor,
   SensorOptions,
@@ -14,6 +15,7 @@ export interface DragAndDropReturn {
   activeDrag: ActiveDrag | null
   collisionDetection: CollisionDetection
   overlayModifiers: Modifier[]
+  dropAnimation: DropAnimation | null | undefined
   handleDragStart: (event: DragStartEvent) => void
   handleDragMove: (event: DragMoveEvent) => void
   handleDragEnd: (event: DragEndEvent) => void

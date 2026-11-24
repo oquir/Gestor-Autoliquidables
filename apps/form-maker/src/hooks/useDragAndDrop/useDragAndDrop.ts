@@ -6,13 +6,13 @@ import { getBandElement, getRowElement } from '../../lib'
 import { findNearestFit, getFreeRuns } from '../../lib'
 import { resolveBandDrop, resolveRowDrop } from '../../lib'
 import { findRowById, getActiveRows, useFormStore } from '../../store'
-import type { ActiveDrag } from '../../types'
+import type { ActiveDrag, DragSource } from '../../types'
 import type { DragAndDropReturn } from '../../types'
 import type { CanvasField } from '../../types'
 import type { FieldTypeDef } from '../../types'
 import type { CanvasRow } from '../../types'
 import type { CanvasTarget, DragPlacement, RowDropTarget } from '../../types'
-import { DRAG_ACTIVATION_DISTANCE_PX } from './useDragAndDrop.constants'
+import { POINTER_SENSOR_OPTIONS } from './useDragAndDrop.constants'
 import type { PointerPosition } from './useDragAndDrop.types'
 import {
   centerOverlayOnCursor,
@@ -46,6 +46,9 @@ export function useDragAndDrop(): DragAndDropReturn {
   const hoveredTransferTarget = useFormStore((state) => state.hoveredTransferTarget)
   const isLowPerformance = useFormStore((state) => state.isLowPerformance)
   const [activeDrag, setActiveDrag] = useState<ActiveDrag | null>(null)
+  // Sobrevive al soltar: dnd-kit lee dropAnimation en los renders de despues, con activeDrag ya en
+  // null (auditoria B9).
+  const [lastDragSource, setLastDragSource] = useState<DragSource | null>(null)
 
   // En refs y no en estado: cambia en cada movimiento y en cada tecla.
   const activeDragRef = useRef<ActiveDrag | null>(null)
@@ -55,9 +58,7 @@ export function useDragAndDrop(): DragAndDropReturn {
   const modifiersRef = useRef({ shift: false, ctrl: false })
   const anchorRef = useRef<number | null>(null)
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE_PX } }),
-  )
+  const sensors = useSensors(useSensor(PointerSensor, POINTER_SENSOR_OPTIONS))
 
   const getDraggedSpan = useCallback((drag: ActiveDrag | null): number => {
     if (!drag) return GRID_BASE_COLUMNS
@@ -230,6 +231,7 @@ export function useDragAndDrop(): DragAndDropReturn {
     }
 
     setActiveDrag(drag)
+    setLastDragSource(drag?.source ?? null)
     activeDragRef.current = drag
     anchorRef.current = null
     // Al store porque lo leen la banda, la grilla y la previsualizacion; son dos escrituras por
@@ -312,6 +314,9 @@ export function useDragAndDrop(): DragAndDropReturn {
       activeDrag?.source === 'canvas-row' && !hoveredTransferTarget && !isLowPerformance
         ? ROW_OVERLAY_MODIFIERS
         : OVERLAY_MODIFIERS,
+    // Una fila no anima al soltarla ni al cancelarla: la copia necesita rowDrag, que ya se borro, y
+    // se volvia la ficha chica flotando 300 ms. undefined es la animacion de dnd-kit.
+    dropAnimation: lastDragSource === 'canvas-row' ? null : undefined,
     handleDragStart,
     handleDragMove,
     handleDragEnd,

@@ -2,6 +2,8 @@ import type { CssStyleMap, PdfHtmlElement, PdfHtmlNode } from '../../types'
 import {
   ALLOWED_ATTRIBUTES,
   ALLOWED_TAGS,
+  CANVAS_VARIABLE_IMAGE,
+  CANVAS_VARIABLE_SRC,
   DATA_FM_ATTRIBUTE,
   DROP_WITH_CONTENT,
   RAW_TEXT_TAGS,
@@ -94,6 +96,13 @@ export function sanitizePdfHtml(html: string): string {
   }
 
   return out
+}
+
+// Solo para el lienzo: un <img src="{Code}"> pediria "{Code}" al servidor y se pintaria roto, y con
+// alt Chrome lo cambia por el texto (la fila se encoge y salta). Lleva una muestra local del mismo
+// tamano, como los componentes; el .html sigue con la variable para el back.
+export function sanitizePdfCanvasHtml(html: string): string {
+  return sanitizePdfHtml(html).replace(CANVAS_VARIABLE_SRC, `$1${CANVAS_VARIABLE_IMAGE}"`)
 }
 
 // Lector tolerante de HTML YA SANEADO: cierra lo abierto como el navegador, sin agregar lo que

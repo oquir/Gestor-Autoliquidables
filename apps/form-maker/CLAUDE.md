@@ -62,7 +62,6 @@ Guidance for Claude Code in this app (FormMaker, formerly "Form Orchestrator"): 
 - **Two selects still infer their catalog from the path** (`periodo_anio`, `clasificacion_contribuyente`); `juegos_permitidos` has no field. Catalog ids are unconfirmed contract names.
 - Renglones 31 and 37 need the intro modal (`{{periodo_anio}}` lives there); deleting those intro steps leaves them uncalculated (the export review blocks).
 - Selects mapped to `number` leaves show a permanent `⚠ tipo` (fix offered, not approved).
-- **Moving a field out of a repeatable group to another step keeps its `apiBinding`** (`planLanding`); one-line fix not applied.
 - PDF designer: §3.1, §3.2, §3.3, §3.5 built; no variable list (§3.4). §3.3 has no checkbox and no repeating row — the user's call, don't build them without asking. Styles go in design classes (one `<style>`, `class="…"` per cell); don't reintroduce per-cell inline defaults. The sidebar isn't checked in a browser yet, nor anything through the real back.
 
 ## Invariants that bite (details in `docs/Decisiones.md`)
@@ -75,6 +74,7 @@ Guidance for Claude Code in this app (FormMaker, formerly "Form Orchestrator"): 
 - **Never in the draft or export**: the simulator banks (catalogs, fechas, UVT), the PDF design (own `localStorage` key per tax), `canvasZoom`, `canvasTool`, panel state.
 - **Never store rich text/PDF HTML as raw HTML**; the serializer/sanitizer is the barrier, `safeHref` runs at insert, serialize and draft load.
 - **The `DndContext` needs `onDragCancel` → `resetDragState`**: dnd-kit cancels on Escape, `pointercancel`, tab switch and resize and then never calls `onDragEnd`; without it the drag state and the window listeners survive the drag.
+- **dnd-kit consumers are thin shells over a memoized body** (`CanvasFieldChip`, `CanvasRow` → `RowToolbar`, `PaletteChip`, `StepTabChip`): `useDraggable`/`useDroppable` re-render past any `memo` on every drag state change. Keep `POINTER_SENSOR_OPTIONS` a module constant and the chips' handlers stable (`useCallback`), or every body repaints again.
 - **Save the draft through `saveDraftOrWarn`** (`lib/draftSave`), never `saveDraft` + `markSaved` by hand: `saveDraft` returns ok/error (full `localStorage`), and only `saveDraftOrWarn` marks "Guardado" or shows the error toast.
 - **Equality for undo is `sameDocument`** — selection, zoom, tool and drag state never create a history step. Edits that change nothing must return the same reference: `mapFieldEverywhere`/`mapRowEverywhere` keep every untouched step and row, so an updater must return the **same** object when nothing changes (`patchChanges`).
 - **Rounding/negatives/decimals change the value, not just display**; the formatted text never leaves the input (state holds a real `number`).

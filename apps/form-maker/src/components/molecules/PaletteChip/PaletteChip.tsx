@@ -1,14 +1,13 @@
 import { useDraggable } from '@dnd-kit/core'
+import { memo, type NamedExoticComponent } from 'react'
 import { FIELD_TYPE_ICONS } from '../../../constants'
-import type { PaletteChipProps } from './PaletteChip.types'
+import type { PaletteChipContentProps, PaletteChipProps } from './PaletteChip.types'
 
 export function PaletteChip({ fieldType, onAdd }: PaletteChipProps) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `palette-${fieldType.type}`,
     data: { source: 'palette', fieldType },
   })
-
-  const Icon = FIELD_TYPE_ICONS[fieldType.type]
 
   return (
     <button
@@ -21,8 +20,23 @@ export function PaletteChip({ fieldType, onAdd }: PaletteChipProps) {
         isDragging ? 'opacity-40' : ''
       }`}
     >
-      {Icon && <Icon size={20} className="text-slate-400 dark:text-neutral-400" />}
-      <span>{fieldType.label}</span>
+      <PaletteChipContent fieldType={fieldType} />
     </button>
   )
 }
+
+function PaletteChipContentBase({ fieldType }: PaletteChipContentProps) {
+  const Icon = FIELD_TYPE_ICONS[fieldType.type]
+
+  return (
+    <>
+      {Icon && <Icon size={20} className="text-slate-400 dark:text-neutral-400" />}
+      <span>{fieldType.label}</span>
+    </>
+  )
+}
+
+// Aparte de useDraggable: ese hook repinta las fichas en cada cambio de estado de un arrastre,
+// aunque no sean la arrastrada (auditoria O2).
+const PaletteChipContent: NamedExoticComponent<PaletteChipContentProps> =
+  memo(PaletteChipContentBase)
