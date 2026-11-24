@@ -1,15 +1,12 @@
 import type { StoreApi } from 'zustand'
 import { savePdfDesign } from '../../lib/pdfDesignBank'
-import type { PdfDesign, PdfDesignState, PdfSaveResult } from '../../types'
+import type { PdfDesignState, PdfSaveResult } from '../../types'
+import type { PdfAutosave, PendingSave } from './usePdfDesignAutosave.types'
 
-interface PendingSave {
-  design: PdfDesign
-  version: number | null
-}
-
-// Guarda tras delayMs de calma y devuelve el apagado (que guarda lo pendiente). Abrir una plantilla
-// no guarda; subir si cuenta como cambio, o la N se repetiria tras recargar.
-export function startPdfAutosave(store: StoreApi<PdfDesignState>, delayMs: number): () => void {
+// Guarda tras delayMs de calma. Devuelve el guardado inmediato y el apagado (que tambien guarda lo
+// pendiente). Abrir una plantilla no guarda; subir si cuenta como cambio, o la N se repetiria tras
+// recargar.
+export function startPdfAutosave(store: StoreApi<PdfDesignState>, delayMs: number): PdfAutosave {
   let timer: ReturnType<typeof setTimeout> | null = null
   let pending: PendingSave | null = null
 
@@ -44,8 +41,11 @@ export function startPdfAutosave(store: StoreApi<PdfDesignState>, delayMs: numbe
     timer = setTimeout(() => flush(true), delayMs)
   })
 
-  return () => {
-    unsubscribe()
-    flush(true)
+  return {
+    flush: () => flush(true),
+    stop: () => {
+      unsubscribe()
+      flush(true)
+    },
   }
 }

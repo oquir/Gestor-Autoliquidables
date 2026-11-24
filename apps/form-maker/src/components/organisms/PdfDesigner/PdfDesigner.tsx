@@ -48,7 +48,7 @@ export function PdfDesigner() {
     [formType],
   )
 
-  usePdfDesignAutosave()
+  const saveNow = usePdfDesignAutosave()
   usePdfDesignerShortcuts()
 
   useEffect(() => {
@@ -68,7 +68,10 @@ export function PdfDesigner() {
           <Tooltip content="Volver al formulario">
             <button
               type="button"
-              onClick={() => setPdfDesignerOpen(false)}
+              onClick={() => {
+                saveNow()
+                setPdfDesignerOpen(false)
+              }}
               className={BACK_BUTTON_CLASSES}
             >
               <ArrowLeft size={14} />
