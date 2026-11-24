@@ -23,7 +23,6 @@ Known gaps:
 - **Two catalog-fed selects still use path-inference instead of `dataSource`**: `periodo_anio`, `clasificacion_contribuyente` (+ the `tipo_representante` toggle). `CATALOGS` declares 9 names, only 8 are wired. `juegos_permitidos` has no field pointing at it yet. Catalog ids are unconfirmed contract names with the consumer.
 - **Renglones 31 and 37 need the intro modal** (`{{periodo_anio}}` lives there). The wizard always creates it for `industria_comercio` (step 2 is skipped), but nothing stops deleting those intro steps afterwards. Without them the field stays typeable but uncalculated — no longer silently: the unknown `{{periodo_anio}}` shows red and the export review blocks.
 - Selects mapped to `number` leaves show a permanent `⚠ tipo` warning (a two-line fix in `fieldMatchesSchemaType` has been offered, not approved).
-- **Moving a field out of a repeatable group to another step keeps its `apiBinding`** — `moveFieldsToStep` → `planLanding` copies the field as is, contrary to the rule in "Repeatable groups". Shared by drag-to-tab and "Mover a paso". One-line fix, not applied: it changes single-field transfers too.
 
 ## The right panel (`RightSidebar`)
 
@@ -327,7 +326,7 @@ Helpers in `src/lib/repeatableGroup/repeatableGroup.ts`. Bounds default `DEFAULT
 Settled:
 
 - **`arrayPath` is absolute** (`actividades[].idActividad`), not group-relative — one namespace, no special cases in `resolveLeaf`/mapping.
-- Moving a field out of a group clears its `apiBinding` (path is meaningless outside the array item). Changing a group's `arrayPath` clears all members' bindings for the same reason.
+- Moving a field out of a group clears its `apiBinding` (path is meaningless outside the array item) — **also when it leaves for another step** (2026-11-23): `moveFieldsToStep` (drag to a tab and "Mover a paso") used to hand the field to `planLanding` as is, so `actividad` landed in "Datos" still pointing at `actividades[].idActividad`. Now a field that comes from a group row loses a `mapped` binding before landing (a step never lands into a group, `planLanding` skips them); a loose field keeps its own (`contribuyente.idTipoPersona` in the test), and undo brings both back. Checked through `tsx` on the real store, before and after. Changing a group's `arrayPath` clears all members' bindings for the same reason.
 - Deleting a group's last row deletes the group (`pruneEmptyGroups`); `removeGroup` instead keeps the rows and strips `groupId`.
 
 UI: `RepeatableGroupBand` (title, min/max, `arrayPath` select, +Fila, dissolve, collapsed `GroupChecksEditor`), `CanvasRowsGrid.utils.ts` (`toCanvasBlocks`), "+ Grupo repetible" in `CanvasToolbar`.

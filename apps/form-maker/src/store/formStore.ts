@@ -428,6 +428,13 @@ const createFormState: StateCreator<FormState, [['temporal', unknown]], []> = (s
       const alreadyThere: Set<string> = new Set<string>(
         targetRows.flatMap((row) => row.fields.map((field) => field.id)),
       )
+      // El destino nunca es un grupo (planLanding los saltea): quien sale de uno pierde el mapeo,
+      // igual que en moveField. Su ruta (actividades[].algo) no significa nada fuera.
+      const inGroup: Set<string> = new Set<string>(
+        rows
+          .filter((row) => row.groupId !== undefined)
+          .flatMap((row) => row.fields.map((f) => f.id)),
+      )
       const moving: CanvasField[] = []
       const movingIds: Set<string> = new Set<string>()
 
@@ -437,7 +444,11 @@ const createFormState: StateCreator<FormState, [['temporal', unknown]], []> = (s
         for (const field of transferGroup(rows, fieldId)) {
           if (movingIds.has(field.id)) continue
           movingIds.add(field.id)
-          moving.push(field)
+          moving.push(
+            inGroup.has(field.id) && field.apiBinding?.kind === 'mapped'
+              ? { ...field, apiBinding: undefined }
+              : field,
+          )
         }
       }
 
