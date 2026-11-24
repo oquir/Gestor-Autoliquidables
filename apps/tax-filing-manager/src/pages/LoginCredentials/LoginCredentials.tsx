@@ -178,6 +178,7 @@ export default function LoginCredentials() {
           <div className="mt-3 text-center">
             <button
               type="button"
+              onClick={() => navigate(`/recuperar/${user.id}`)}
               className="text-[14px] font-medium text-blue-900 hover:underline transition-colors cursor-pointer"
             >
               ¿Olvidaste tu contraseña?
