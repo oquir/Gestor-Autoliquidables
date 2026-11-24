@@ -12,7 +12,7 @@ import type { CanvasField } from '../../types'
 import type { FieldTypeDef } from '../../types'
 import type { CanvasRow } from '../../types'
 import type { CanvasTarget, DragPlacement, RowDropTarget } from '../../types'
-import { DRAG_ACTIVATION_DISTANCE_PX } from './useDragAndDrop.constants'
+import { POINTER_SENSOR_OPTIONS } from './useDragAndDrop.constants'
 import type { PointerPosition } from './useDragAndDrop.types'
 import {
   centerOverlayOnCursor,
@@ -58,9 +58,7 @@ export function useDragAndDrop(): DragAndDropReturn {
   const modifiersRef = useRef({ shift: false, ctrl: false })
   const anchorRef = useRef<number | null>(null)
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE_PX } }),
-  )
+  const sensors = useSensors(useSensor(PointerSensor, POINTER_SENSOR_OPTIONS))
 
   const getDraggedSpan = useCallback((drag: ActiveDrag | null): number => {
     if (!drag) return GRID_BASE_COLUMNS

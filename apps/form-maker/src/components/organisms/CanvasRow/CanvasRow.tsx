@@ -1,5 +1,11 @@
 import { useDraggable, useDroppable } from '@dnd-kit/core'
-import { type CSSProperties, memo, type MouseEvent, type NamedExoticComponent } from 'react'
+import {
+  type CSSProperties,
+  memo,
+  type MouseEvent,
+  type NamedExoticComponent,
+  useCallback,
+} from 'react'
 import { resolveRowStyles } from '../../../lib'
 import { getSelectedFieldId, useFormStore } from '../../../store'
 import { CanvasFieldChip } from '../../molecules'
@@ -38,20 +44,37 @@ function CanvasRowBase({
   const pinnedFieldId: string | null = canvasTool === 'move' ? singleSelectedId : null
   const pinned: boolean = row.fields.some((field) => field.id === pinnedFieldId)
 
-  function setRefs(node: HTMLLIElement | null): void {
-    setDropRef(node)
-    setDragRef(node)
-  }
+  // Estables: durante un arrastre la fila se repinta en cada cambio de estado de dnd-kit, y los
+  // chips (memo) solo se saltan ese repintado si reciben los mismos manejadores (auditoria O2).
+  const setRefs = useCallback(
+    (node: HTMLLIElement | null): void => {
+      setDropRef(node)
+      setDragRef(node)
+    },
+    [setDropRef, setDragRef],
+  )
 
   // Shift, Ctrl o Cmd suman a la seleccion.
-  function handleFieldClick(event: MouseEvent<HTMLButtonElement>, fieldId: string): void {
-    if (canvasTool === 'select' || event.shiftKey || event.ctrlKey || event.metaKey) {
-      toggleFieldSelection(fieldId)
-      return
-    }
+  const handleChipClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>, fieldId: string): void => {
+      if (canvasTool === 'select' || event.shiftKey || event.ctrlKey || event.metaKey) {
+        toggleFieldSelection(fieldId)
+        return
+      }
 
-    selectField(fieldId)
-  }
+      selectField(fieldId)
+    },
+    [canvasTool, selectField, toggleFieldSelection],
+  )
+
+  const handleChipContextMenu = useCallback(
+    (event: MouseEvent<HTMLButtonElement>, fieldId: string): void => {
+      event.preventDefault()
+      selectField(fieldId)
+      onFieldContextMenu(fieldId, event.clientX, event.clientY)
+    },
+    [selectField, onFieldContextMenu],
+  )
 
   return (
     <li
@@ -111,12 +134,8 @@ function CanvasRowBase({
           linkedLabel={linkedLabels.get(field.id) ?? null}
           selected={selectedFieldIds.includes(field.id)}
           pinned={field.id === pinnedFieldId}
-          onClick={(event) => handleFieldClick(event, field.id)}
-          onContextMenu={(event) => {
-            event.preventDefault()
-            selectField(field.id)
-            onFieldContextMenu(field.id, event.clientX, event.clientY)
-          }}
+          onChipClick={handleChipClick}
+          onChipContextMenu={handleChipContextMenu}
         />
       ))}
       {zonePlacement && <RowZoneOverlay columns={row.columns} placement={zonePlacement} />}

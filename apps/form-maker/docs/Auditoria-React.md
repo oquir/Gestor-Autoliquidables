@@ -187,15 +187,15 @@ Contexto técnico: React 19.2 con StrictMode, Zustand 5 + zundo, sin React Compi
 
 ## C. Oportunidades (solo si el Profiler lo justifica)
 
-| #                                                            | Dónde                                                                                | Qué pasa                                                                                                                                                                                  | Cuándo vale la pena                                                                                  |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| [x] ~~O1~~ (2026-11-22, hecho en la Fase 2: −64 % por tecla) | `Canvas` → `CanvasRowsGrid` → `CanvasRow` → `CanvasFieldChip`                        | Cada tecla, cambio de selección o paso de zoom vuelve a renderizar todas las filas y chips del paso. **Medido 2026-11-22: no es barato**, 12,6 ms por tecla (67,7 ms con CPU ×4), ver A3. | Requiere A6 y callbacks estables. Candidato a subir de prioridad: pendiente de decisión del usuario. |
-| [ ] O2 (Fase 3: el costo es otro, ver el perfil)             | `FormBuilder` (usa `useDragAndDrop`)                                                 | Al empezar y al terminar cada arrastre, y al pasar sobre una pestaña de paso, se vuelve a renderizar la app entera.                                                                       | Si se nota un tirón al empezar a arrastrar.                                                          |
-| [x] ~~O3~~ (2026-11-23, medido y descartado: 0,13 ms)        | `ActiveStepLabel`, `RightSidebar`, `CanvasTabs`, `StepTitleEditor`, `FormSummary`    | Se suscriben a `formSteps` entero para datos chicos y se renderizan en cada tecla.                                                                                                        | Junto con O1: selectores de valores primitivos.                                                      |
-| [x] ~~O4~~ (2026-11-23, medido y descartado: +1,8 ms)        | `JsonPreviewCanvas`                                                                  | Con la vista JSON abierta, cada tecla reconstruye el export y tokeniza ~2.200 líneas.                                                                                                     | Si se siente lento: `useDeferredValue(json)`.                                                        |
-| [x] ~~O5~~ (2026-11-23, medido y descartado: 0,08 ms)        | `preview/PreviewResults:15-24`                                                       | Arma los JSON de las dos pestañas en cada tecla, aunque solo se ve una.                                                                                                                   | Barato: solo el de la pestaña activa.                                                                |
-| [x] ~~O6~~ (2026-11-23, medido y descartado: 0 por tecla)    | `useClickOutside`, `useModalKeyGuard`, `useFieldContextMenu`, `useSimpleCalcBuilder` | Vuelven a registrar sus listeners en cada render del padre (callbacks nuevos). Inofensivo.                                                                                                | Limpieza con `useEffectEvent` (React 19.2).                                                          |
-| [x] ~~O7~~ (2026-11-23, medido y descartado: 0,49 ms)        | `pdf/PdfThumbnail`                                                                   | Al volver a Proyecto relee el diseño guardado (`JSON.parse` + Zod) solo para la llave de la caché.                                                                                        | Si el diseño pesa mucho: llave a partir del texto crudo.                                             |
+| #                                                             | Dónde                                                                                | Qué pasa                                                                                                                                                                                  | Cuándo vale la pena                                                                                  |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [x] ~~O1~~ (2026-11-22, hecho en la Fase 2: −64 % por tecla)  | `Canvas` → `CanvasRowsGrid` → `CanvasRow` → `CanvasFieldChip`                        | Cada tecla, cambio de selección o paso de zoom vuelve a renderizar todas las filas y chips del paso. **Medido 2026-11-22: no es barato**, 12,6 ms por tecla (67,7 ms con CPU ×4), ver A3. | Requiere A6 y callbacks estables. Candidato a subir de prioridad: pendiente de decisión del usuario. |
+| [x] ~~O2~~ (2026-11-23, hecho en la Fase 3: −43 % al empezar) | `FormBuilder` (usa `useDragAndDrop`)                                                 | Al empezar y al terminar cada arrastre, y al pasar sobre una pestaña de paso, se vuelve a renderizar la app entera.                                                                       | Si se nota un tirón al empezar a arrastrar.                                                          |
+| [x] ~~O3~~ (2026-11-23, medido y descartado: 0,13 ms)         | `ActiveStepLabel`, `RightSidebar`, `CanvasTabs`, `StepTitleEditor`, `FormSummary`    | Se suscriben a `formSteps` entero para datos chicos y se renderizan en cada tecla.                                                                                                        | Junto con O1: selectores de valores primitivos.                                                      |
+| [x] ~~O4~~ (2026-11-23, medido y descartado: +1,8 ms)         | `JsonPreviewCanvas`                                                                  | Con la vista JSON abierta, cada tecla reconstruye el export y tokeniza ~2.200 líneas.                                                                                                     | Si se siente lento: `useDeferredValue(json)`.                                                        |
+| [x] ~~O5~~ (2026-11-23, medido y descartado: 0,08 ms)         | `preview/PreviewResults:15-24`                                                       | Arma los JSON de las dos pestañas en cada tecla, aunque solo se ve una.                                                                                                                   | Barato: solo el de la pestaña activa.                                                                |
+| [x] ~~O6~~ (2026-11-23, medido y descartado: 0 por tecla)     | `useClickOutside`, `useModalKeyGuard`, `useFieldContextMenu`, `useSimpleCalcBuilder` | Vuelven a registrar sus listeners en cada render del padre (callbacks nuevos). Inofensivo.                                                                                                | Limpieza con `useEffectEvent` (React 19.2).                                                          |
+| [x] ~~O7~~ (2026-11-23, medido y descartado: 0,49 ms)         | `pdf/PdfThumbnail`                                                                   | Al volver a Proyecto relee el diseño guardado (`JSON.parse` + Zod) solo para la llave de la caché.                                                                                        | Si el diseño pesa mucho: llave a partir del texto crudo.                                             |
 
 ---
 
@@ -298,8 +298,19 @@ paso 1 (16 campos en 7 filas). JS por escritura, CPU normal:
       (2026-11-23) Un proyecto coherente exporta el mismo JSON (huellas comparadas con `tsx`). Con
       un borrador desfasado (dice que no y hay 2 pasos), antes el resumen escondía el modal y el
       simulador abría sin él; ahora los dos siguen a los pasos. La forma del borrador no cambia.
-- [ ] O2 arrastre: que cada cambio de estado de dnd-kit no repinte todo el lienzo, la paleta y las
-      pestañas.
+- [x] ~~O2 arrastre: que cada cambio de estado de dnd-kit no repinte todo el lienzo, la paleta y
+      las pestañas.~~ (2026-11-23) Chips, filas, paleta y pestañas: un cascarón con el hook de
+      dnd-kit y un cuerpo con memo; manejadores de los chips estables; opciones del sensor como
+      constante (con un objeto nuevo en cada render, dnd-kit rehacía su contexto para todos los
+      arrastrables cada vez que `FormBuilder` se repintaba); y el layout fijo en `FormBuilder`.
+      Arrastrar un campo, empezar y cancelar: **42,1 → 24,1 ms** (×4: **288 → 105 ms**); cada
+      movimiento cruzando filas 4,4 → 1,8 ms (×4: 20,5 → 8,8, ya cabe en un cuadro de 60 fps). Una
+      fila 46,8 → 21,3 ms, la paleta 36,0 → 14,2 ms. Por arrastre, `Tooltip` 496 → 70 y el cuerpo
+      del chip 137 → 6. La tecla no cambia (2,13 → 2,06 ms). Las 18 pruebas del lienzo dan lo mismo
+      en la compilación vieja y la nueva. `RepeatableGroupBand` no se separó: pesa poco.
+
+**Fase 3 terminada (2026-11-23):** B6, B8, B9 y O2 hechos; O3 a O7 y B5 medidos y descartados; B7
+aceptado.
 
 ### Perfil de la Fase 3 (2026-11-23)
 
@@ -314,9 +325,13 @@ Proyecto, sigue en **2,24 ms**.
 | Tecla con la vista JSON (O4)                  | 4,06 ms               | el export 0,72 ms y `JsonCode` 0,91 ms; el lienzo no se pinta          |
 | Tecla en el simulador (O5)                    | 2,32 ms               | `PreviewResults` 0,02 ms y `JsonCode` 0,06 ms; validar, 0,48 ms        |
 | Volver a Proyecto con un diseño guardado (O7) | 9,04 ms               | `loadPdfDesign` 0,49 ms (diseño de 70 KB); el resto es montar el panel |
-| Arrastrar un campo: empezar y cancelar (O2)   | **43,9 ms** (×4: 267) | unas 5 pasadas por todas las filas, chips, fichas y pestañas           |
-| Cada movimiento en la misma fila              | 2,2 ms (×4: 10,8)     | el chip arrastrado y, a ratos, todo                                    |
-| Cada movimiento cruzando filas                | 3,7 ms (×4: 23,2)     | todo, cada vez que cambia el destino (`over`)                          |
+| Arrastrar un campo: empezar y cancelar (O2)   | **42,1 ms** (×4: 288) | unas 5 pasadas por todas las filas, chips, fichas y pestañas           |
+| Cada movimiento en la misma fila              | 1,4 ms (×4: 6,8)      | solo el chip arrastrado                                                |
+| Cada movimiento cruzando filas                | 4,4 ms (×4: 20,5)     | todo, cada vez que cambia el destino (`over`)                          |
+
+Las tres filas del arrastre se volvieron a medir después de registrar este perfil: la primera
+versión del script llevaba el lienzo libre a su esquina (`scrollTo(0, 0)`) y los movimientos no
+caían donde decía. Empezar y cancelar casi no cambió (43,9 → 42,1 ms).
 
 - **O2 tenía mal la causa.** `FormBuilder` repinta la app solo dos veces por arrastre (al empezar
   y al terminar). Lo caro es dnd-kit: cada cambio de su estado (el activo, las medidas de las zonas,

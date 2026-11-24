@@ -1,9 +1,9 @@
 import { Tooltip } from '../../atoms/Tooltip'
 import { useDroppable } from '@dnd-kit/core'
-import { useEffect, useRef } from 'react'
+import { memo, type NamedExoticComponent, useEffect, useRef } from 'react'
 import { Xmark } from 'reicon-react'
 import { STEP_NAVIGATION_HINT } from '../../../constants/stepNavigation'
-import type { StepTabChipProps } from './StepTabChip.types'
+import type { StepTabChipBodyProps, StepTabChipProps } from './StepTabChip.types'
 import { transferClasses } from './StepTabChip.utils'
 
 export function StepTabChip({
@@ -24,6 +24,34 @@ export function StepTabChip({
     data: { canvasTarget },
     disabled: transferState !== 'ready',
   })
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`relative shrink-0 rounded-md ${transferClasses(transferState, isOver)} ${className}`}
+    >
+      <StepTabChipBody
+        index={index}
+        label={label}
+        active={active}
+        onSelect={onSelect}
+        onRemove={onRemove}
+        removeTitle={removeTitle}
+        removeIconSize={removeIconSize}
+      />
+    </div>
+  )
+}
+
+function StepTabChipBodyBase({
+  index,
+  label,
+  active,
+  onSelect,
+  onRemove,
+  removeTitle,
+  removeIconSize,
+}: StepTabChipBodyProps) {
   const buttonRef = useRef<HTMLButtonElement | null>(null)
 
   // Con Ctrl+flecha el paso cambia sin tocar la grilla: la pestana activa se trae a la vista.
@@ -38,10 +66,7 @@ export function StepTabChip({
     : 'bg-surface-raised text-fg-soft hover:bg-surface-inset hover:text-fg-strong'
 
   return (
-    <div
-      ref={setNodeRef}
-      className={`relative shrink-0 rounded-md ${transferClasses(transferState, isOver)} ${className}`}
-    >
+    <>
       <Tooltip content={`${label}\n${STEP_NAVIGATION_HINT}`} className="whitespace-pre-line">
         <button
           ref={buttonRef}
@@ -70,6 +95,10 @@ export function StepTabChip({
           </button>
         </Tooltip>
       )}
-    </div>
+    </>
   )
 }
+
+// Aparte de useDroppable: ese hook repinta todas las pestanas en cada cambio de estado de un
+// arrastre, y la pestana (su Tooltip y sus botones) no depende de eso (auditoria O2).
+const StepTabChipBody: NamedExoticComponent<StepTabChipBodyProps> = memo(StepTabChipBodyBase)

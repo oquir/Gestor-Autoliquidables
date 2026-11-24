@@ -15,3 +15,10 @@ export interface StepTabChipProps {
   removeIconSize?: number
   className?: string
 }
+
+export interface StepTabChipBodyProps extends Pick<
+  StepTabChipProps,
+  'index' | 'label' | 'active' | 'onSelect' | 'onRemove' | 'removeTitle'
+> {
+  removeIconSize: number
+}
