@@ -524,6 +524,25 @@ export const useData = create<StoreState>()(
         resetDemo: () => set({ ...generateData(), selectedMunicipality: null, dateQueries: {} }),
       }
     },
-    { name: 'tax-filing-manager-demo', version: 50 },
+    {
+      name: 'tax-filing-manager-demo',
+      version: 51,
+      migrate: (persisted) => {
+        const p = persisted as StoreState
+        return {
+          ...p,
+          settingsList: (p.settingsList ?? []).map((c) => ({
+            ...c,
+            securitySurcharge: c.securitySurcharge ?? { active: false, percentage: 0 },
+            voluntaryContribution: c.voluntaryContribution ?? {
+              active: false,
+              mode: 'free',
+              suggestedPercentage: 0,
+              requestDestination: false,
+            },
+          })),
+        }
+      },
+    },
   ),
 )

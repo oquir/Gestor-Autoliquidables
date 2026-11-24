@@ -14,6 +14,7 @@ import Registrations from './pages/Registrations'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import LoginCredentials from './pages/LoginCredentials'
+import RecoverPassword from './pages/RecoverPassword'
 import Municipalities from './pages/Municipalities'
 import Payments from './pages/Payments'
 import Reports from './pages/Reports'
@@ -25,6 +26,8 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/login/:userId" element={<LoginCredentials />} />
+        <Route path="/recuperar" element={<RecoverPassword />} />
+        <Route path="/recuperar/:userId" element={<RecoverPassword />} />
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="rit" element={<Registrations />} />

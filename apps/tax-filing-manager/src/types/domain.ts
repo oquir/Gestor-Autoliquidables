@@ -504,6 +504,13 @@ export interface MunicipalityConfig {
   taxCalendar: { byFiscalYear: FiscalYearCalendar[] }
   advancePercentage: number
   fireSurcharge: { active: boolean; percentage: number }
+  securitySurcharge: { active: boolean; percentage: number }
+  voluntaryContribution: {
+    active: boolean
+    mode: 'free' | 'percentage'
+    suggestedPercentage: number
+    requestDestination: boolean
+  }
   reteica: {
     modality: 'flat' | 'activity' | 'concept'
     flatRatePerThousand: number
