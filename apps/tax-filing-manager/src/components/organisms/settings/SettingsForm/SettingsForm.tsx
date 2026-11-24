@@ -26,7 +26,16 @@ export default function SettingsForm({ config, editable }: SettingsFormProps) {
   const taxes = municipality?.taxes ?? ALL_ACTIVE
   const withRit = municipality?.rit ?? true
   const withApproval = TAXES.filter((i) => taxes[i] && municipality?.priorApproval[i])
-  const [b, setB] = useState(config)
+  const [b, setB] = useState({
+    ...config,
+    securitySurcharge: config.securitySurcharge ?? { active: false, percentage: 0 },
+    voluntaryContribution: config.voluntaryContribution ?? {
+      active: false,
+      mode: 'free',
+      suggestedPercentage: 0,
+      requestDestination: false,
+    },
+  })
   const change = (partial: Partial<MunicipalityConfig>) => {
     setB((current) => ({ ...current, ...partial }))
   }

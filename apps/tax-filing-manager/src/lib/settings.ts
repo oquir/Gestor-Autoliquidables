@@ -99,6 +99,13 @@ export function newSettings(municipalityId: string): MunicipalityConfig {
     taxCalendar: { byFiscalYear: [] },
     advancePercentage: 40,
     fireSurcharge: { active: true, percentage: 4 },
+    securitySurcharge: { active: false, percentage: 0 },
+    voluntaryContribution: {
+      active: false,
+      mode: 'free',
+      suggestedPercentage: 0,
+      requestDestination: false,
+    },
     reteica: {
       modality: 'flat',
       flatRatePerThousand: 2,
