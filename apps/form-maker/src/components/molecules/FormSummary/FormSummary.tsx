@@ -11,16 +11,16 @@ import {
 
 export function FormSummary() {
   const formSteps = useFormStore((state) => state.formSteps)
-  const setupConfig = useFormStore((state) => state.setupConfig)
+  const formType = useFormStore((state) => state.setupConfig.formType)
   const introSteps = useFormStore((state) => state.introModal.steps)
 
   const formTypeLabel: string =
-    FORM_TYPES.find((option) => option.value === setupConfig.formType)?.label ?? 'Sin definir'
+    FORM_TYPES.find((option) => option.value === formType)?.label ?? 'Sin definir'
   const fieldCount: number = formSteps.reduce(
     (total, step) => total + getAllFields(step.rows).length,
     0,
   )
-  const hasIntro: boolean = setupConfig.hasIntroModal
+  const hasIntro: boolean = introSteps.length > 0
 
   return (
     <>
