@@ -106,6 +106,7 @@ export function newSettings(municipalityId: string): MunicipalityConfig {
       suggestedPercentage: 0,
       requestDestination: false,
     },
+    crossCheckSelfWithholdings: false,
     reteica: {
       modality: 'flat',
       flatRatePerThousand: 2,

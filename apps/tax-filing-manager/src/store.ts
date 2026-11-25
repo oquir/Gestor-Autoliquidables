@@ -526,7 +526,7 @@ export const useData = create<StoreState>()(
     },
     {
       name: 'tax-filing-manager-demo',
-      version: 51,
+      version: 52,
       migrate: (persisted) => {
         const p = persisted as StoreState
         return {
@@ -540,6 +540,7 @@ export const useData = create<StoreState>()(
               suggestedPercentage: 0,
               requestDestination: false,
             },
+            crossCheckSelfWithholdings: c.crossCheckSelfWithholdings ?? false
           })),
         }
       },

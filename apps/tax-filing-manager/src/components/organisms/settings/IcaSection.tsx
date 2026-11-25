@@ -1,15 +1,21 @@
 import { number, MAX_ADVANCE } from '../../../lib'
-import type { SettingsEdit } from '../../../types'
+import type { SettingsEdit, Tax } from '../../../types'
 import { Input } from '../../atoms'
 import { Field, Toggle, Section } from '../../molecules'
 
+interface IcaSectionProps extends SettingsEdit {
+  taxes: Record<Tax, boolean>
+}
+
 /** ICA anual: anticipo y sobretasa bomberil. El descuento por pronto pago está en la página Calendario. */
-export default function IcaSection({ b, change, editable, errors }: SettingsEdit) {
+export default function IcaSection({ b, change, editable, errors, taxes }: IcaSectionProps) {
+  const withSelfWithholding = taxes.selfWithholding && !b.disabledForms.selfWithholding
   return (
     <Section
       title="ICA anual"
       description="Cobros que fija el concejo municipal. El descuento por pronto pago se pone en Calendario."
     >
+      {/* Anticipo */}
       <Field
         label="Anticipo del año siguiente (%)"
         help="0 si el municipio no lo exige."
@@ -24,6 +30,8 @@ export default function IcaSection({ b, change, editable, errors }: SettingsEdit
           onChange={(e) => change({ advancePercentage: number(e.target.value) })}
         />
       </Field>
+
+      {/* Sobretasa bomberil */}
       <div className="space-y-3">
         <Toggle
           label="Sobretasa bomberil"
@@ -55,7 +63,7 @@ export default function IcaSection({ b, change, editable, errors }: SettingsEdit
         )}
       </div>
 
-      {/* Fila 2 - Izquierda */}
+      {/* Sobretasa de seguridad */}
       <div className="space-y-3">
         <Toggle
           label="Sobretasa de seguridad"
@@ -90,7 +98,7 @@ export default function IcaSection({ b, change, editable, errors }: SettingsEdit
         )}
       </div>
 
-      {/* Fila 2 - Derecha */}
+      {/* Pago volunatrio */}
       <div className="space-y-3">
         <Toggle
           label="Pago voluntario"
@@ -196,6 +204,21 @@ export default function IcaSection({ b, change, editable, errors }: SettingsEdit
             </label>
           </div>
         )}
+      </div>
+
+      {/* Cruce de autorretenciones */}
+      <div className="space-y-3">
+        <Toggle
+          label="Cruce de autorretenciones"
+          help={
+            withSelfWithholding
+              ? 'Pertenece al renglón 28 que corresponde a Menos autorretenciones.'
+              : 'Requiere tener activo el formulario de AutoReteICA.'
+          }
+          value={withSelfWithholding && b.crossCheckSelfWithholdings}
+          isDisabled={!editable || !withSelfWithholding}
+          onChange={(v) => change({ crossCheckSelfWithholdings: v })} 
+        />
       </div>
     </Section>
   )

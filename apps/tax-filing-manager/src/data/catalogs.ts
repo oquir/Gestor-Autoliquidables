@@ -353,6 +353,7 @@ export const SETTINGS: MunicipalityConfig[] = [
       suggestedPercentage: 0,
       requestDestination: false,
     },
+    crossCheckSelfWithholdings: false,
     selfWithholding: { modality: 'percentage', percentage: 50 },
     penalties: { ...STATUTORY_PENALTIES },
     registrationTermMonths: 2,
@@ -488,6 +489,7 @@ export const SETTINGS: MunicipalityConfig[] = [
       suggestedPercentage: 0,
       requestDestination: false,
     },
+    crossCheckSelfWithholdings: false,
     selfWithholding: { modality: 'full', percentage: 100 },
     penalties: { ...STATUTORY_PENALTIES },
     registrationTermMonths: 2,
@@ -567,6 +569,7 @@ export const SETTINGS: MunicipalityConfig[] = [
       suggestedPercentage: 0,
       requestDestination: false,
     },
+    crossCheckSelfWithholdings: false,
     selfWithholding: { modality: 'percentage', percentage: 60 },
     // Ejemplo de municipio que rebajó las sanciones de ley.
     penalties: {
