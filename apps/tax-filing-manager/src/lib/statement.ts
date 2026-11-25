@@ -112,6 +112,7 @@ export function buildStatement({
     latest: declarations.reduce((last, d) => (d.filingDate > last.filingDate ? d : last)),
     ica,
     withholdings,
+    isWithholdingAgent: declarations.some((d) => d.tax === 'reteica'),
     movements,
     totals: {
       toPay: debts.reduce((sum, r) => sum + r.d.totalToPay, 0),

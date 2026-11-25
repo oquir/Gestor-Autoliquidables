@@ -28,6 +28,7 @@ export interface AccountStatement {
   latest: Declaration
   ica: StatementRow[]
   withholdings: StatementRow[]
+  isWithholdingAgent: boolean
   movements: StatementMovement[]
   /** Solo del ICA y solo de lo que es deuda. */
   totals: { toPay: number; paid: number; balance: number }

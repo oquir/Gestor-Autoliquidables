@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router'
+import { Button } from '../components/atoms'
 import { EmptyState, StatTile } from '../components/molecules'
 import {
   DeclarationTaxpayer,
@@ -12,6 +13,7 @@ import {
   activeTax,
   buildStatement,
   documentFormat,
+  downloadExogenous,
   formatPesos,
   sameTaxpayer,
   useApproval,
@@ -73,8 +75,9 @@ export default function AccountStatement() {
     )
   }
 
-  const { latest, ica, withholdings, movements, totals } = statement
+  const { latest, ica, withholdings, movements, totals, isWithholdingAgent } = statement
   const municipality = municipalities.find((m) => m.id === municipalityId)
+  const reteica = withholdings.filter((r) => r.d.tax === 'reteica')
   const withRitCard = withRit(municipalities)(latest)
   // Su ficha del RIT, si el municipio lo tiene en el aplicativo y el contribuyente está inscrito.
   const registration = withRitCard
@@ -92,6 +95,17 @@ export default function AccountStatement() {
       goBack={{ a: '/declaraciones', text: 'Declaraciones' }}
       title={latest.taxpayer.name}
       description={`Estado de cuenta · ${documentFormat(latest.taxpayer)} · ${municipality?.name}`}
+      actions={
+        isWithholdingAgent && (
+          <Button 
+            variant="secondary"
+            disabled={reteica.length === 0}
+            onClick={() => municipality && downloadExogenous(reteica)}
+          >
+            Información exógena
+          </Button>
+        )
+      }
       main={
         <>
           {municipality?.taxes.ica && (
