@@ -19,6 +19,8 @@ describe('slugifyFieldName', () => {
     expect(slugifyFieldName('')).toBe('campo')
     expect(slugifyFieldName('¿?')).toBe('campo')
     expect(slugifyFieldName('31. Sanciones')).toBe('campo_31_sanciones')
+    // Un nombre del prototipo de Object leeria la funcion Object como valor del campo.
+    expect(slugifyFieldName('Constructor')).toBe('constructor_campo')
   })
 })
 
@@ -55,6 +57,23 @@ describe('migrateFieldNames', () => {
 
     expect(rows[0].fields.map((field) => field.name)).toEqual(['total', 'total_2'])
     expect(renamed).toEqual([{ from: 'total', to: 'total_2', label: 'Total bis' }])
+  })
+
+  it('un nombre reservado de un borrador se renombra y se reporta', () => {
+    const renamed: FieldRename[] = []
+    const rows: CanvasRow[] = migrateFieldNames(
+      [
+        makeRow([
+          makeField('text', 'constructor', { label: 'Constructor' }),
+          makeField('text', '__proto__', { id: 'otro', label: 'Proto' }),
+        ]),
+      ],
+      new Set(),
+      renamed,
+    )
+
+    expect(rows[0].fields.map((field) => field.name)).toEqual(['constructor_campo', 'proto'])
+    expect(renamed.map((rename) => rename.to)).toEqual(['constructor_campo', 'proto'])
   })
 
   it('un campo intacto queda como el mismo objeto', () => {
