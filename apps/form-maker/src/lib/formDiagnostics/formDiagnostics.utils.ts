@@ -20,7 +20,7 @@ import {
   validatePrelude,
 } from '../fieldScript/fieldScript'
 import { enabledChecks } from '../groupCheck/groupCheck'
-import { resolveLeaf } from '../payloadSchema/payloadSchema'
+import { hasReservedPathKey, resolveLeaf } from '../payloadSchema/payloadSchema'
 import {
   CONCEPT_IN_GROUP_MESSAGE,
   CYCLE_MESSAGE,
@@ -33,6 +33,7 @@ import {
   ORPHAN_MAPPING_MESSAGE,
   PRELUDE_READS_FIELDS_MESSAGE,
   PRELUDE_WHERE,
+  RESERVED_MAPPING_MESSAGE,
   SCRIPT_SUBJECT,
   TYPES_WITHOUT_PATTERN,
   UNKNOWN_REFS_HINT,
@@ -315,6 +316,12 @@ export function mappingProblems(located: LocatedField): ProblemDraft[] {
   const leaf: SchemaLeaf | null = resolveLeaf(PAYLOAD_SCHEMA, binding.path)
   const where: string = fieldWhere(located.field)
   const target: ProblemTarget = fieldTarget(located, 'apiMapping')
+
+  if (hasReservedPathKey(binding.path)) {
+    return [
+      { severity: 'error', where, message: `${RESERVED_MAPPING_MESSAGE} ${binding.path}`, target },
+    ]
+  }
 
   if (leaf === null) {
     return [

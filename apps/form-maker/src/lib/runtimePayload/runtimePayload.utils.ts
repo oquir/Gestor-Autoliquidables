@@ -1,6 +1,7 @@
 import type { ExportedField } from '../../types/exportForm'
 import type { ConceptoPayload } from '../../types/fieldConcept'
 import { isValidConceptId } from '../fieldConcept/fieldConcept'
+import { hasReservedPathKey } from '../payloadSchema/payloadSchema'
 
 // Escritura por ruta ("contribuyente.x", "actividades[0].y"), creando los tramos que falten.
 
@@ -24,9 +25,11 @@ export function parsePath(path: string): PathSegment[] {
     })
 }
 
+// La revision del export ya bloquea un tramo reservado; esto es la segunda defensa para un JSON
+// editado a mano.
 export function setDeepValue(target: Record<string, unknown>, path: string, value: unknown): void {
   const segments: PathSegment[] = parsePath(path)
-  if (segments.length === 0) return
+  if (segments.length === 0 || hasReservedPathKey(path)) return
 
   let cursor: Record<string, unknown> = target
 

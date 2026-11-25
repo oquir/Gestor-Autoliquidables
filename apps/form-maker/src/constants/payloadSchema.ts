@@ -128,3 +128,11 @@ export const PAYLOAD_SCHEMA: SchemaNode = object('root', [
   declarante,
   responsableLegal,
 ])
+
+// Tramos que nunca son una ruta del contrato: escribir en "__proto__" contaminaria Object.prototype
+// en el consumidor, que corre JSON ajeno.
+export const RESERVED_PATH_KEYS: ReadonlySet<string> = new Set([
+  '__proto__',
+  'constructor',
+  'prototype',
+])
