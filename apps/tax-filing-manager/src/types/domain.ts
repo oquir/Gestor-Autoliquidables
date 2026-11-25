@@ -511,6 +511,7 @@ export interface MunicipalityConfig {
     suggestedPercentage: number
     requestDestination: boolean
   }
+  crossCheckSelfWithholdings: boolean
   reteica: {
     modality: 'flat' | 'activity' | 'concept'
     flatRatePerThousand: number

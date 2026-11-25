@@ -35,6 +35,7 @@ export default function SettingsForm({ config, editable }: SettingsFormProps) {
       suggestedPercentage: 0,
       requestDestination: false,
     },
+    crossCheckSelfWithholdings: config.crossCheckSelfWithholdings ?? false
   })
   const change = (partial: Partial<MunicipalityConfig>) => {
     setB((current) => ({ ...current, ...partial }))
@@ -52,7 +53,7 @@ export default function SettingsForm({ config, editable }: SettingsFormProps) {
       {(taxes.reteica || taxes.selfWithholding) && (
         <WithholdingSection {...editing} taxes={taxes} />
       )}
-      {taxes.ica && <IcaSection {...editing} />}
+      {taxes.ica && <IcaSection {...editing} taxes={taxes} />}
       <ProcedureSection {...editing} withRit={withRit} />
       {acceptsChecks(municipality) && <PaymentsSection {...editing} />}
       {withApproval.length > 0 && <PriorApprovalSection {...editing} taxes={withApproval} />}
