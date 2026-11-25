@@ -89,6 +89,11 @@ describe('sanitizePdfHtml: estilos', () => {
 
   it('un comentario no sirve de escondite y un < no cierra el <style> antes', () => {
     expect(sanitizeCss('/* x */@im/**/port url(a.css);')).not.toContain('@import')
+    // Un escape en el at-keyword tambien es @import para el navegador.
+    expect(
+      sanitizePdfHtml('<style>@\\69mport "https://evil.example/x.css"; td { color: red }</style>'),
+    ).not.toContain('evil.example')
+    expect(sanitizeCss('@i\\6dport url(a.css); td { color: red }')).toBe(' td { color: red }')
     expect(
       sanitizePdfHtml('<style>td::after { content: "</style><script>" }</style>'),
     ).not.toContain('<script')
