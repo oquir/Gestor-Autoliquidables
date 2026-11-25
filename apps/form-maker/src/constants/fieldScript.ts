@@ -1,6 +1,5 @@
 // Lo que el runtime inyecta en cada script, como parametros sueltos (sum(x), no lib.sum(x)) para
-// que el editor los ofrezca. roundTo y el DV estan duplicados con constants/formula.ts a proposito
-// hasta borrar el lenguaje viejo.
+// que el editor los ofrezca.
 
 // Lo que no sea un numero legible vale 0. Es semantica del lenguaje: el consumidor la copia.
 export function toScriptNumber(value: unknown): number {
@@ -34,9 +33,19 @@ function toNumbers(args: unknown[]): number[] {
   return flat
 }
 
+// Magnitud y signo, como lib/fieldRounding: Math.round desempata hacia +infinito y rompia la
+// simetria con negativos (round(-2.5) daba -2). El + 0 mata el -0.
 function roundTo(value: number, decimals: number): number {
   const factor: number = 10 ** Math.trunc(decimals)
-  return Math.round(value * factor) / factor
+  const rounded: number = Math.round(Math.abs(value) * factor) / factor
+  return (value < 0 ? -rounded : rounded) + 0
+}
+
+// El NIT suele llegar escrito con puntos ("900.123.456"): parseFloat se quedaria en 900,123 y el DV
+// saldria mal sin aviso. Lo que viene tras un guion (el DV ya escrito) lo corta parseFloat.
+function nitNumber(value: unknown): number {
+  if (typeof value !== 'string') return toScriptNumber(value)
+  return toScriptNumber(value.replace(/[.,\s]/g, ''))
 }
 
 // Pesos oficiales DIAN, de derecha a izquierda sobre las cifras del NIT.
@@ -68,7 +77,7 @@ export const SCRIPT_HELPERS: Record<string, (...args: unknown[]) => number> = {
     roundTo(toScriptNumber(args[0]), args.length > 1 ? toScriptNumber(args[1]) : 0),
   floor: (...args) => Math.floor(toScriptNumber(args[0])),
   ceil: (...args) => Math.ceil(toScriptNumber(args[0])),
-  dvNit: (...args) => digitoVerificacion(toScriptNumber(args[0])),
+  dvNit: (...args) => digitoVerificacion(nitNumber(args[0])),
 }
 
 // Solo los nombres: la implementacion vive en lib/scriptDates (constants no importa lib). Son
