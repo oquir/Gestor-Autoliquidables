@@ -74,17 +74,17 @@ Lista revisada con el usuario el 2026-11-15. Ya no trae lo implementado ni lo de
 
 ### 2.1 Pendientes
 
-1. **Crear municipios**: que 1cero1 pueda agregar un municipio nuevo desde el dashboard, con su escudo en la barra y en los PDF. Hoy son 3 fijos.
-2. **Estado de cuenta como sección propia**: que tenga su entrada en el menú, con un buscador del contribuyente por documento. Hoy es una página sin entrada en el menú, a la que solo se llega desde la declaración, la ficha del RIT o la cartera de Pagos (§1).
-3. **Calendario tributario más sencillo**: simplificar la parte de la página Calendario donde se cargan los vencimientos de cada año.
-4. **Login con mejor apariencia**.
-5. **Sobretasa de seguridad y pago voluntario** en Configuración (renglones 24, 39 y 40 del FUN).
-6. **Cruce del renglón 28**: comparar las autorretenciones que el contribuyente resta en su ICA anual con las AutoReteICA que declaró y pagó en ese año gravable (§6.2 de `Dominio-ICA.md`). Será una funcionalidad que cada municipio enciende o apaga.
+1. **Crear municipios**: que 1cero1 pueda agregar un municipio nuevo desde el dashboard, con su escudo en la barra y en los PDF. Hoy son 3 fijos (Hecho).
+2. **Estado de cuenta como sección propia**: que tenga su entrada en el menú, con un buscador del contribuyente por documento. Hoy es una página sin entrada en el menú, a la que solo se llega desde la declaración, la ficha del RIT o la cartera de Pagos (§1) (Hecho).
+3. **Calendario tributario más sencillo**: simplificar la parte de la página Calendario donde se cargan los vencimientos de cada año (Hecho).
+4. **Login con mejor apariencia** (Hecho).
+5. **Sobretasa de seguridad y pago voluntario** en Configuración (renglones 24, 39 y 40 del FUN)  (Hecho).
+6. **Cruce del renglón 28**: comparar las autorretenciones que el contribuyente resta en su ICA anual con las AutoReteICA que declaró y pagó en ese año gravable (§6.2 de `Dominio-ICA.md`). Será una funcionalidad que cada municipio enciende o apaga (Hecho).
 7. **Saldos a favor, acuerdos de pago, certificados de retención y exógena** (explicación pendiente de revisar con el usuario):
    - _saldo a favor_: cuando lo retenido y lo autorretenido superan el impuesto, el contribuyente queda con plata a su favor y la pide en devolución o la compensa con otra deuda;
    - _acuerdo de pago_: el municipio le permite pagar una deuda en cuotas, con garantía;
    - _certificado de retención_: el que el agente retenedor le entrega a su proveedor para que reste lo retenido en el renglón 27;
-   - _exógena_: el reporte anual que los agentes le envían al municipio con a quién le retuvieron y cuánto.
+   - _exógena_: el reporte anual que los agentes le envían al municipio con a quién le retuvieron y cuánto(Hecho - Cuando se tenga la API se debe de revisar este informe ya que no tiene información sobre el contribuyente).
 8. **En el RIT** (ideas de la §9 de `Contexto-RIT.md`, pendientes de revisar con el usuario):
    - _inscripción de oficio_: que el municipio inscriba a alguien sin que lo haya pedido, por ejemplo a un negocio que encontró fiscalización;
    - _resolución de autorretenedores_: en Medellín, la administración nombra cada año a los autorretenedores en una resolución con la lista de NIT; se cargaría esa lista, como la plantilla de actividades, en lugar de que cada uno lo pida;
