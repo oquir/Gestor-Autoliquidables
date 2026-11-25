@@ -71,7 +71,12 @@ function byName(load: DraftLoad, name: string): CanvasField {
 
 describe('migrateDraft', () => {
   it('lleva cualquier versión vieja a la actual', () => {
-    for (const version of [undefined, 1, 2, 3, 4, 5, 6]) {
+    // Derivada de la constante: al subir la version, la anterior entra sola a la lista.
+    const oldVersions: (number | undefined)[] = [
+      undefined,
+      ...Array.from({ length: DRAFT_SCHEMA_VERSION - 1 }, (_, index: number) => index + 1),
+    ]
+    for (const version of oldVersions) {
       expect(migrateDraft(draftAt(version, [])).schemaVersion).toBe(DRAFT_SCHEMA_VERSION)
     }
   })
