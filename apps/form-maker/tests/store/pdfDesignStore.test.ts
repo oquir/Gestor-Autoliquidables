@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { findCell } from '../../src/lib/pdfDesignEdit/pdfDesignEdit'
 import { createBlankDesign } from '../../src/lib/pdfDesign/pdfDesign'
 import { savePdfDesign } from '../../src/lib/pdfDesignBank/pdfDesignBank'
@@ -11,6 +11,9 @@ import { later, startClock, stopClock } from '../helpers/storeHarness'
 const storage: MemoryStorage = installMemoryStorage()
 // El reloj falso antes del import: createBurstGate guarda Date.now al cargarse el modulo.
 startClock()
+// Modulo nuevo: sin aislamiento entre archivos el store ya cargado por otra prueba guardo el
+// Date.now del reloj real.
+vi.resetModules()
 const { usePdfDesignStore } = await import('../../src/store/pdfDesignStore')
 
 const INITIAL: PdfDesignState = usePdfDesignStore.getState()
@@ -39,7 +42,10 @@ function selectCells(anchor: string, focus: string): void {
   if (focus !== anchor) state().selectCell(tableId, focus, true)
 }
 
-afterAll(stopClock)
+afterAll(() => {
+  stopClock()
+  vi.unstubAllGlobals()
+})
 
 beforeEach(() => {
   storage.clear()

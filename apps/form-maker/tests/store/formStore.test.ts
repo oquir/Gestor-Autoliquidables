@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { FIELD_TYPES } from '../../src/constants/fieldTypes'
 import type { CanvasField, CanvasRow, FieldTypeDef, FormState, FormStep } from '../../src/types'
 import { fieldId, makeField, makeGroup, makeRow, makeStep } from '../helpers/canvasFixtures'
@@ -11,6 +11,9 @@ import { later, soon, startClock, stopClock } from '../helpers/storeHarness'
 installMemoryStorage()
 // El reloj falso antes del import: createBurstGate guarda Date.now al cargarse el modulo.
 startClock()
+// Modulo nuevo: sin aislamiento entre archivos el store ya cargado por otra prueba guardo el
+// Date.now del reloj real y no lee el localStorage de esta.
+vi.resetModules()
 const { useFormStore } = await import('../../src/store/formStore')
 
 const INITIAL: FormState = useFormStore.getState()
@@ -105,7 +108,10 @@ function load(): void {
   useFormStore.temporal.getState().clear()
 }
 
-afterAll(stopClock)
+afterAll(() => {
+  stopClock()
+  vi.unstubAllGlobals()
+})
 
 beforeEach(() => {
   useFormStore.setState(INITIAL, true)
