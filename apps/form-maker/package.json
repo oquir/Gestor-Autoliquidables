@@ -10,7 +10,8 @@
     "test:watch": "vitest",
     "lint": "eslint . && prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
     "format": "prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:chunks": "tsx scripts/checkChunks.ts"
   },
   "dependencies": {
     "@codemirror/autocomplete": "6.20.3",
