@@ -4,7 +4,7 @@
 >
 > **Cómo se usa**: al corregir uno, tacharlo con `~~…~~` y anotar la fecha y el commit, por ejemplo `## ~~1. Las reglas no ven el contexto~~ (2026-11-30, abc1234)`. No se borra nada.
 >
-> Escrito el 2026-11-24, al cerrar las seis tandas de pruebas. La sección 4 se agregó el 2026-11-26. Lo que dice del código es de la fecha de cada sección: antes de usarlo, verificar que siga igual.
+> Escrito el 2026-11-24, al cerrar las seis tandas de pruebas. Las secciones 4 y 5 se agregaron el 2026-11-26. Lo que dice del código es de la fecha de cada sección: antes de usarlo, verificar que siga igual.
 
 ## 1. Bug: el script de una regla no ve las tablas (UVT, SMMLV, fechas)
 
@@ -267,3 +267,41 @@ Quedan 7 `it.fails`: el hallazgo 1 y seis de esta sección. Al corregir cada bug
 - Sin mutación a fondo (solo 2 a 4 mutantes por módulo): `store`, `scriptRuntime`, `zodSchema` y `fieldTypes`.
 - No se corrió en Linux ni en CI.
 - Dos mutantes sobrevivieron porque no cambian el comportamiento, y no son hallazgos: `maxDates.ts:60` (`b <= a` / `b < a`) y `runtimeValidation.ts:100` (`> 0` / `>= 0`).
+
+## 5. Lo que encontraron las pruebas por propiedades (2026-11-26)
+
+> **De dónde sale**: las pruebas por propiedades (`tests/lib/*.props.test.ts`, con `fast-check`) generan cientos de entradas al azar y buscan una que rompa una regla que siempre debería cumplirse. Cubren `numberFormat`, `dateFormat`, el saneo del HTML del PDF, la carga del borrador y el nombre de campo. Las fechas, el borrador y los nombres pasaron todas sus reglas. Estos tres casos salieron en las primeras corridas y se confirmaron con un script aparte.
+>
+> Estado de todos: **sin corregir. Falta la decisión del usuario.** Cada uno tiene su `it.fails` con un comentario `BUG:`.
+
+### 5.1 Un punto después de la coma deja el campo numérico vacío [E]
+
+- **Qué pasa**: el filtro del input numérico (`sanitizeNumericInput`) deja pasar un punto después de la coma, pero el lector (`parseFormattedNumber`) no lo acepta y devuelve `null`. `PreviewNumberInput` manda entonces `''` al estado: el usuario ve el número y el campo queda vacío, y al salir del input el número desaparece.
+- **Ejemplos**: `"1,234.56"` (un número pegado en formato inglés), `"0,5."` (un dedo de más), `"12,3.4"`. `"1.234,5"` sí funciona.
+- **Dónde**: `src/lib/numberFormat/numberFormat.ts`, `sanitizeNumericInput` (la parte después de la coma solo quita comas, no puntos).
+- **Cómo reproducirlo en el aplicativo**: en el simulador, en un campo numérico, pegar `1,234.56` y salir del campo.
+- **Por qué importa**: pegar un valor copiado de otro sistema es común, y el campo se vacía sin aviso.
+- **Prueba que lo fija**: `tests/lib/numberFormat.props.test.ts`, el caso concreto "un número pegado a la inglesa" y la propiedad "con cualquier tecleo".
+
+### 5.2 Un `<style/>` deja el `<style>` abierto y se salta el saneo del CSS [E]
+
+- **Qué pasa**: `sanitizePdfHtml` lee `<style>` como texto crudo solo si no se cierra solo. Un `<style/>` sale como `<style>` sin cerrar, y lo que viene después se sanea como HTML, no como CSS. `<style/>@import url(http://x/y.css);<td>hola</td>` sale con el `@import` intacto, y el navegador lee como CSS todo lo que sigue, así que el contenido de después desaparece. Con atributos pasa igual (`<style class="a"/>x` sale `<style class="a">x`), y también cuando un valor mal cerrado termina la etiqueta en `/>` (`<style src="><td class=""/>`, encontrado con 200 000 entradas).
+- **Dónde**: `src/lib/pdfHtml/pdfHtml.ts`, en `sanitizePdfHtml`, el `if (RAW_TEXT_TAGS.has(tag.name) && !tag.selfClosing)`.
+- **Cómo reproducirlo**: en el diseñador de PDF, un bloque de HTML libre con `<style/>` seguido de texto, o importar una plantilla que lo tenga.
+- **Por qué importa**: el saneo existe para que el HTML libre no traiga nada de afuera. Es raro que alguien escriba `<style/>`, pero el sanitizador no debería depender de eso.
+- **Prueba que lo fija**: `tests/lib/pdfHtml.props.test.ts`, "un <style/> no deja un <style> abierto…".
+
+### 5.3 Un `url(` sin cerrar esconde un `url(javascript:)` [E]
+
+- **Qué pasa**: misma causa que el `)` suelto de 4.8: la expresión de `url()` en `sanitizeCss` es perezosa. En `a:url(http://e/x.png b:url('javascript:x');` toma todo, desde el primer `url(` hasta el primer `)`, como una sola URL, y como empieza por `http://` la deja pasar. Al sanear otra vez se vuelve `none`, así que sanear dos veces tampoco da lo mismo.
+- **Dónde**: `src/lib/pdfHtml/pdfHtml.ts`, en `sanitizeCss`.
+- **Por qué importa poco**: el navegador lee eso como una URL inválida y ningún motor ejecuta `javascript:` en CSS. Es el saneo el que no cumple su regla. Conviene corregirlo junto con el de 4.8.
+- **Prueba que lo fija**: `tests/lib/pdfHtml.props.test.ts`, "un url( sin cerrar no esconde…".
+
+### 5.4 Lo que se descartó
+
+- **Un comentario de CSS partido** (`*/@\69mport x;*/`, `*//*/`) se vuelve a juntar al sanear otra vez. El navegador lo lee igual, como comentario, y no se pierde contenido. Por eso los generadores no usan `/*` ni `*/`.
+- **Un `</style>` suelto** sale tal cual, y el navegador lo ignora.
+- **`url(javascript:x` sin cerrar al final de un `style`**: es de la familia de 4.8, y ningún motor ejecuta `javascript:` en CSS.
+
+Con esto quedan 12 `it.fails`: los 7 de antes (el hallazgo 1 y seis de la sección 4) y 5 nuevos. El `-0` de 4.7 ahora también lo fija una propiedad, y 5.1 tiene dos pruebas.
