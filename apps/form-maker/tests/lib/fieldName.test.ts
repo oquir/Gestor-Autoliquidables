@@ -30,6 +30,12 @@ describe('uniqueFieldName', () => {
     expect(uniqueFieldName('total', new Set(['total']))).toBe('total_2')
     expect(uniqueFieldName('total', new Set(['total', 'total_2']))).toBe('total_3')
   })
+
+  // Hallazgo 4.10 de docs/Hallazgos-Pruebas.md: solo desempata. Los reservados los saca quien lo
+  // llama (slugifyFieldName o migrateFieldNames), que es lo que se prueba arriba.
+  it('no filtra los nombres reservados: eso lo hace quien lo llama', () => {
+    expect(uniqueFieldName('__proto__', new Set())).toBe('__proto__')
+  })
 })
 
 describe('collectFieldNames', () => {

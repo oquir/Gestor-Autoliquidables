@@ -336,6 +336,17 @@ describe('parseDraft: inválidos', () => {
     )
   })
 
+  // RIESGO (hallazgo 4.9 de docs/Hallazgos-Pruebas.md; Known gaps de CLAUDE.md): zod revisa la
+  // forma y no la coherencia. Fija lo que pasa hoy; si se agrega esa revision, cambia a proposito.
+  it('un borrador con la forma bien pero incoherente se acepta', () => {
+    const fuera: Loose = field({ name: 'fuera', colStart: 14, colSpan: 8 })
+    const raro: Loose = field({ name: 'raro', type: 'no_existe', colSpan: 0 })
+
+    expect(
+      parseDraft(draftAt(DRAFT_SCHEMA_VERSION, [fuera, raro], { formScript: '' })).status,
+    ).toBe('ok')
+  })
+
   it('uno más nuevo que la app no se migra hacia atrás', () => {
     const newer: Loose = draftAt(DRAFT_SCHEMA_VERSION + 1, [], { formScript: '' })
 

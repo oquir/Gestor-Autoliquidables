@@ -16,6 +16,12 @@ describe('parseFormattedNumber', () => {
     expect(parseFormattedNumber('  42  ')).toBe(42)
   })
 
+  // RIESGO (hallazgo 4.7): los puntos se quitan sin mirar donde estan. Fija lo que pasa hoy.
+  it('los puntos se quitan estén donde estén', () => {
+    expect(parseFormattedNumber('1..2')).toBe(12)
+    expect(parseFormattedNumber('1.23.4')).toBe(1234)
+  })
+
   it('el punto siempre es de miles: "1.5" es 15', () => {
     expect(parseFormattedNumber('1.5')).toBe(15)
   })
@@ -60,6 +66,14 @@ describe('formatNumber', () => {
 
   it('el cero negativo sale "0"', () => {
     expect(formatNumber(-0)).toBe('0')
+  })
+
+  // BUG (hallazgo 4.7 de docs/Hallazgos-Pruebas.md): un negativo que redondea a cero conserva el
+  // signo, porque se mira value < 0 y no lo que se imprime. Pendiente de confirmar con el usuario;
+  // it.fails avisa cuando se corrija.
+  it.fails('un negativo que se redondea a cero tampoco sale "-0"', () => {
+    expect(formatNumber(-1e-9)).toBe('0')
+    expect(formatNumber(-0.0001, 2)).toBe('0,00')
   })
 
   it('lo que no es finito sale vacío', () => {

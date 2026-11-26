@@ -103,6 +103,13 @@ describe('helpers del script', () => {
     expect(run('return dvNit(" 890 903 938 ");').value).toBe(8)
   })
 
+  // RIESGO (hallazgo 4.7 de docs/Hallazgos-Pruebas.md): num() lee el punto como decimal (como
+  // JavaScript) y numberFormat como miles, y corta en la coma. Fija lo que pasa hoy.
+  it('num lee el punto como decimal y corta en la coma', () => {
+    expect(run('return num("1.234,56");').value).toBe(1.234)
+    expect(run('return num("1,5");').value).toBe(1)
+  })
+
   it('uvt y smmlv leen la tabla del contexto; sin año, el de hoy', () => {
     const context: RuntimeContext = {
       reglas: [],

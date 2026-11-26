@@ -115,6 +115,23 @@ describe('sanitizePdfHtml: estilos', () => {
     expect(sanitizeCss('background: url("https://a.co/f.png")')).toContain('https://a.co/f.png')
     expect(sanitizeCss('background: url("\\6a avascript:alert(1)")')).toBe('background: none')
   })
+
+  // BUG (hallazgo 4.8 de docs/Hallazgos-Pruebas.md): el escape de CSS en el nombre de la funcion
+  // (u\72l es url) no pasa por el filtro de url(). Pendiente de confirmar con el usuario; it.fails
+  // avisa cuando se corrija.
+  it.fails('un escape en el nombre de la función tampoco deja pasar javascript:', () => {
+    expect(sanitizeCss('td { background: u\\72l(javascript:alert(1)) }')).not.toContain(
+      'javascript',
+    )
+  })
+
+  // BUG (hallazgo 4.8): una url() sin comillas se reemplaza hasta el primer ")" y deja el otro.
+  // Pendiente de confirmar con el usuario; it.fails avisa cuando se corrija.
+  it.fails('una url() peligrosa sin comillas no deja un ) suelto', () => {
+    expect(sanitizeCss('td { background: url(javascript:alert(1)) }')).toBe(
+      'td { background: none }',
+    )
+  })
 })
 
 describe('sanitizePdfHtml: lo que se conserva y se tolera', () => {
