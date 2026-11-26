@@ -207,6 +207,18 @@ describe('filas y columnas', () => {
     expect(removeColumn(single, 'c00')).toBe(single)
   })
 
+  it('una columna que cruza una combinada la agranda y solo agrega celda en las otras filas', () => {
+    const merged: PdfTable = mergeCells(grid(2, 3), 'c00', 'c01')
+    const wider: PdfTable = insertColumn(merged, 'c10', 'right')
+    const grid2: string[][] = layout(wider)
+
+    expect(wider.columns).toHaveLength(4)
+    expect(grid2[0]).toEqual(['c00', 'c00', 'c00', 'c02'])
+    expect([grid2[1][0], grid2[1][2], grid2[1][3]]).toEqual(['c10', 'c11', 'c12'])
+    expect(['c00', 'c02', 'c10', 'c11', 'c12', '·']).not.toContain(grid2[1][1])
+    expect(wider.rows.map((row) => row.cells.length)).toEqual([2, 4])
+  })
+
   it('ancho y alto: igual valor, misma tabla; undefined vuelve al automático', () => {
     const table: PdfTable = setColumnWidth(grid(1, 2), 0, 120)
 

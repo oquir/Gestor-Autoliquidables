@@ -22,7 +22,12 @@ interface TypeCase {
   payload?: unknown
   // Lleno pero invalido; ausente si el tipo no tiene un valor asi.
   bad?: unknown
+  // El mensaje que tiene que dar bad: sin el, un error por otra regla tambien pasaria.
+  badError?: RegExp
 }
+
+// Lo que dice zod cuando falta el valor; no el de un patron o un rango.
+const MISSING_VALUE: RegExp = /^(Invalid input|Too small: expected array to have >=1)/
 
 const SMALL_FILE: File = new File(['rut'], 'rut.pdf', { type: 'application/pdf' })
 
@@ -31,17 +36,36 @@ const BIG_FILE: File = new File([new Uint8Array(2 * 1024 * 1024)], 'grande.pdf',
 })
 
 const INPUT_CASES: TypeCase[] = [
-  { type: 'text', extra: { validations: { pattern: '^[A-Z]+$' } }, good: 'ABC', bad: 'abc' },
-  { type: 'textarea', extra: { validations: { maxLength: 5 } }, good: 'hola', bad: 'demasiado' },
-  { type: 'number', extra: { validations: { min: 0 } }, good: 1500, bad: -1 },
-  { type: 'tel', good: '3001234567', bad: '12345' },
-  { type: 'email', good: 'ana@empresa.co', bad: 'ana@' },
-  { type: 'date', good: '2026-03-31', bad: '31/03/2026' },
+  {
+    type: 'text',
+    extra: { validations: { pattern: '^[A-Z]+$' } },
+    good: 'ABC',
+    bad: 'abc',
+    badError: /^Invalid string: must match pattern/,
+  },
+  {
+    type: 'textarea',
+    extra: { validations: { maxLength: 5 } },
+    good: 'hola',
+    bad: 'demasiado',
+    badError: /^Too big: expected string to have <=5/,
+  },
+  {
+    type: 'number',
+    extra: { validations: { min: 0 } },
+    good: 1500,
+    bad: -1,
+    badError: /^Too small: expected number to be >=0/,
+  },
+  { type: 'tel', good: '3001234567', bad: '12345', badError: /^Ingrese un celular válido/ },
+  { type: 'email', good: 'ana@empresa.co', bad: 'ana@', badError: /^Ingrese un correo válido$/ },
+  { type: 'date', good: '2026-03-31', bad: '31/03/2026', badError: /^Fecha inválida$/ },
   {
     type: 'datalist',
     extra: { validations: { maxLength: 10 } },
     good: 'Bogotá',
     bad: 'muy largo de verdad',
+    badError: /^Too big: expected string to have <=10/,
   },
   { type: 'select', good: '2' },
   { type: 'search_select', good: '4711' },
@@ -53,6 +77,7 @@ const INPUT_CASES: TypeCase[] = [
     extra: { fileConfig: { acceptedFormats: ['.pdf'], maxSizeMB: 1 } },
     good: SMALL_FILE,
     bad: BIG_FILE,
+    badError: /^Máximo 1MB$/,
   },
 ]
 
@@ -108,7 +133,7 @@ describe.each(INPUT_CASES)('$type de punta a punta', (testCase) => {
   it('obligatorio y vacío da error', () => {
     const empty: unknown = testCase.type === 'checkbox_group' ? [] : undefined
 
-    expect(run(testCase, empty).validation.errors.campo).toBeDefined()
+    expect(run(testCase, empty).validation.errors.campo).toMatch(MISSING_VALUE)
   })
 
   it('un valor bueno pasa y llega al payload', () => {
@@ -124,6 +149,11 @@ describe.each(INPUT_CASES)('$type de punta a punta', (testCase) => {
     expect(result.snapshot.root.visible.campo).toBe(false)
     expect(result.validation.errors).toEqual({})
     expect(result.payload).toEqual({})
+  })
+
+  // Con un valor que si viajaria si se viera: undefined no prueba que el oculto se filtre.
+  it('oculto con un valor bueno tampoco viaja', () => {
+    expect(run(testCase, testCase.good, 'no').payload).toEqual({})
   })
 
   it('enableWhen lo deshabilita sin ocultarlo', () => {
@@ -143,7 +173,7 @@ describe.each(INPUT_CASES.filter((testCase) => testCase.bad !== undefined))(
   '$type rechaza un valor inválido',
   (testCase) => {
     it('lleno pero inválido da error', () => {
-      expect(run(testCase, testCase.bad).validation.errors.campo).toBeDefined()
+      expect(run(testCase, testCase.bad).validation.errors.campo).toMatch(testCase.badError ?? /^$/)
     })
   },
 )

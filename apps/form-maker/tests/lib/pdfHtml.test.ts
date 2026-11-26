@@ -144,6 +144,14 @@ describe('sanitizePdfHtml: lo que se conserva y se tolera', () => {
   it('nunca lanza, ni con basura', () => {
     expect(() => sanitizePdfHtml('<<<td <a href="x" <img src=')).not.toThrow()
   })
+
+  it('sanear dos veces da lo mismo con HTML normal', () => {
+    const once: string = sanitizePdfHtml(
+      '<style>td { color: red }</style><table><tr><td style="width: 10px">a &amp; b</td></tr></table>',
+    )
+
+    expect(sanitizePdfHtml(once)).toBe(once)
+  })
 })
 
 describe('sanitizePdfCanvasHtml', () => {
@@ -187,6 +195,23 @@ describe('parsePdfHtml y normalizePdfHtml', () => {
       '<table class="fm-t"><tbody><tr><td style="color: red">a &amp; b</td></tr></tbody></table>'
 
     expect(serializePdfHtml(parsePdfHtml(html))).toBe(html)
+  })
+
+  it('el contenido de un <style> es texto crudo y lo que sigue a su cierre se lee', () => {
+    const nodes = parsePdfHtml('<style>td{color:red}<b>no</b></style ><p>después</p>')
+
+    expect(nodes.map((node) => (node.type === 'element' ? node.name : '#text'))).toEqual([
+      'style',
+      'p',
+    ])
+    expect(serializePdfHtml(nodes)).toBe('<style>td{color:red}<b>no</b></style><p>después</p>')
+  })
+
+  it('un </style sin > al final no lanza ni pierde el estilo', () => {
+    const nodes = parsePdfHtml('<style>td{}</style')
+
+    expect(nodes).toHaveLength(1)
+    expect(serializePdfHtml(nodes)).toBe('<style>td{}</style>')
   })
 
   it('pdfHtmlText da el texto que se ve, decodificado y con saltos', () => {
