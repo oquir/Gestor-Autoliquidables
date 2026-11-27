@@ -5,3 +5,7 @@ export interface PaletteSection {
   heading: string
   fieldTypes: FieldTypeDef[]
 }
+
+export interface FieldPaletteProps {
+  onAfterAdd?: () => void
+}

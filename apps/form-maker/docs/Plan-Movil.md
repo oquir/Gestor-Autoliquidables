@@ -359,7 +359,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     `FieldContextMenu` (Atributos, Validaciones, Estilos, Lógica, Mapeo).
   - Se extrae un `FieldEditorTabs` compartido entre el menú y la hoja, para no duplicarlo.
   - Arriba van el nombre, borrar y mover.
-- [ ] **P4 Agregar:**
+- [x] ~~**P4 Agregar:**~~ (2026-11-27)
   - "+" abre una hoja con la paleta (`FieldPalette`). Tocar agrega con
     `appendFieldToActiveCanvas`, que ya existe.
   - En el menú de una fila, "Agregar campo aquí" usa `addFieldToRow(rowId, tipo)`.

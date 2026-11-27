@@ -7,8 +7,9 @@ import {
   SECTION_GRID_CLASSES,
   SECTION_HEADING_CLASSES,
 } from './FieldPalette.constants'
+import type { FieldPaletteProps } from './FieldPalette.types'
 
-export function FieldPalette() {
+export function FieldPalette({ onAfterAdd }: FieldPaletteProps = {}) {
   const appendFieldToActiveCanvas = useFormStore((state) => state.appendFieldToActiveCanvas)
   const setCanvasViewMode = useFormStore((state) => state.setCanvasViewMode)
   const reveal = useCanvasReveal()
@@ -21,6 +22,7 @@ export function FieldPalette() {
 
     const rows: CanvasRow[] = getActiveRows(useFormStore.getState())
     if (rows.length > before) reveal({ kind: 'row', id: rows[rows.length - 1].id })
+    onAfterAdd?.()
   }
 
   return (

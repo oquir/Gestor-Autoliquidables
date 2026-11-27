@@ -135,7 +135,7 @@ function CanvasListRowCard({
   }
 
   return (
-    <article data-canvas-row={row.id} className={ROW_CARD_CLASSES}>
+    <article data-row-id={row.id} data-canvas-row={row.id} className={ROW_CARD_CLASSES}>
       <div className={ROW_HEADER_CLASSES}>
         <span className={ROW_TITLE_CLASSES}>
           Fila {rowNumber} · {columnsLabel}

@@ -5,3 +5,9 @@ export const BAR_CLASSES: string =
 
 export const ITEM_CLASSES: string =
   'press flex min-h-11 min-w-14 flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-[10px] font-medium hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-40'
+
+export const STRUCTURE_GRID_CLASSES: string =
+  'mb-4 grid grid-cols-2 gap-2 border-b border-border pb-4'
+
+export const STRUCTURE_BUTTON_CLASSES: string =
+  'flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-fg transition-colors hover:border-brand-border hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-40'
