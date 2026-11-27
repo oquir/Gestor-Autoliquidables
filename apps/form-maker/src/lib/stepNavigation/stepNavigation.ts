@@ -1,5 +1,6 @@
 import type { FormStep, IntroModalStep } from '../../types/formStructure'
 import type { CanvasTarget } from '../../types/placement'
+import type { ActiveStepDescription } from '../../types/stepNavigation'
 
 // Ctrl + flechas, de a un paso y sin dar la vuelta: a proposito no hay salto directo.
 
@@ -25,4 +26,26 @@ export function adjacentStep(
   if (index === -1) return null
 
   return steps[index + offset] ?? null
+}
+
+// El numero es la posicion dentro de su grupo (modal o formulario), igual que el chip y "Paso
+// activo". null si el activo ya no esta.
+export function describeActiveStep(
+  formSteps: FormStep[],
+  introSteps: IntroModalStep[],
+  activeCanvas: CanvasTarget,
+): ActiveStepDescription | null {
+  const isIntro: boolean = activeCanvas.type === 'introStep'
+  const steps: (FormStep | IntroModalStep)[] = isIntro ? introSteps : formSteps
+  const index: number = steps.findIndex((step) => step.stepId === activeCanvas.stepId)
+  if (index < 0) return null
+
+  const step: FormStep | IntroModalStep = steps[index]
+  return {
+    isIntro,
+    number: index + 1,
+    total: steps.length,
+    title: step.title.trim(),
+    hidden: !isIntro && Boolean((step as FormStep).hidden),
+  }
 }

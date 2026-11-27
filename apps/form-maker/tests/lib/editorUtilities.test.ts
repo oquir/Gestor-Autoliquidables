@@ -21,7 +21,11 @@ import {
   zoomOut,
 } from '../../src/lib/canvasZoom/canvasZoom'
 import { createBurstGate, sameDocument, toHistorySnapshot } from '../../src/lib/history/history'
-import { adjacentStep, orderedSteps } from '../../src/lib/stepNavigation/stepNavigation'
+import {
+  adjacentStep,
+  describeActiveStep,
+  orderedSteps,
+} from '../../src/lib/stepNavigation/stepNavigation'
 import type { CanvasTarget, HistorySnapshot } from '../../src/types'
 import { makeField, makeStep } from '../helpers/canvasFixtures'
 
@@ -238,5 +242,20 @@ describe('Ctrl + flechas entre pasos', () => {
     expect(adjacentStep(steps, steps[2], 1)).toBeNull()
     expect(adjacentStep(steps, steps[0], -1)).toBeNull()
     expect(adjacentStep(steps, { type: 'formStep', stepId: 'borrado' }, 1)).toBeNull()
+  })
+
+  it('describeActiveStep numera dentro de su grupo', () => {
+    const formSteps = [makeStep('Uno', []), { ...makeStep('Dos', []), hidden: true }]
+    const introSteps = [{ stepId: 'intro', title: ' Intro ', rows: [] }]
+
+    expect(
+      describeActiveStep(formSteps, introSteps, { type: 'formStep', stepId: 'paso-Dos' }),
+    ).toEqual({ isIntro: false, number: 2, total: 2, title: 'Dos', hidden: true })
+    expect(
+      describeActiveStep(formSteps, introSteps, { type: 'introStep', stepId: 'intro' }),
+    ).toEqual({ isIntro: true, number: 1, total: 1, title: 'Intro', hidden: false })
+    expect(
+      describeActiveStep(formSteps, introSteps, { type: 'formStep', stepId: 'borrado' }),
+    ).toBeNull()
   })
 })

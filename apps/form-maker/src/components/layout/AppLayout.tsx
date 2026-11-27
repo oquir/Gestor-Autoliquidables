@@ -4,6 +4,7 @@ import { useFormStore } from '../../store/formStore'
 import type { LayoutMode } from '../../types'
 import { SideDrawer } from '../molecules'
 import { PhoneBottomBar } from '../organisms/PhoneBottomBar'
+import { PhoneTopBar } from '../organisms/PhoneTopBar'
 import type { AppLayoutProps } from './AppLayout.types'
 
 export function AppLayout({ sidebar, canvas, canvasOverlay, rightSidebar }: AppLayoutProps) {
@@ -33,6 +34,8 @@ export function AppLayout({ sidebar, canvas, canvasOverlay, rightSidebar }: AppL
     <div
       className={`flex h-dvh w-full overflow-hidden bg-slate-50 text-slate-900 dark:bg-neutral-950 dark:text-neutral-100 ${isPhone ? 'flex-col' : ''}`}
     >
+      {isPhone && <PhoneTopBar />}
+
       {/* Con el cajon abierto el riel queda vacio: un solo Sidebar montado, o la paleta tendria
           dos draggables con el mismo id. */}
       {!isPhone && (

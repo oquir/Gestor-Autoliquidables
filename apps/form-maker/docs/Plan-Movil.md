@@ -340,7 +340,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     barra flotante; P1b barra de arriba con los pasos; P1c el menú ⋯. El ⋯ lleva una **versión
     propia del celular** (acciones grandes y debajo `FormSummary` + vista previa del PDF), no
     `RightSidebar` metido en una hoja.
-  - [ ] P1a · [ ] P1b · [ ] P1c
+  - [x] ~~P1a~~ (2026-11-27, 0a42c2e9: `PhoneBottomBar`; sin riel ni `CanvasToolbar` en `phone`)
+    · [ ] P1b · [ ] P1c
 - [ ] **P2 `organisms/CanvasList` (nuevo):**
   - Su modelo es puro, en `lib/canvasList`, con prueba:
     - Pasos → filas → campos, en orden de `colStart`, como `PreviewRowsGrid`.
