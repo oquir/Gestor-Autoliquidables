@@ -1,7 +1,9 @@
-import { useCallback, useId, useRef } from 'react'
+import { type FocusEvent, useCallback, useEffect, useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Xmark } from 'reicon-react'
 import { useBackClose, useInertOutside, useModalKeyGuard } from '../../../hooks'
+import { revealScrollBehavior } from '../../../lib'
+import { useFormStore } from '../../../store'
 import { IconButton } from '../../atoms'
 import {
   BACKDROP_CLASSES,
@@ -33,6 +35,41 @@ export function BottomSheet({
   useInertOutside(layerRef, dialogRef)
   useBackClose(true, onClose)
 
+  // Con el teclado abierto la pantalla en dvh se achica: mantiene visible el campo enfocado.
+  useEffect(() => {
+    const viewport: VisualViewport | null = window.visualViewport
+    if (!viewport) return
+
+    function keepFocusedVisible(): void {
+      const active = document.activeElement
+      if (
+        active instanceof HTMLElement &&
+        dialogRef.current?.contains(active) &&
+        active.matches('input, textarea, select')
+      ) {
+        active.scrollIntoView({
+          block: 'nearest',
+          behavior: revealScrollBehavior(useFormStore.getState().isLowPerformance),
+        })
+      }
+    }
+
+    viewport.addEventListener('resize', keepFocusedVisible)
+    return () => viewport.removeEventListener('resize', keepFocusedVisible)
+  }, [dialogRef])
+
+  function handleBodyFocusCapture(event: FocusEvent<HTMLDivElement>): void {
+    const target = event.target
+    if (!(target instanceof HTMLElement) || !target.matches('input, textarea, select')) return
+
+    window.setTimeout(() => {
+      target.scrollIntoView({
+        block: 'nearest',
+        behavior: revealScrollBehavior(useFormStore.getState().isLowPerformance),
+      })
+    }, 150)
+  }
+
   return createPortal(
     <div ref={layerRef} className={LAYER_CLASSES}>
       <div aria-hidden className={BACKDROP_CLASSES} onClick={onClose} />
@@ -57,7 +94,9 @@ export function BottomSheet({
           </IconButton>
         </header>
 
-        <div className={BODY_CLASSES}>{children}</div>
+        <div onFocusCapture={handleBodyFocusCapture} className={BODY_CLASSES}>
+          {children}
+        </div>
 
         {footer && <footer className={FOOTER_CLASSES}>{footer}</footer>}
       </div>

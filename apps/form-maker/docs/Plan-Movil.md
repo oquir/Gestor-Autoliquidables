@@ -424,7 +424,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 - [x] ~~**D5 La barra del PDF (`PdfToolbar`):**~~ (2026-11-27; selección múltiple desactivada en `phone` por decisión del usuario)
   - Íconos y zoom (−, ajustar, +), y la selección "N celdas · Combinar · Deseleccionar" entra en 360.
   - La Mano se oculta en táctil. Va con la zona segura.
-- [ ] **D6 Paneles en la hoja:**
+- [x] ~~**D6 Paneles en la hoja:**~~ (2026-11-27)
   - `PdfCellPanel`, `PdfStyleFields`, el selector de color (`react-colorful` ya es táctil),
     `PdfClassesPanel`, `PdfComponentPanel`, `PdfHtmlBlockPanel` y `PdfImageSourceField`. "Elegir
     archivo…" abre la cámara o la galería.
