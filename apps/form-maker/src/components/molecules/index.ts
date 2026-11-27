@@ -1,6 +1,7 @@
 // Moleculas: combinan atomos. ScriptEditor no esta: se carga con React.lazy desde ScriptInput.
 export * from './ApiPathSelect'
 export * from './BinaryChoiceToggle'
+export * from './BottomSheet'
 export * from './CalcTermRow'
 export * from './CanvasFieldChip'
 export * from './CanvasToolPicker'
