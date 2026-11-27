@@ -1,6 +1,15 @@
+import { useEffect, useRef } from 'react'
+import { Refresh } from 'reicon-react'
+import { useLayoutMode } from '../../../../hooks'
 import { usePreviewNavigation } from '../../../../hooks/usePreviewNavigation'
 import { PreviewStep } from '../PreviewStep'
-import { NAV_BUTTON_CLASSES, PRIMARY_BUTTON_CLASSES } from './PreviewForm.constants'
+import {
+  NAV_BUTTON_CLASSES,
+  NAV_FOOTER_CLASSES,
+  PRIMARY_BUTTON_CLASSES,
+  RESTART_BUTTON_CLASSES,
+  SUBMITTED_CLASSES,
+} from './PreviewForm.constants'
 import type { PreviewFormProps } from './PreviewForm.types'
 import {
   ENTER_FADE_CLASSES,
@@ -14,10 +23,22 @@ import {
 
 export function PreviewForm({ preview }: PreviewFormProps) {
   const navigation = usePreviewNavigation(preview)
+  const isPhone: boolean = useLayoutMode() === 'phone'
+  const cardRef = useRef<HTMLDivElement | null>(null)
+  const shownStepId = useRef<string | undefined>(navigation.step?.stepId)
+  const stepId: string | undefined = navigation.step?.stepId
+
+  // Con el pie pegado abajo se avanza desde el final del paso: el siguiente tiene que empezar arriba.
+  useEffect(() => {
+    if (shownStepId.current === stepId) return
+    shownStepId.current = stepId
+    if (isPhone) cardRef.current?.scrollIntoView({ block: 'start' })
+  }, [stepId, isPhone])
 
   return (
     <div
-      className={`${PREVIEW_FORM_CONTAINER_CLASSES} relative min-w-0 rounded-lg border border-border bg-surface p-6`}
+      ref={cardRef}
+      className={`${PREVIEW_FORM_CONTAINER_CLASSES} relative min-w-0 scroll-mt-4 rounded-lg border border-border bg-surface p-6`}
     >
       {navigation.step ? (
         <div
@@ -32,7 +53,14 @@ export function PreviewForm({ preview }: PreviewFormProps) {
         <p>Sin pasos.</p>
       )}
 
-      <footer className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+      <footer className={NAV_FOOTER_CLASSES}>
+        {navigation.submitted && (
+          <span
+            className={`${SUBMITTED_CLASSES} w-full text-center sm:hidden ${ENTER_POP_CLASSES}`}
+          >
+            Formulario válido · el payload está listo
+          </span>
+        )}
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -49,12 +77,13 @@ export function PreviewForm({ preview }: PreviewFormProps) {
 
         <div className="flex items-center gap-2">
           {navigation.submitted && (
-            <span className={`text-[11px] font-medium text-success ${ENTER_POP_CLASSES}`}>
+            <span className={`${SUBMITTED_CLASSES} max-sm:hidden ${ENTER_POP_CLASSES}`}>
               Formulario válido · el payload está listo
             </span>
           )}
-          <button type="button" onClick={navigation.restart} className={NAV_BUTTON_CLASSES}>
-            Reiniciar
+          <button type="button" onClick={navigation.restart} className={RESTART_BUTTON_CLASSES}>
+            <Refresh size={16} aria-hidden className="sm:hidden" />
+            <span className="max-sm:sr-only">Reiniciar</span>
           </button>
           <button type="button" onClick={navigation.advance} className={PRIMARY_BUTTON_CLASSES}>
             {navigation.isLastStep ? 'Enviar' : 'Siguiente'}
