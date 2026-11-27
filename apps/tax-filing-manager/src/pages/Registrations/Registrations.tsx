@@ -40,6 +40,7 @@ import {
   PLURAL,
   CRITERION,
   NO_QUERY,
+  NO_RIT,
 } from './Registrations.constants'
 
 export default function Registrations() {
@@ -82,8 +83,9 @@ export default function Registrations() {
     )
   }, [registrations, text, personType, capacity, status, procedure, pendingOnly])
 
-  if (!ritVisible(municipalities, municipalityId)) return <Navigate to="/" replace />
-
+  const withRitVisible = ritVisible(municipalities, municipalityId)
+  // El municipio sin RIT manda a Inicio; 1cero1 se queda para elegir otro municipio sin salir de la vista.
+  if (!withRitVisible && !canSeeAll) return <Navigate to="/" replace />
   const count = (c: Capacity) =>
     registrations.filter((i) => i.status === 'active' && i.capacities.some((q) => q.capacity === c))
       .length
@@ -98,7 +100,11 @@ export default function Registrations() {
         {canSeeAll && <MunicipalitySearch inline />}
       </DateQueryBar>
 
-      {!query ? (
+      {!withRitVisible ? (
+        <Card>
+          <EmptyState title={NO_RIT.title} description={NO_RIT.description} />
+        </Card>
+      ) : !query ? (
         <Card>
           <EmptyState title={NO_QUERY.title} description={NO_QUERY.description} />
         </Card>

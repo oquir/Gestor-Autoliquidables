@@ -46,3 +46,9 @@ export const NO_QUERY = {
   title: 'Elige el rango de fechas',
   description: 'Escoge desde y hasta y presiona Consultar para ver las inscripciones.',
 }
+
+/** Lo que se muestra si el municipio elegido no tiene el RIT en el aplicativo. */
+export const NO_RIT = {
+  title: 'Este municipio no tiene RIT',
+  description: 'Selecciona otro municipio para consultar su información.',
+}
