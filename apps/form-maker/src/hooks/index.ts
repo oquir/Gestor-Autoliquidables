@@ -3,6 +3,7 @@
 // por la carpeta.
 export * from './useApiMappingPanel'
 export * from './useAutosave'
+export * from './useBackClose'
 export * from './useCanvasMarquee'
 export * from './useCanvasPan'
 export * from './useCanvasReveal'

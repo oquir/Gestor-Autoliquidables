@@ -1,6 +1,7 @@
 // Libs del builder. Las del simulador y del PDF no estan: se importan por carpeta, detras del
 // React.lazy. Fuera: catalogFill, formRuntime, mockCatalog, pdf*, runtime*, scriptDates,
 // scriptRuntime, scriptValores, zodHydrate.
+export * from './backStack'
 export * from './baseTemplate'
 export * from './canvasDom'
 export * from './canvasSelection'

@@ -1,7 +1,7 @@
 import { useCallback, useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Xmark } from 'reicon-react'
-import { useInertOutside, useModalKeyGuard } from '../../../hooks'
+import { useBackClose, useInertOutside, useModalKeyGuard } from '../../../hooks'
 import { IconButton } from '../../atoms'
 import {
   BACKDROP_CLASSES,
@@ -31,6 +31,7 @@ export function BottomSheet({
   const isCovered = useCallback((): boolean => layerRef.current?.inert === true, [])
   const { dialogRef, handleDialogKeyDown } = useModalKeyGuard(onClose, isCovered)
   useInertOutside(layerRef, dialogRef)
+  useBackClose(true, onClose)
 
   return createPortal(
     <div ref={layerRef} className={LAYER_CLASSES}>

@@ -9,3 +9,6 @@ export const LAYOUT_MEDIA_QUERIES: readonly string[] = [
   `(min-width: ${LAYOUT_PHONE_MAX_WIDTH}px)`,
   `(min-width: ${LAYOUT_DESKTOP_MIN_WIDTH}px)`,
 ]
+
+// Puntero principal tactil: lo que decide la interaccion, aparte del ancho.
+export const TOUCH_POINTER_QUERY: string = '(pointer: coarse)'

@@ -1,5 +1,6 @@
 // Tipos compartidos. Entre archivos de esta carpeta se importa por la ruta.
 export * from './activeDrag'
+export * from './backStack'
 export * from './banksSlice'
 export * from './canvasSelection'
 export * from './canvasViewport'

@@ -112,7 +112,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
   - Se decide dentro de `atoms/Tooltip`, que sigue siendo el único lugar de los globos: nada de
     `title=` nativo.
 
-### [ ] B7 Hojas, cajones y modales
+### [x] ~~B7 Hojas, cajones y modales~~ (2026-11-26, e312e9cf, 3a13d320, 4616ccea, f8596708)
 
 - **Nuevo `molecules/BottomSheet`:**
   - Fondo oscuro detrás y alturas "asoma", "media" y "completa", con tope `max-h-dvh` y respeto de

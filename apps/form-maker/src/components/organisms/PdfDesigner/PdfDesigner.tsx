@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, CloudUpload, DocumentDownload2, FolderOpen, Moon, Sun } from 'reicon-react'
-import { useCanvasPan } from '../../../hooks'
+import { useBackClose, useCanvasPan } from '../../../hooks'
 import { usePdfDesignAutosave } from '../../../hooks/usePdfDesignAutosave'
 import { usePdfDesignerShortcuts } from '../../../hooks/usePdfDesignerShortcuts'
 import { usePdfFile } from '../../../hooks/usePdfFile'
@@ -51,6 +51,15 @@ export function PdfDesigner() {
   const saveNow = usePdfDesignAutosave()
   usePdfDesignerShortcuts()
 
+  // Volver y el Atras de Android hacen lo mismo: guardar antes de cerrar (la miniatura del panel lee
+  // el diseno al volver).
+  function closeDesigner(): void {
+    saveNow()
+    setPdfDesignerOpen(false)
+  }
+
+  useBackClose(true, closeDesigner)
+
   useEffect(() => {
     if (taxType) openDesign(taxType)
   }, [taxType, openDesign])
@@ -66,14 +75,7 @@ export function PdfDesigner() {
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-6 py-2">
         <div className="flex min-w-0 items-center gap-5">
           <Tooltip content="Volver al formulario">
-            <button
-              type="button"
-              onClick={() => {
-                saveNow()
-                setPdfDesignerOpen(false)
-              }}
-              className={BACK_BUTTON_CLASSES}
-            >
+            <button type="button" onClick={closeDesigner} className={BACK_BUTTON_CLASSES}>
               <ArrowLeft size={14} />
               Volver
             </button>

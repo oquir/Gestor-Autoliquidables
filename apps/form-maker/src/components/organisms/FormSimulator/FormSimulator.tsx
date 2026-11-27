@@ -1,4 +1,5 @@
 import { ArrowLeft, Moon, Sun } from 'reicon-react'
+import { useBackClose } from '../../../hooks'
 import { useFormPreview } from '../../../hooks/useFormPreview'
 import { useFormStore } from '../../../store'
 import type { FormPreviewApi } from '../../../types'
@@ -12,6 +13,7 @@ export function FormSimulator() {
   const setSimulatorOpen = useFormStore((state) => state.setSimulatorOpen)
   const isDarkMode = useFormStore((state) => state.isDarkMode)
   const toggleDarkMode = useFormStore((state) => state.toggleDarkMode)
+  useBackClose(true, () => setSimulatorOpen(false))
 
   return (
     <div className="flex h-dvh w-full flex-col overflow-hidden bg-surface-sunken text-fg">

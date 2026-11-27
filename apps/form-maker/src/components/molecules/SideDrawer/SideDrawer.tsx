@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { useInertOutside, useModalKeyGuard } from '../../../hooks'
+import { useBackClose, useInertOutside, useModalKeyGuard } from '../../../hooks'
 import {
   BACKDROP_CLASSES,
   LAYER_CLASSES,
@@ -15,6 +15,7 @@ export function SideDrawer({ label, children, onClose, side = 'left' }: SideDraw
   const isCovered = useCallback((): boolean => layerRef.current?.inert === true, [])
   const { dialogRef, handleDialogKeyDown } = useModalKeyGuard(onClose, isCovered)
   useInertOutside(layerRef, dialogRef)
+  useBackClose(true, onClose)
 
   return createPortal(
     <div ref={layerRef} className={LAYER_CLASSES}>
