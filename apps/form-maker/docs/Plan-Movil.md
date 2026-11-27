@@ -222,7 +222,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - En `pointer-coarse:` (`PreviewFieldControl.constants.ts`): chips y filas con `min-h-11` (44 px),
     casilla de 20 px, letra de las filas a 16 px. Tamaño real y no `touch-target`: el `::after` de
     un chip pisaría al vecino. Medido en Edge headless; el escritorio no cambia.
-- [ ] **S3 El teclado correcto en cada campo:**
+- [x] ~~**S3 El teclado correcto en cada campo:**~~ (2026-11-27, beb9f252; el NIT queda en veremos)
   - Revisar `inputMode`, `enterKeyHint` y `autoComplete` por tipo. Número ya usa `decimal`, y la
     máscara de fecha ya usa `numeric`.
   - `tel` y `email` (`PreviewFieldControl.tsx:114`) y el NIT.
