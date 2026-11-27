@@ -24,6 +24,9 @@ export const INVALID_CONDITION_PATTERN_MESSAGE: string =
 export const ORPHAN_MAPPING_MESSAGE: string =
   'Está mapeado a una ruta que no existe en el contrato:'
 
+export const RESERVED_MAPPING_MESSAGE: string =
+  'Está mapeado a una ruta con un nombre reservado de JavaScript:'
+
 export const HOST_MAPPING_MESSAGE: string =
   'Está mapeado a una hoja que llena el aplicativo receptor:'
 

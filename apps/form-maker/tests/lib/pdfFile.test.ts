@@ -268,4 +268,26 @@ describe('plantillas hechas a mano', () => {
     expect(result.warnings.join(' ')).toContain('2 variables distintas: {Nombre}, {Nit}')
     expect(result.warnings).toContain(MESSAGES.page)
   })
+
+  it('una variable en un atributo avisa; src, href y data-fm-* no cuentan', () => {
+    const result = read(
+      '<html><body><table><tr><td title="{Nombre}" data-fm-x="{Oculta}"><a href="{Url}">x</a><img src="{Logo}"></td></tr></table></body></html>',
+    )
+    const warning: string | undefined = result.warnings.find((text) =>
+      text.startsWith('Atributos con variable'),
+    )
+
+    expect(warning).toContain('title="{Nombre}"')
+    expect(warning).not.toContain('{Oculta}')
+    expect(warning).not.toContain('{Url}')
+    expect(warning).not.toContain('{Logo}')
+  })
+
+  it('sin variables en los atributos no sale ese aviso', () => {
+    const result = read(
+      '<html><body><table><tr><td title="fijo">{Nombre}</td></tr></table></body></html>',
+    )
+
+    expect(result.warnings.some((text) => text.startsWith('Atributos con variable'))).toBe(false)
+  })
 })

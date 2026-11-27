@@ -89,6 +89,11 @@ describe('sanitizePdfHtml: estilos', () => {
 
   it('un comentario no sirve de escondite y un < no cierra el <style> antes', () => {
     expect(sanitizeCss('/* x */@im/**/port url(a.css);')).not.toContain('@import')
+    // Un escape en el at-keyword tambien es @import para el navegador.
+    expect(
+      sanitizePdfHtml('<style>@\\69mport "https://evil.example/x.css"; td { color: red }</style>'),
+    ).not.toContain('evil.example')
+    expect(sanitizeCss('@i\\6dport url(a.css); td { color: red }')).toBe(' td { color: red }')
     expect(
       sanitizePdfHtml('<style>td::after { content: "</style><script>" }</style>'),
     ).not.toContain('<script')
@@ -109,6 +114,23 @@ describe('sanitizePdfHtml: estilos', () => {
   it('una url de imagen segura en el CSS se conserva; con escape de CSS no', () => {
     expect(sanitizeCss('background: url("https://a.co/f.png")')).toContain('https://a.co/f.png')
     expect(sanitizeCss('background: url("\\6a avascript:alert(1)")')).toBe('background: none')
+  })
+
+  // BUG (hallazgo 4.8 de docs/Hallazgos-Pruebas.md): el escape de CSS en el nombre de la funcion
+  // (u\72l es url) no pasa por el filtro de url(). Pendiente de confirmar con el usuario; it.fails
+  // avisa cuando se corrija.
+  it.fails('un escape en el nombre de la función tampoco deja pasar javascript:', () => {
+    expect(sanitizeCss('td { background: u\\72l(javascript:alert(1)) }')).not.toContain(
+      'javascript',
+    )
+  })
+
+  // BUG (hallazgo 4.8): una url() sin comillas se reemplaza hasta el primer ")" y deja el otro.
+  // Pendiente de confirmar con el usuario; it.fails avisa cuando se corrija.
+  it.fails('una url() peligrosa sin comillas no deja un ) suelto', () => {
+    expect(sanitizeCss('td { background: url(javascript:alert(1)) }')).toBe(
+      'td { background: none }',
+    )
   })
 })
 
@@ -138,6 +160,14 @@ describe('sanitizePdfHtml: lo que se conserva y se tolera', () => {
 
   it('nunca lanza, ni con basura', () => {
     expect(() => sanitizePdfHtml('<<<td <a href="x" <img src=')).not.toThrow()
+  })
+
+  it('sanear dos veces da lo mismo con HTML normal', () => {
+    const once: string = sanitizePdfHtml(
+      '<style>td { color: red }</style><table><tr><td style="width: 10px">a &amp; b</td></tr></table>',
+    )
+
+    expect(sanitizePdfHtml(once)).toBe(once)
   })
 })
 
@@ -182,6 +212,23 @@ describe('parsePdfHtml y normalizePdfHtml', () => {
       '<table class="fm-t"><tbody><tr><td style="color: red">a &amp; b</td></tr></tbody></table>'
 
     expect(serializePdfHtml(parsePdfHtml(html))).toBe(html)
+  })
+
+  it('el contenido de un <style> es texto crudo y lo que sigue a su cierre se lee', () => {
+    const nodes = parsePdfHtml('<style>td{color:red}<b>no</b></style ><p>después</p>')
+
+    expect(nodes.map((node) => (node.type === 'element' ? node.name : '#text'))).toEqual([
+      'style',
+      'p',
+    ])
+    expect(serializePdfHtml(nodes)).toBe('<style>td{color:red}<b>no</b></style><p>después</p>')
+  })
+
+  it('un </style sin > al final no lanza ni pierde el estilo', () => {
+    const nodes = parsePdfHtml('<style>td{}</style')
+
+    expect(nodes).toHaveLength(1)
+    expect(serializePdfHtml(nodes)).toBe('<style>td{}</style>')
   })
 
   it('pdfHtmlText da el texto que se ve, decodificado y con saltos', () => {

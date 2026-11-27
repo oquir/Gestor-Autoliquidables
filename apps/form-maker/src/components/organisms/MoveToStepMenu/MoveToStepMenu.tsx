@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { AngleDown2 } from 'reicon-react'
 import { CANVAS_TOOLBAR_ACTION_CLASSES } from '../../../constants'
-import { useClickOutside } from '../../../hooks'
+import { useClickOutside, useLayoutMode } from '../../../hooks'
 import { useFormStore } from '../../../store'
 import type { CanvasTarget } from '../../../types'
 import {
@@ -13,6 +13,7 @@ import {
 import type { MoveTargetSection, MoveToStepMenuProps } from './MoveToStepMenu.types'
 import { buildMoveSections } from './MoveToStepMenu.utils'
 import { Tooltip } from '../../atoms'
+import { MenuSurface } from '../../molecules'
 
 export function MoveToStepMenu({ onSelect }: MoveToStepMenuProps) {
   const formSteps = useFormStore((state) => state.formSteps)
@@ -20,8 +21,10 @@ export function MoveToStepMenu({ onSelect }: MoveToStepMenuProps) {
   const activeCanvas = useFormStore((state) => state.activeCanvas)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  // En el celular el menu es una hoja en un portal: un toque adentro contaria como afuera.
+  const isPhone: boolean = useLayoutMode() === 'phone'
 
-  useClickOutside(containerRef, () => setIsOpen(false), isOpen)
+  useClickOutside(containerRef, () => setIsOpen(false), isOpen && !isPhone)
 
   const sections: MoveTargetSection[] = buildMoveSections(formSteps, introSteps, activeCanvas)
 
@@ -49,7 +52,12 @@ export function MoveToStepMenu({ onSelect }: MoveToStepMenuProps) {
       </Tooltip>
 
       {isOpen && (
-        <div className={MENU_CLASSES}>
+        <MenuSurface
+          title="Mover a paso"
+          onClose={() => setIsOpen(false)}
+          popoverClassName={MENU_CLASSES}
+          sheetContentClassName="flex flex-col"
+        >
           {sections.map((section) => (
             <div key={section.key} className="flex flex-col">
               {section.caption && <span className={MENU_CAPTION_CLASSES}>{section.caption}</span>}
@@ -66,7 +74,7 @@ export function MoveToStepMenu({ onSelect }: MoveToStepMenuProps) {
               ))}
             </div>
           ))}
-        </div>
+        </MenuSurface>
       )}
     </div>
   )

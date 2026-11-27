@@ -243,6 +243,30 @@ describe('problemas del formulario', () => {
   })
 })
 
+// Hallazgo 4.1 de docs/Hallazgos-Pruebas.md: el obligatorio solo mira la ausencia de .optional().
+// El numero con espacios no va: el input numerico solo deja digitos, separadores y signo.
+describe('obligatorios con valores que parecen vacíos', () => {
+  const steps: FormStep[] = [
+    makeStep('Datos', [
+      makeField('text', 'nombre', { validations: { required: true } }),
+      makeField('number', 'monto', { validations: { required: true } }),
+      makeField('checkbox', 'acepto', { validations: { required: true } }),
+    ]),
+  ]
+
+  // BUG: un texto obligatorio con solo espacios pasa: coerceValue solo convierte '' en undefined.
+  // Pendiente de confirmar con el usuario; it.fails avisa cuando se corrija.
+  it.fails('un texto obligatorio con solo espacios da error', () => {
+    expect(validate(steps, { nombre: '   ', monto: 1, acepto: true }).errors.nombre).toBeDefined()
+  })
+
+  // RIESGO: el checkbox nunca exige marcarse (z.boolean() sin .optional() acepta false). Fija lo
+  // que pasa hoy; si se decide que required obliga a marcarlo, esta prueba cambia a proposito.
+  it('un checkbox obligatorio sin marcar no da error', () => {
+    expect(validate(steps, { nombre: 'Ana', monto: 1, acepto: false }).errors).toEqual({})
+  })
+})
+
 describe('coerceValue', () => {
   const field = (type: string): ExportedField => ({ type }) as ExportedField
 

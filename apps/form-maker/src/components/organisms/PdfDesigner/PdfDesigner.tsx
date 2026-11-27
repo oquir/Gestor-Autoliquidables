@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, CloudUpload, DocumentDownload2, FolderOpen, Moon, Sun } from 'reicon-react'
-import { useCanvasPan } from '../../../hooks'
+import { useBackClose, useCanvasPan } from '../../../hooks'
 import { usePdfDesignAutosave } from '../../../hooks/usePdfDesignAutosave'
 import { usePdfDesignerShortcuts } from '../../../hooks/usePdfDesignerShortcuts'
 import { usePdfFile } from '../../../hooks/usePdfFile'
@@ -51,6 +51,15 @@ export function PdfDesigner() {
   const saveNow = usePdfDesignAutosave()
   usePdfDesignerShortcuts()
 
+  // Volver y el Atras de Android hacen lo mismo: guardar antes de cerrar (la miniatura del panel lee
+  // el diseno al volver).
+  function closeDesigner(): void {
+    saveNow()
+    setPdfDesignerOpen(false)
+  }
+
+  useBackClose(true, closeDesigner)
+
   useEffect(() => {
     if (taxType) openDesign(taxType)
   }, [taxType, openDesign])
@@ -62,18 +71,11 @@ export function PdfDesigner() {
   useCanvasPan(isReady && tool === 'hand')
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-surface-sunken text-fg">
+    <div className="flex h-dvh w-full flex-col overflow-hidden bg-surface-sunken text-fg">
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-6 py-2">
         <div className="flex min-w-0 items-center gap-5">
           <Tooltip content="Volver al formulario">
-            <button
-              type="button"
-              onClick={() => {
-                saveNow()
-                setPdfDesignerOpen(false)
-              }}
-              className={BACK_BUTTON_CLASSES}
-            >
+            <button type="button" onClick={closeDesigner} className={BACK_BUTTON_CLASSES}>
               <ArrowLeft size={14} />
               Volver
             </button>
@@ -174,7 +176,7 @@ export function PdfDesigner() {
           <div className="relative flex min-w-0 flex-1 flex-col">
             <main
               data-canvas-scroll
-              className={`min-h-0 flex-1 overflow-auto ${tool === 'hand' ? HAND_CURSOR_CLASSES : ''}`}
+              className={`min-h-0 flex-1 overflow-auto touch-pan-x touch-pan-y ${tool === 'hand' ? HAND_CURSOR_CLASSES : ''}`}
             >
               <PdfCanvas />
             </main>

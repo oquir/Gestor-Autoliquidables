@@ -117,6 +117,18 @@ describe('resultado de un script', () => {
     expect(snapshot.issues).toEqual([expect.objectContaining({ kind: 'script', field: 'roto' })])
   })
 
+  // BUG (hallazgo 4.5 de docs/Hallazgos-Pruebas.md): un throw sin mensaje deja error: '', y como
+  // computeDerivedValues mira if (run.error), no se reporta. Pendiente de confirmar con el usuario;
+  // it.fails avisa cuando se corrija.
+  it.fails('un script que lanza sin mensaje también se reporta', () => {
+    const snapshot: RuntimeSnapshot = resolve(
+      [makeStep('Paso', [calc('roto', 'throw new Error();')])],
+      { roto: 7 },
+    )
+
+    expect(snapshot.issues).toEqual([expect.objectContaining({ kind: 'script', field: 'roto' })])
+  })
+
   it('redondea al millar y a los decimales solo lo calculado', () => {
     const snapshot: RuntimeSnapshot = resolve(
       [

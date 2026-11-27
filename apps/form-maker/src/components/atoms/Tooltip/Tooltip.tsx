@@ -29,6 +29,7 @@ import {
   TOOLTIP_VIEWPORT_PADDING,
 } from './Tooltip.constants'
 import type { TooltipFloatingProps, TooltipProps, TooltipReferenceProps } from './Tooltip.types'
+import { isActionReference } from './Tooltip.utils'
 
 // Globo de ayuda del builder (no es field.tooltip, que se exporta). Va en un portal con position
 // fixed: asi no lo recortan los paneles ni lo mueve el scale() del lienzo.
@@ -38,6 +39,7 @@ export function Tooltip({
   placement = 'top',
   className = '',
   disabled = false,
+  tapToOpen = false,
 }: TooltipProps) {
   // En estado y no en refs: la regla react-hooks/refs no deja leer refs al pintar.
   const [reference, setReference] = useState<Element | null>(null)
@@ -59,6 +61,7 @@ export function Tooltip({
         placement={placement}
         className={className}
         isEnabled={isEnabled}
+        tapToOpen={tapToOpen}
         onReferenceProps={setReferenceProps}
       />
     </>
@@ -71,9 +74,12 @@ function TooltipFloatingBase({
   placement,
   className,
   isEnabled,
+  tapToOpen,
   onReferenceProps,
 }: TooltipFloatingProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const isTapEnabled: boolean =
+    isEnabled && (tapToOpen || (reference !== null && !isActionReference(reference)))
   const [floating, setFloating] = useState<HTMLElement | null>(null)
   const { floatingStyles, context } = useFloating({
     elements: { reference, floating },
@@ -87,8 +93,9 @@ function TooltipFloatingBase({
   const { getReferenceProps, getFloatingProps } = useInteractions([
     useHover(context, { enabled: isEnabled, mouseOnly: true, delay: { open: TOOLTIP_OPEN_DELAY } }),
     useFocus(context, { enabled: isEnabled }),
-    // Sin hover en pantallas tactiles: el toque lo abre y lo cierra.
-    useClick(context, { enabled: isEnabled, ignoreMouse: true }),
+    // Sin hover en pantallas tactiles: el toque lo abre y lo cierra, salvo que el toque sea para una
+    // accion (B6 de docs/Plan-Movil.md). ignoreMouse: con mouse nada cambia.
+    useClick(context, { enabled: isTapEnabled, ignoreMouse: true }),
     useDismiss(context, { enabled: isEnabled }),
     useRole(context, { enabled: isEnabled, role: 'tooltip' }),
   ])

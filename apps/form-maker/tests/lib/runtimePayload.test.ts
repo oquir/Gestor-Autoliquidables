@@ -59,6 +59,16 @@ describe('setDeepValue y parsePath', () => {
     expect(target).toEqual({ actividades: [{}, {}, { tarifa: 4 }] })
   })
 
+  it('un tramo reservado no escribe nada ni contamina Object.prototype', () => {
+    const target: Record<string, unknown> = {}
+    setDeepValue(target, '__proto__.contaminado', 'si')
+    setDeepValue(target, 'a.constructor.prototype.contaminado', 'si')
+    setDeepValue(target, 'lista[0].__proto__.contaminado', 'si')
+
+    expect(({} as Record<string, unknown>).contaminado).toBeUndefined()
+    expect(target).toEqual({})
+  })
+
   it('parsePath separa claves e índices', () => {
     expect(parsePath('a.b[3].c')).toEqual([
       { key: 'a', index: null },

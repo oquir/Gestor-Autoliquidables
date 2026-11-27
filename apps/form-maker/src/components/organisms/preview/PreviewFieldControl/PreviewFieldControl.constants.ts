@@ -1,5 +1,5 @@
 export const CONTROL_BASE_CLASSES: string =
-  'w-full rounded-md border bg-field px-2.5 py-1.5 text-sm text-fg outline-none transition-colors disabled:cursor-not-allowed disabled:bg-surface-raised disabled:text-fg-muted'
+  'w-full rounded-md border bg-field px-2.5 py-1.5 text-sm text-fg outline-none transition-colors pointer-coarse:text-base disabled:cursor-not-allowed disabled:bg-surface-raised disabled:text-fg-muted'
 
 export const CONTROL_IDLE_CLASSES: string = 'border-border focus:border-brand-border'
 

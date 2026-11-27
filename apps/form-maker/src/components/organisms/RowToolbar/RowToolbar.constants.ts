@@ -5,3 +5,9 @@ export const ROW_TOOLBAR_CLASSES: string =
 
 export const ROW_TOOLBAR_DANGER_ITEM_CLASSES: string =
   'flex h-5 w-5 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-danger-surface hover:text-danger hover:cursor-pointer'
+
+// En tactil la barra queda compacta (asa y ⋯) mientras la fila no tiene el campo seleccionado.
+// contents: el envoltorio no arma caja, asi los menus se siguen midiendo contra la barra.
+export const ROW_TOOLBAR_COLLAPSIBLE_CLASSES: string = 'contents pointer-coarse:hidden'
+
+export const ROW_TOOLBAR_MORE_CLASSES: string = 'hidden pointer-coarse:contents'

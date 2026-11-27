@@ -15,6 +15,7 @@ import {
   INVALID_PATTERN_MESSAGE,
   ORPHAN_MAPPING_MESSAGE,
   PRELUDE_READS_FIELDS_MESSAGE,
+  RESERVED_MAPPING_MESSAGE,
   UNSUPPORTED_CSS_MESSAGE,
 } from '../../src/lib/formDiagnostics/formDiagnostics.constants'
 
@@ -165,6 +166,16 @@ describe('diagnoseForm', () => {
     expect(problems.map((problem) => [problem.severity, problem.message])).toEqual([
       ['warning', `${ORPHAN_MAPPING_MESSAGE} no.existe`],
       ['warning', `${HOST_MAPPING_MESSAGE} contribuyente.codigoMunicipio`],
+    ])
+  })
+
+  it('un mapeo con un tramo reservado es un error, no un aviso de huérfano', () => {
+    const problems: FormProblem[] = diagnose([
+      makeField('text', 'a', { apiBinding: { kind: 'mapped', path: '__proto__.x' } }),
+    ])
+
+    expect(problems.map((problem) => [problem.severity, problem.message])).toEqual([
+      ['error', `${RESERVED_MAPPING_MESSAGE} __proto__.x`],
     ])
   })
 

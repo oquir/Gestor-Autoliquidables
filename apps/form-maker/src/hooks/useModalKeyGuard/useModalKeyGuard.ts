@@ -10,12 +10,18 @@ function isSaveShortcut(event: KeyboardEvent | ReactKeyboardEvent): boolean {
   return (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's'
 }
 
-export function useModalKeyGuard(onClose: () => void): UseModalKeyGuardResult {
+// isCovered: la capa quedo tapada por otra (una hoja abierta desde esta). Entonces no frena ni
+// cierra nada: si frenara en captura, el Escape no llegaria nunca a la de arriba y cerraria esta.
+export function useModalKeyGuard(
+  onClose: () => void,
+  isCovered?: () => boolean,
+): UseModalKeyGuardResult {
   const dialogRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent): void {
       if (isSaveShortcut(event)) return
+      if (isCovered?.()) return
       if (event.target instanceof Node && dialogRef.current?.contains(event.target)) return
 
       event.stopPropagation()
@@ -25,14 +31,21 @@ export function useModalKeyGuard(onClose: () => void): UseModalKeyGuardResult {
     window.addEventListener('keydown', handleKeyDown, true)
 
     return () => window.removeEventListener('keydown', handleKeyDown, true)
-  }, [onClose])
+  }, [onClose, isCovered])
 
   function handleDialogKeyDown(event: ReactKeyboardEvent<HTMLDivElement>): void {
     if (isSaveShortcut(event)) return
 
     event.stopPropagation()
     // Un Escape que CodeMirror ya uso (cerrar el autocompletado, colapsar una seleccion) no cierra.
-    if (event.key === 'Escape' && !event.defaultPrevented) onClose()
+    // Tampoco uno que nace en otro dialogo de adentro (un ModalShell sin guardia propia abierto desde
+    // un panel del cajon): es de ese modal, y cerrar esta capa lo desmontaria con su trabajo.
+    if (event.key !== 'Escape' || event.defaultPrevented) return
+    if (event.target instanceof Element) {
+      const ownerDialog: Element | null = event.target.closest('[role="dialog"]')
+      if (ownerDialog !== null && ownerDialog !== event.currentTarget) return
+    }
+    onClose()
   }
 
   return { dialogRef, handleDialogKeyDown }

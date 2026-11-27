@@ -1,4 +1,5 @@
 import type { SchemaLeaf, SchemaNode, SchemaNodeType } from '../../types'
+import { RESERVED_PATH_KEYS } from '../../constants/payloadSchema'
 import { collectLeaves } from './payloadSchema.utils'
 
 export function flattenLeaves(schema: SchemaNode): SchemaLeaf[] {
@@ -35,4 +36,9 @@ export function resolveLeaf(schema: SchemaNode, path: string): SchemaLeaf | null
 export function resolveLeafType(schema: SchemaNode, path: string): SchemaNodeType | null {
   const leaf: SchemaLeaf | null = resolveLeaf(schema, path)
   return leaf ? leaf.type : null
+}
+
+// Por tramos y sin los indices: "x[0]" cuenta como "x".
+export function hasReservedPathKey(path: string): boolean {
+  return path.split(/[.[\]]/).some((segment: string) => RESERVED_PATH_KEYS.has(segment))
 }

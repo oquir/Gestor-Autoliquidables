@@ -5,7 +5,7 @@ import type { InfoHintProps } from './InfoHint.types'
 
 export function InfoHint({ text, label }: InfoHintProps) {
   return (
-    <Tooltip content={text} className={BUBBLE_CLASSES}>
+    <Tooltip content={text} className={BUBBLE_CLASSES} tapToOpen>
       <button type="button" aria-label={label} className={TRIGGER_CLASSES}>
         <InfoCircle size={13} />
       </button>

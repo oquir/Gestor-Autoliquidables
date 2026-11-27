@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
-import { useClickOutside } from '../../../hooks'
+import { useClickOutside, useLayoutMode } from '../../../hooks'
 import { Label } from '../../atoms'
+import { MenuSurface } from '../MenuSurface'
 import type { ColorPickerFieldProps } from './ColorPickerField.types'
 
 export function ColorPickerField({
@@ -15,8 +16,10 @@ export function ColorPickerField({
 }: ColorPickerFieldProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  // En el celular el selector es una hoja en un portal: un toque adentro contaria como afuera.
+  const isPhone: boolean = useLayoutMode() === 'phone'
 
-  useClickOutside(containerRef, () => setIsOpen(false), isOpen)
+  useClickOutside(containerRef, () => setIsOpen(false), isOpen && !isPhone)
 
   return (
     <div ref={containerRef} className="relative">
@@ -42,13 +45,16 @@ export function ColorPickerField({
       {/* El lado lo decide quien lo coloca: el overflow del panel recorta tambien en X y ningun
           z-index lo salva. */}
       {isOpen && (
-        <div
-          className={`absolute z-50 mt-1 rounded-md border border-slate-200 bg-white p-2 shadow-lg dark:border-neutral-700 dark:bg-neutral-800 ${
+        <MenuSurface
+          title={label}
+          onClose={() => setIsOpen(false)}
+          popoverClassName={`absolute z-50 mt-1 rounded-md border border-slate-200 bg-white p-2 shadow-lg dark:border-neutral-700 dark:bg-neutral-800 ${
             align === 'right' ? 'right-0' : 'left-0'
           }`}
+          sheetContentClassName="flex justify-center"
         >
           <HexColorPicker color={value || defaultColor} onChange={onChange} />
-        </div>
+        </MenuSurface>
       )}
     </div>
   )

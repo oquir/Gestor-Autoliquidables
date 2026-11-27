@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { CATALOG_BANK_KEY } from '../../src/lib/catalogBank/catalogBank.constants'
 import { MAX_DATES_KEY } from '../../src/lib/maxDatesBank/maxDatesBank.constants'
 import { VALORES_KEY } from '../../src/lib/valoresBank/valoresBank.constants'
@@ -12,6 +12,9 @@ storage.setItem(
   CATALOG_BANK_KEY,
   JSON.stringify({ tipos: { source: 'custom', entries: [{ id: '1', label: 'Guardado' }] } }),
 )
+// Modulo nuevo: sin aislamiento entre archivos (isolate: false) el store ya cargado no relee el
+// localStorage de esta prueba.
+vi.resetModules()
 const { useFormStore } = await import('../../src/store/formStore')
 
 const INITIAL: FormState = useFormStore.getState()
@@ -30,6 +33,10 @@ const FECHAS: FechasMaximasPresentacion = {
   reteica: [],
   autoretencionIca: [],
 }
+
+afterAll(() => {
+  vi.unstubAllGlobals()
+})
 
 beforeEach(() => {
   useFormStore.setState(INITIAL, true)

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { DATE_FORMAT_IDS } from '../../src/constants/dateFormats'
 import { boundExpression, boundMessage, isCompleteBound } from '../../src/lib/dateBound/dateBound'
 import {
@@ -58,11 +58,14 @@ describe('formatIsoValue y displayDateText', () => {
   })
 
   it('ida y vuelta en los siete formatos', () => {
+    // El 07/05 ademas del 31/03: con un dia de 31 no se nota si se cruzan dia y mes.
     for (const format of DATE_FORMAT_IDS) {
-      const text: string | null = formatIsoValue('2026-03-31', format, false)
+      for (const iso of ['2026-03-31', '2026-05-07']) {
+        const text: string | null = formatIsoValue(iso, format, false)
 
-      expect(text).not.toBeNull()
-      expect(parseDateText(text ?? '', format)).toBe('2026-03-31')
+        expect(text).not.toBeNull()
+        expect(parseDateText(text ?? '', format)).toBe(iso)
+      }
     }
     expect(DATE_FORMAT_IDS).toHaveLength(7)
   })
@@ -105,19 +108,40 @@ describe('límites de fecha', () => {
     ).toBe('La fecha tiene que estar al menos 3 días en el futuro')
   })
 
+  // Reloj falso en hora local: con el real, la prueba podia caer justo en la medianoche.
   it('un límite relativo corre contra el reloj de quien llena, en hora local', () => {
     const run = (expression: string): string => new Function(`return ${expression};`)()
-    const today = new Date()
-    const local: string = [
-      today.getFullYear(),
-      String(today.getMonth() + 1).padStart(2, '0'),
-      String(today.getDate()).padStart(2, '0'),
-    ].join('-')
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 2, 31, 23, 30))
 
-    expect(boundExpression({ kind: 'fixed', date: '2026-01-31' })).toBe('"2026-01-31"')
-    expect(run(boundExpression({ kind: 'today' }))).toBe(local)
-    expect(
-      run(boundExpression({ kind: 'relative', amount: 1, unit: 'days', direction: 'future' })),
-    ).not.toBe(local)
+    try {
+      expect(boundExpression({ kind: 'fixed', date: '2026-01-31' })).toBe('"2026-01-31"')
+      expect(run(boundExpression({ kind: 'today' }))).toBe('2026-03-31')
+      expect(
+        run(boundExpression({ kind: 'relative', amount: 1, unit: 'days', direction: 'future' })),
+      ).toBe('2026-04-01')
+      expect(
+        run(boundExpression({ kind: 'relative', amount: 3, unit: 'days', direction: 'past' })),
+      ).toBe('2026-03-28')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('un límite en meses o años pasa por el día 1: el 31 menos un mes no salta de mes', () => {
+    const run = (expression: string): string => new Function(`return ${expression};`)()
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 2, 31, 12, 0))
+
+    try {
+      expect(
+        run(boundExpression({ kind: 'relative', amount: 1, unit: 'months', direction: 'past' })),
+      ).toBe('2026-02-28')
+      expect(
+        run(boundExpression({ kind: 'relative', amount: 2, unit: 'years', direction: 'future' })),
+      ).toBe('2028-03-31')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

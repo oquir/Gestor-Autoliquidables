@@ -2,6 +2,8 @@ import { Tooltip } from '../../atoms/Tooltip'
 import { useRef, useState } from 'react'
 import { AngleDown2, Check } from 'reicon-react'
 import { useClickOutside } from '../../../hooks/useClickOutside/useClickOutside'
+import { useLayoutMode } from '../../../hooks/useLayoutMode/useLayoutMode'
+import { MenuSurface } from '../MenuSurface'
 import {
   canZoomIn,
   canZoomOut,
@@ -26,8 +28,10 @@ export function CanvasZoomControl() {
   const isCanvasView: boolean = useFormStore((state) => state.canvasViewMode === 'canvas')
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  // En el celular el menu es una hoja en un portal: un toque adentro contaria como afuera.
+  const isPhone: boolean = useLayoutMode() === 'phone'
 
-  useClickOutside(containerRef, () => setIsOpen(false), isOpen)
+  useClickOutside(containerRef, () => setIsOpen(false), isOpen && !isPhone)
 
   function apply(zoom: number): void {
     setCanvasZoom(zoom)
@@ -55,8 +59,11 @@ export function CanvasZoomControl() {
       </Tooltip>
 
       {isOpen && (
-        <div
-          className={`absolute right-0 top-7 z-20 flex w-44 origin-top-right flex-col rounded-md border border-border bg-surface py-1 shadow-lg ${ENTER_POP_CLASSES}`}
+        <MenuSurface
+          title="Zoom del lienzo"
+          onClose={() => setIsOpen(false)}
+          popoverClassName={`absolute right-0 top-7 z-20 flex w-44 origin-top-right flex-col rounded-md border border-border bg-surface py-1 shadow-lg ${ENTER_POP_CLASSES}`}
+          sheetContentClassName="flex flex-col"
         >
           <button
             type="button"
@@ -94,7 +101,7 @@ export function CanvasZoomControl() {
               ) : null}
             </button>
           ))}
-        </div>
+        </MenuSurface>
       )}
     </div>
   )

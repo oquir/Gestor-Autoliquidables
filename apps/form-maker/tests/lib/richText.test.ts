@@ -114,6 +114,12 @@ describe('safeHref', () => {
     expect(safeHref('  ')).toBeUndefined()
     expect(safeHref(null)).toBeUndefined()
   })
+
+  // RIESGO (hallazgo 4.8 de docs/Hallazgos-Pruebas.md): sin protocolo se asume https, asi que un
+  // correo escrito sin mailto: queda como enlace al host del correo. Fija lo que pasa hoy.
+  it('un correo sin mailto: se vuelve un enlace https', () => {
+    expect(safeHref('a@b.co')).toBe('https://a@b.co/')
+  })
 })
 
 describe('isEmptyRichText', () => {

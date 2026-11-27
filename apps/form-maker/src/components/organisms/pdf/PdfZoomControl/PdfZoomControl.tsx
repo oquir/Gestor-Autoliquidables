@@ -6,11 +6,12 @@ import {
   PDF_ZOOM_MIN,
   PDF_ZOOM_PRESETS,
 } from '../../../../constants'
-import { useClickOutside } from '../../../../hooks'
+import { useClickOutside, useLayoutMode } from '../../../../hooks'
 import { formatZoom, getCanvasScrollPort } from '../../../../lib'
 import { fitPdfZoom, stepPdfZoom } from '../../../../lib/pdfDesign'
 import { usePdfDesignStore } from '../../../../store/pdfDesignStore'
 import { Tooltip } from '../../../atoms'
+import { MenuSurface } from '../../../molecules'
 import {
   MENU_CLASSES,
   ZOOM_ITEM_CLASSES,
@@ -25,8 +26,10 @@ export function PdfZoomControl() {
   const setZoom = usePdfDesignStore((state) => state.setZoom)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  // En el celular el menu es una hoja en un portal: un toque adentro contaria como afuera.
+  const isPhone: boolean = useLayoutMode() === 'phone'
 
-  useClickOutside(containerRef, () => setIsOpen(false), isOpen)
+  useClickOutside(containerRef, () => setIsOpen(false), isOpen && !isPhone)
 
   function fitWidth(): void {
     const port: HTMLElement | null = getCanvasScrollPort()
@@ -82,7 +85,13 @@ export function PdfZoomControl() {
       </Tooltip>
 
       {isOpen && (
-        <div role="menu" className={MENU_CLASSES}>
+        <MenuSurface
+          title="Zoom del PDF"
+          onClose={() => setIsOpen(false)}
+          popoverClassName={MENU_CLASSES}
+          sheetContentClassName="flex flex-col"
+          role="menu"
+        >
           <button type="button" role="menuitem" onClick={fitWidth} className={ZOOM_ITEM_CLASSES}>
             Ajustar al ancho
           </button>
@@ -106,7 +115,7 @@ export function PdfZoomControl() {
           <p className="border-t border-border-subtle px-2.5 pt-1.5 pb-1 text-[10px] text-fg-muted">
             También con Ctrl + rueda del mouse.
           </p>
-        </div>
+        </MenuSurface>
       )}
     </div>
   )

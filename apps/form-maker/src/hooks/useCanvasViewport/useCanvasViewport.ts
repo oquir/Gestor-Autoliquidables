@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/refs -- el ancla se captura en render a proposito, ver captureAnchor */
 import { type CSSProperties, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { getViewportLayout } from '../../lib/canvasViewport/canvasViewport'
-import { wheelZoom } from '../../lib/canvasZoom/canvasZoom'
+import { pinchZoom, wheelZoom } from '../../lib/canvasZoom/canvasZoom'
 import { useFormStore } from '../../store/formStore'
 import type { ViewportLayout } from '../../types/canvasViewport'
+import type { PinchFrame, PinchPoint } from '../../types/pinch'
+import { usePinchZoom } from '../usePinchZoom'
 import type { CanvasViewportReturn } from '../../types/canvasViewportReturn'
 import type { HomedView, PortSize, ViewAnchor } from './useCanvasViewport.types'
 import { captureAnchor, readPortSize, restoreAnchor, samePortSize } from './useCanvasViewport.utils'
@@ -28,6 +30,10 @@ export function useCanvasViewport(): CanvasViewportReturn {
   const pendingAnchor = useRef<ViewAnchor | null>(null)
   const previousZoom = useRef<number>(zoom)
   const homed = useRef<HomedView | null>(null)
+  // Pellizco: el zoom de cuando se apoyaron los dedos y el punto medio del ultimo cuadro, que el
+  // render usa de ancla en vez del centro.
+  const pinchStartZoom = useRef<number>(zoom)
+  const pinchPoint = useRef<PinchPoint | null>(null)
 
   const port: HTMLElement | null = useMemo(
     () => content?.closest<HTMLElement>('[data-canvas-scroll]') ?? null,
@@ -116,10 +122,26 @@ export function useCanvasViewport(): CanvasViewportReturn {
     }
   }, [port])
 
+  // B10 de docs/Plan-Movil.md. Un zoom que no cambia (tope) no anota punto: si no, el proximo zoom
+  // por teclado anclaria ahi.
+  usePinchZoom(port, {
+    onStart: () => {
+      pinchStartZoom.current = useFormStore.getState().canvasZoom
+    },
+    onPinch: (frame: PinchFrame) => {
+      const state = useFormStore.getState()
+      const next: number = pinchZoom(pinchStartZoom.current, frame.scale)
+      if (next === state.canvasZoom) return
+      pinchPoint.current = frame.midpoint
+      state.setCanvasZoom(next)
+    },
+  })
+
   // Con los rects de ANTES del cambio: no mover a un efecto, ahi ya cambiaron. Ancla al centro y no
-  // al cursor: el zoom tambien llega por teclado y menu.
+  // al cursor: el zoom tambien llega por teclado y menu. Al pellizcar, al punto medio de los dedos.
   if (previousZoom.current !== zoom) {
-    if (content && port) pendingAnchor.current = captureAnchor(port, content)
+    if (content && port) pendingAnchor.current = captureAnchor(port, content, pinchPoint.current)
+    pinchPoint.current = null
     previousZoom.current = zoom
   }
 

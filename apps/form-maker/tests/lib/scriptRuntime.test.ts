@@ -84,10 +84,30 @@ describe('helpers del script', () => {
     expect(run('return round(1.2345, 2);').value).toBe(1.23)
   })
 
+  it('round redondea la magnitud: los negativos empatan simétricos y no queda -0', () => {
+    expect(run('return round(-2.5);').value).toBe(-3)
+    expect(run('return round(-1500, -3);').value).toBe(-2000)
+    expect(run('return round(1500, -3);').value).toBe(2000)
+    expect(Object.is(run('return round(-0.4);').value, 0)).toBe(true)
+  })
+
   it('dvNit calcula el dígito de verificación de la DIAN', () => {
     expect(run('return dvNit(890903938);').value).toBe(8)
     expect(run('return dvNit("800197268");').value).toBe(4)
     expect(run('return dvNit(900123456);').value).toBe(8)
+  })
+
+  it('dvNit lee un NIT escrito con puntos o con el DV tras el guion', () => {
+    expect(run('return dvNit("900.123.456");').value).toBe(8)
+    expect(run('return dvNit("900.123.456-8");').value).toBe(8)
+    expect(run('return dvNit(" 890 903 938 ");').value).toBe(8)
+  })
+
+  // RIESGO (hallazgo 4.7 de docs/Hallazgos-Pruebas.md): num() lee el punto como decimal (como
+  // JavaScript) y numberFormat como miles, y corta en la coma. Fija lo que pasa hoy.
+  it('num lee el punto como decimal y corta en la coma', () => {
+    expect(run('return num("1.234,56");').value).toBe(1.234)
+    expect(run('return num("1,5");').value).toBe(1)
   })
 
   it('uvt y smmlv leen la tabla del contexto; sin año, el de hoy', () => {

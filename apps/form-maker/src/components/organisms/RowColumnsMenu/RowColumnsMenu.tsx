@@ -1,17 +1,20 @@
 import { useRef } from 'react'
 import { MAX_ROW_COLUMNS, MIN_ROW_COLUMNS } from '../../../constants'
 import { ROW_TOOLBAR_ITEM_CLASSES, ROW_TOOLBAR_POPOVER_CLASSES } from '../../../constants'
-import { useClickOutside } from '../../../hooks'
+import { useClickOutside, useLayoutMode } from '../../../hooks'
 import { useFormStore } from '../../../store'
 import type { RowColumnsMenuProps } from './RowColumnsMenu.types'
 import { Tooltip } from '../../atoms'
+import { MenuSurface } from '../../molecules'
 
 // El abierto/cerrado lo lleva la barra: los menus son excluyentes sin conocerse.
 export function RowColumnsMenu({ rowId, columns, isOpen, onToggle, onClose }: RowColumnsMenuProps) {
   const updateRowColumns = useFormStore((state) => state.updateRowColumns)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  // En el celular el menu es una hoja en un portal: un toque adentro contaria como afuera.
+  const isPhone: boolean = useLayoutMode() === 'phone'
 
-  useClickOutside(containerRef, onClose, isOpen)
+  useClickOutside(containerRef, onClose, isOpen && !isPhone)
 
   return (
     <div ref={containerRef} className="relative">
@@ -21,7 +24,12 @@ export function RowColumnsMenu({ rowId, columns, isOpen, onToggle, onClose }: Ro
         </button>
       </Tooltip>
       {isOpen && (
-        <div className={ROW_TOOLBAR_POPOVER_CLASSES}>
+        <MenuSurface
+          title="Columnas de la fila"
+          onClose={onClose}
+          popoverClassName={ROW_TOOLBAR_POPOVER_CLASSES}
+          sheetSize="peek"
+        >
           <label htmlFor={`row-columns-${rowId}`} className="text-[11px] font-medium text-fg-muted">
             Columnas de la fila
           </label>
@@ -51,7 +59,7 @@ export function RowColumnsMenu({ rowId, columns, isOpen, onToggle, onClose }: Ro
           <p className="text-[10px] text-fg-muted">
             Los campos que excedan se ajustan automaticamente.
           </p>
-        </div>
+        </MenuSurface>
       )}
     </div>
   )

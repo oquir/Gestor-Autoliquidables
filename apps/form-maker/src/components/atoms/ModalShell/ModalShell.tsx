@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import { Xmark } from 'reicon-react'
+import { useBackClose } from '../../../hooks/useBackClose'
 import { Tooltip } from '../Tooltip'
 import {
   BODY_CLASSES,
@@ -26,6 +27,9 @@ export function ModalShell({
   onKeyDown,
 }: ModalShellProps) {
   const titleId: string = useId()
+  // Sin onClose (asistente, recuperar borrador) el usuario tiene que elegir: Atras no lo cierra y
+  // sale de la pagina como siempre.
+  useBackClose(onClose !== undefined, () => onClose?.())
 
   return (
     <div className={OVERLAY_CLASSES}>

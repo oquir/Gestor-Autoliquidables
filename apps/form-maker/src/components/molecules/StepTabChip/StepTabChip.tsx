@@ -3,6 +3,7 @@ import { useDroppable } from '@dnd-kit/core'
 import { memo, type NamedExoticComponent, useEffect, useRef } from 'react'
 import { Xmark } from 'reicon-react'
 import { STEP_NAVIGATION_HINT } from '../../../constants/stepNavigation'
+import { TOUCH_TARGET_CLASSES } from '../../../constants/uiClasses'
 import type { StepTabChipBodyProps, StepTabChipProps } from './StepTabChip.types'
 import { transferClasses } from './StepTabChip.utils'
 
@@ -89,7 +90,7 @@ function StepTabChipBodyBase({
               e.stopPropagation()
               onRemove()
             }}
-            className="-right-1.5 -top-1.5 absolute flex h-4 w-4 items-center justify-center rounded-full border border-border bg-surface text-fg-subtle shadow-sm transition-colors hover:border-danger-soft hover:text-danger hover:cursor-pointer"
+            className={`-right-1.5 -top-1.5 absolute flex h-4 w-4 items-center justify-center rounded-full border border-border bg-surface text-fg-subtle shadow-sm transition-colors hover:border-danger-soft hover:text-danger hover:cursor-pointer ${TOUCH_TARGET_CLASSES}`}
           >
             <Xmark size={removeIconSize} weight="Filled" />
           </button>

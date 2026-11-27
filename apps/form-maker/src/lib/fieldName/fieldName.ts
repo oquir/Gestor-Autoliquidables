@@ -1,6 +1,6 @@
 import type { CanvasRow } from '../../types'
 import type { FieldRename } from '../../types'
-import { FALLBACK_NAME } from './fieldName.constants'
+import { FALLBACK_NAME, RESERVED_FIELD_NAMES } from './fieldName.constants'
 
 // La identidad del campo hacia afuera: unico y valido como identificador (sin acentos ni digito
 // inicial).
@@ -15,6 +15,7 @@ export function slugifyFieldName(label: string): string {
 
   if (slug.length === 0) return FALLBACK_NAME
   if (/^[0-9]/.test(slug)) return `${FALLBACK_NAME}_${slug}`
+  if (RESERVED_FIELD_NAMES.has(slug)) return `${slug}_${FALLBACK_NAME}`
 
   return slug
 }
@@ -51,7 +52,11 @@ export function migrateFieldNames(
   return rows.map((row) => ({
     ...row,
     fields: row.fields.map((field) => {
-      const candidate: string = field.name ? field.name : slugifyFieldName(field.label)
+      // Un nombre reservado de un borrador viejo o editado a mano se renombra y se reporta.
+      const candidate: string =
+        field.name && !RESERVED_FIELD_NAMES.has(field.name)
+          ? field.name
+          : slugifyFieldName(field.name || field.label)
       const name: string = uniqueFieldName(candidate, taken)
       taken.add(name)
 

@@ -9,9 +9,11 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { PDF_CANVAS_CLASS } from '../../../../constants'
-import { fitPdfZoom, pdfStyleSheet, wheelPdfZoom } from '../../../../lib/pdfDesign'
+import { usePinchZoom } from '../../../../hooks'
+import { clampPdfZoom, fitPdfZoom, pdfStyleSheet, wheelPdfZoom } from '../../../../lib/pdfDesign'
 import { selectedCellIds } from '../../../../lib/pdfDesignEdit'
 import { useFormStore } from '../../../../store'
+import type { PinchFrame } from '../../../../types'
 import { usePdfDesignStore } from '../../../../store/pdfDesignStore'
 import { PdfSheetView } from '../PdfSheetView'
 import { CANVAS_CSS } from './PdfCanvas.constants'
@@ -39,6 +41,7 @@ export function PdfCanvas() {
   const swallowClickRef = useRef<boolean>(false)
   const anchorRef = useRef<ZoomAnchor | null>(null)
   const pendingRef = useRef<PendingZoom | null>(null)
+  const pinchStartZoomRef = useRef<number>(1)
 
   // attachShadow solo se puede llamar una vez por elemento: si ya tiene, se reusa.
   const hostRef = useCallback((node: HTMLDivElement | null) => {
@@ -71,6 +74,23 @@ export function PdfCanvas() {
     port.addEventListener('wheel', handleWheel, { passive: false })
     return () => port.removeEventListener('wheel', handleWheel)
   }, [shadowRoot])
+
+  // Pellizcar acerca sobre el punto medio de los dedos, con la misma ancla que Ctrl+rueda (B10 de
+  // docs/Plan-Movil.md). Un zoom que no cambia (tope) no deja ancla para el proximo.
+  usePinchZoom(scrollerOf(shadowRoot), {
+    onStart: () => {
+      pinchStartZoomRef.current = usePdfDesignStore.getState().zoom
+    },
+    onPinch: (frame: PinchFrame) => {
+      const port: HTMLElement | null = scrollerOf(shadowRoot)
+      const state = usePdfDesignStore.getState()
+      const next: number = clampPdfZoom(pinchStartZoomRef.current * frame.scale)
+      if (!port || next === state.zoom) return
+      const rect: DOMRect = port.getBoundingClientRect()
+      anchorRef.current = { x: frame.midpoint.x - rect.left, y: frame.midpoint.y - rect.top }
+      state.setZoom(next)
+    },
+  })
 
   // El scroll se anota al cambiar, antes de pintar: despues, al alejar, ya estaria recortado. Sin
   // ancla, el centro.

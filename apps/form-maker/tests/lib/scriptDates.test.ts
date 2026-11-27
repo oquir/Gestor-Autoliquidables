@@ -84,4 +84,15 @@ describe('buildDateHelpers', () => {
     expect(diasDeMora(2025, 1, '900123456')).toBe(0)
     expect(mesesDeMora(2025, 1, '900123456')).toBe(0)
   })
+
+  // RIESGO (hallazgo 4.3 de docs/Hallazgos-Pruebas.md): un hoy que no es AAAA/MM/DD deja la mora en
+  // 0 sin ningun aviso, igual que sin tabla. Fija lo que pasa hoy.
+  it('con hoy en otro formato la mora también es 0, sin aviso', () => {
+    for (const hoy of ['10/06/2026', '2026/06/10 12:00', '']) {
+      const { diasDeMora, mesesDeMora } = helpers(hoy)
+
+      expect(diasDeMora(2025, 1, '900123456')).toBe(0)
+      expect(mesesDeMora(2025, 1, '900123456')).toBe(0)
+    }
+  })
 })

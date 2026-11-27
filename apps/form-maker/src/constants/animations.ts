@@ -31,3 +31,16 @@ export const ENTER_STEP_BACK_CLASSES: string =
 
 export const ENTER_CHECK_CLASSES: string =
   'animate-in fade-in zoom-in-40 animation-duration-260 ease-[cubic-bezier(0.34,1.4,0.5,1)] motion-reduce:animate-none'
+
+// La hoja de abajo (BottomSheet) sube desde fuera de la pantalla. Sin fill-mode: al terminar no
+// queda transform, que volveria a la hoja bloque contenedor de un ModalShell abierto desde adentro.
+export const ENTER_SHEET_CLASSES: string =
+  'animate-in slide-in-from-bottom animation-duration-240 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:animate-none'
+
+// El cajon lateral (SideDrawer) entra desde su borde. Sin fill-mode, por lo mismo que la hoja: los
+// paneles que lleva abren ModalShell desde adentro.
+export const ENTER_DRAWER_LEFT_CLASSES: string =
+  'animate-in slide-in-from-left animation-duration-240 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:animate-none'
+
+export const ENTER_DRAWER_RIGHT_CLASSES: string =
+  'animate-in slide-in-from-right animation-duration-240 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:animate-none'

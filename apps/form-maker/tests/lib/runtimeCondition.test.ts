@@ -96,6 +96,19 @@ describe('evaluateCondition: los 13 operadores', () => {
   })
 })
 
+// RIESGO (hallazgo 4.2 de docs/Hallazgos-Pruebas.md): fija lo que pasa hoy con entradas que el
+// editor no deberia producir. Si se decide cambiar alguno, la prueba cambia a proposito.
+describe('evaluateCondition: entradas raras', () => {
+  it('un operador desconocido se cumple siempre, como no tener condición', () => {
+    expect(check('noExiste' as ConditionOperator, 'a', 1)).toBe(true)
+  })
+
+  it('in con una lista observada la compara como texto unido por comas', () => {
+    expect(check('in', ['a'], 'a,b')).toBe(true)
+    expect(check('in', ['a', 'b'], 'a,b')).toBe(false)
+  })
+})
+
 describe('evaluateConditions', () => {
   const values: RuntimeValues = { a: '1', b: '' }
   const isA: ExportedCondition = { field: 'a', operator: 'equals', value: '1' }

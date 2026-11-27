@@ -10,4 +10,4 @@ export const FRAME_INVALID_CLASSES: string = 'border-danger-soft focus-within:bo
 export const AFFIX_CLASSES: string = 'shrink-0 select-none text-fg-muted'
 
 export const AFFIX_INPUT_CLASSES: string =
-  'min-w-0 flex-1 bg-transparent py-1.5 text-fg outline-none disabled:cursor-not-allowed disabled:text-fg-muted'
+  'min-w-0 flex-1 bg-transparent py-1.5 text-fg outline-none pointer-coarse:text-base disabled:cursor-not-allowed disabled:text-fg-muted'

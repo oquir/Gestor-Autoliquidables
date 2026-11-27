@@ -1,3 +1,4 @@
+import { TOUCH_TARGET_CLASSES } from '../../../constants/uiClasses'
 import { Tooltip } from '../Tooltip'
 import type { IconButtonProps } from './IconButton.types'
 
@@ -6,11 +7,17 @@ export function IconButton({
   className = '',
   children,
   title,
+  touchTarget = true,
   'aria-label': ariaLabel,
   ...rest
 }: IconButtonProps) {
   const button = (
-    <button type="button" className={className} aria-label={ariaLabel ?? title} {...rest}>
+    <button
+      type="button"
+      className={touchTarget ? `${TOUCH_TARGET_CLASSES} ${className}` : className}
+      aria-label={ariaLabel ?? title}
+      {...rest}
+    >
       {children}
     </button>
   )

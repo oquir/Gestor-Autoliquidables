@@ -71,7 +71,12 @@ function byName(load: DraftLoad, name: string): CanvasField {
 
 describe('migrateDraft', () => {
   it('lleva cualquier versión vieja a la actual', () => {
-    for (const version of [undefined, 1, 2, 3, 4, 5, 6]) {
+    // Derivada de la constante: al subir la version, la anterior entra sola a la lista.
+    const oldVersions: (number | undefined)[] = [
+      undefined,
+      ...Array.from({ length: DRAFT_SCHEMA_VERSION - 1 }, (_, index: number) => index + 1),
+    ]
+    for (const version of oldVersions) {
       expect(migrateDraft(draftAt(version, [])).schemaVersion).toBe(DRAFT_SCHEMA_VERSION)
     }
   })
@@ -329,6 +334,17 @@ describe('parseDraft: inválidos', () => {
     expect(parseDraft({ ...draftAt(7, [], { formScript: '' }), formSteps: [] }).status).toBe(
       'invalid',
     )
+  })
+
+  // RIESGO (hallazgo 4.9 de docs/Hallazgos-Pruebas.md; Known gaps de CLAUDE.md): zod revisa la
+  // forma y no la coherencia. Fija lo que pasa hoy; si se agrega esa revision, cambia a proposito.
+  it('un borrador con la forma bien pero incoherente se acepta', () => {
+    const fuera: Loose = field({ name: 'fuera', colStart: 14, colSpan: 8 })
+    const raro: Loose = field({ name: 'raro', type: 'no_existe', colSpan: 0 })
+
+    expect(
+      parseDraft(draftAt(DRAFT_SCHEMA_VERSION, [fuera, raro], { formScript: '' })).status,
+    ).toBe('ok')
   })
 
   it('uno más nuevo que la app no se migra hacia atrás', () => {

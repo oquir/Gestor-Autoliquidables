@@ -14,6 +14,7 @@ import type {
   FormStep,
   IntroModalStep,
 } from '../../src/types'
+import { hydrateFieldSchemas } from '../../src/lib/zodHydrate/zodHydrate'
 import { buildIcaExport } from '../helpers/runtimeHarness'
 
 function fieldsOf(exported: FormExport): ExportedField[] {
@@ -322,9 +323,10 @@ describe('el documento completo', () => {
     const names: string[] = fields.map((field) => field.name)
 
     expect(new Set(names).size).toBe(names.length)
-    for (const field of fields) {
-      if (field.validations.zodSchema === undefined) continue
-      expect(() => new Function('z', `return (${field.validations.zodSchema});`)).not.toThrow()
-    }
+    // Por el camino del consumidor: compilar la funcion sin llamarla con z no probaba nada
+    // (z.noExiste() pasaba).
+    const { schemas, issues } = hydrateFieldSchemas(fields)
+    expect(issues).toEqual([])
+    expect(schemas.size).toBeGreaterThan(0)
   })
 })

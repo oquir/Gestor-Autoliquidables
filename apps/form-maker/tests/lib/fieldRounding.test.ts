@@ -42,6 +42,12 @@ describe('roundToDecimals', () => {
     expect(roundToDecimals(0.1 + 0.2, 2)).toBe(0.3)
   })
 
+  // RIESGO (hallazgo 4.7 de docs/Hallazgos-Pruebas.md): el comentario de roundToDecimals ya lo
+  // admite; aca queda fijado. 1.005 se guarda como 1.00499...
+  it('1.005 a dos decimales da 1', () => {
+    expect(roundToDecimals(1.005, 2)).toBe(1)
+  })
+
   it('es simétrico con negativos y no devuelve -0', () => {
     expect(roundToDecimals(-0.35, 1)).toBe(-0.4)
     expect(Object.is(roundToDecimals(-0.04, 1), 0)).toBe(true)

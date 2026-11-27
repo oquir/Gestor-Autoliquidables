@@ -235,10 +235,13 @@ export function pdfHtmlAttribute(node: PdfHtmlNode, name: string): string | null
 }
 
 // Quita lo que ejecuta o trae algo de afuera (@import, expression(), behavior, -moz-binding, url()
-// que no sea imagen segura). Los comentarios se quitan antes: no sirven de escondite.
+// que no sea imagen segura). Los comentarios se quitan antes: no sirven de escondite. Un at-keyword
+// con escape ("@\69mport") esconde el @import y ningun CSS legitimo lo escribe asi: se va entero
+// hasta el ";" o el "{".
 export function sanitizeCss(css: string): string {
   return css
     .replace(/\/\*[\s\S]*?(\*\/|$)/g, '')
+    .replace(/@[\w-]*\\[^;{]*;?/g, '')
     .replace(/@import[^;]*;?/gi, '')
     .replace(/expression\s*\(/gi, 'invalid(')
     .replace(/(-moz-binding|behavior)\s*:/gi, 'invalid:')

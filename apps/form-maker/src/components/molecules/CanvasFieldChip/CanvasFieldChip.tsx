@@ -225,6 +225,7 @@ function CanvasFieldChipBodyBase({
         onClick={() => removeFields([field.id])}
         title="Eliminar campo"
         aria-label="Eliminar campo"
+        touchTarget={false}
         className={`${DELETE_BUTTON_CLASSES} ${chromeClasses}`}
       >
         <Xmark size={11} weight="Filled" />

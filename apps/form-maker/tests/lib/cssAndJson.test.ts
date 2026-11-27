@@ -23,6 +23,15 @@ describe('estilos en CSS plano', () => {
     ).toEqual({ fontWeight: '700', '--mi-color': 'red', background: 'url(http://x.png)' })
   })
 
+  // BUG (hallazgo 4.8 de docs/Hallazgos-Pruebas.md): se parte por ; sin mirar si esta dentro de
+  // url() o de una cadena. Pendiente de confirmar con el usuario; it.fails avisa cuando se corrija.
+  it.fails('un ; dentro de url() o de una cadena no corta la declaración', () => {
+    expect(parseCssText('background: url(data:image/png;base64,AAAA); content: "a;b"')).toEqual({
+      background: 'url(data:image/png;base64,AAAA)',
+      content: '"a;b"',
+    })
+  })
+
   it('descarta declaraciones rotas', () => {
     expect(parseCssText(': red; color: ; ; margin-top: 4px')).toEqual({ marginTop: '4px' })
   })
