@@ -5,6 +5,17 @@ export const TRIGGER_IDLE_CLASSES: string = 'border-border hover:border-brand-bo
 
 export const TRIGGER_INVALID_CLASSES: string = 'border-danger-soft'
 
+// dvh y no vh: con el teclado abierto (interactive-widget=resizes-content) la lista se achica con la
+// pantalla en vez de quedar tapada; en el escritorio valen lo mismo. En el celular, pantalla completa.
+export const OVERLAY_CLASSES: string =
+  'fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 max-sm:p-0'
+
+export const PANEL_CLASSES: string =
+  'flex max-h-[80dvh] w-full max-w-xl flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-2xl max-sm:h-dvh max-sm:max-h-none max-sm:max-w-none max-sm:rounded-none max-sm:border-0'
+
+export const FOOTER_CLASSES: string =
+  'flex shrink-0 items-center justify-between gap-2 border-t border-border px-4 py-3 max-sm:pb-safe-3'
+
 export const SEARCH_INPUT_CLASSES: string =
   'w-full rounded-md border border-border bg-field py-2 pr-3 pl-9 text-sm text-fg outline-none pointer-coarse:text-base focus:border-brand-border'
 

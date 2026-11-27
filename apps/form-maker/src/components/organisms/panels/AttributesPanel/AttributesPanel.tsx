@@ -17,7 +17,8 @@ import { supportsPlaceholder } from '../../../../lib/fieldPlaceholder/fieldPlace
 import { supportsRounding } from '../../../../lib/fieldRounding/fieldRounding'
 import { supportsSuggestions } from '../../../../lib/fieldSuggestions/fieldSuggestions'
 import { supportsTooltip } from '../../../../lib/fieldTooltip/fieldTooltip'
-import { getFreeRuns, getMaxSpanAt } from '../../../../lib/rowLayout/rowLayout'
+import { SELECT_CLASSES } from '../../../../constants/uiClasses'
+import { getFreeRuns, getMaxSpanAt, getValidStarts } from '../../../../lib/rowLayout/rowLayout'
 import {
   findRowContainingField,
   getActiveRows,
@@ -64,9 +65,10 @@ export function AttributesPanel({ field }: { field: CanvasField }) {
   const activeRows = useFormStore(getActiveRows)
   const row = useFormStore((state) => findRowContainingField(state, field.id))
   const rowColumns = row?.columns ?? GRID_BASE_COLUMNS
-  const maxSpan = row
-    ? getMaxSpanAt(getFreeRuns(row.fields, row.columns, field.id), field.colStart)
-    : rowColumns
+  const freeRuns = row ? getFreeRuns(row.fields, row.columns, field.id) : []
+  const maxSpan = row ? getMaxSpanAt(freeRuns, field.colStart) : rowColumns
+  const validStarts: number[] = row ? getValidStarts(freeRuns, field.colSpan) : [field.colStart]
+  const moveField = useFormStore((state) => state.moveField)
   const isOptionBased: boolean = isOptionBasedField(field.type)
   const canEditOptions: boolean = allowsManualOptions(field)
   const isPresentational: boolean = isPresentationalField(field.type)
@@ -154,6 +156,29 @@ export function AttributesPanel({ field }: { field: CanvasField }) {
           minLabel="1 col"
           maxLabel={`${maxSpan} col`}
         />
+
+        <div className="flex flex-col gap-1">
+          <Label htmlFor="field-colstart">Columna de inicio</Label>
+          <select
+            id="field-colstart"
+            value={field.colStart}
+            disabled={validStarts.length <= 1}
+            onChange={(event) =>
+              row &&
+              moveField(field.id, row.id, {
+                colStart: Number(event.target.value),
+                colSpan: field.colSpan,
+              })
+            }
+            className={`${SELECT_CLASSES} w-full disabled:cursor-not-allowed disabled:opacity-60`}
+          >
+            {validStarts.map((start) => (
+              <option key={start} value={start}>
+                {field.colSpan > 1 ? `Col ${start} a ${start + field.colSpan - 1}` : `Col ${start}`}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {supportsInlineOptions(field.type) && (
           <>

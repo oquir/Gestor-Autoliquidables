@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CatalogOption } from '../../types'
+import { useBackClose } from '../useBackClose'
 import type {
   UsePreviewSearchSelectParams,
   UsePreviewSearchSelectResult,
@@ -16,6 +17,8 @@ export function usePreviewSearchSelect({
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [query, setQuery] = useState<string>('')
   const searchRef = useRef<HTMLInputElement>(null)
+  // Atras de Android cierra la lista y no el simulador de abajo (S7 de docs/Plan-Movil.md).
+  useBackClose(isOpen, () => setIsOpen(false))
 
   const selected = findSelected(options, value)
   // Cerrado no se filtra nada: es justamente lo que evita las 6.375 opciones montadas de golpe.

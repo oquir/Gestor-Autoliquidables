@@ -140,6 +140,13 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
     cambiar la URL, porque el PDF lee `?impuesto=`. Atrás cierra lo de más arriba.
   - La pila es pura: `lib/backStack`, con prueba. El hook va en `hooks/`.
 - **Meta:** Atrás nunca saca de la app con algo abierto.
+- **Hallazgo (2026-11-27, corregido en el S7):** en `pnpm dev` con puntero táctil,
+  toda capa con `useBackClose` se cierra al abrirse. `StrictMode` monta, limpia y vuelve a montar el
+  efecto: la limpieza hace `history.back()` y el segundo `pushState` llega antes; Chrome vuelve a la
+  entrada de carga (piso 0) y `popstate` cierra la capa. Sin verificar: podría pasar en producción si una
+  capa se cierra y otra se abre en el mismo instante (la misma carrera). B8 se verificó con `vite preview` (sin `StrictMode`).
+  Arreglo: el cierre espera un microtask y se cancela si la misma capa se vuelve a montar
+  (`pendingCloses` en `useBackClose`). Verificado con táctil emulado en `pnpm dev`.
 
 ### [x] ~~B9 Que el guardado no se pierda~~ (2026-11-26, dd14b9e4)
 
@@ -203,27 +210,50 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
 Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px en
 `Decisiones.md`) y la cabecera ya se adapta (`sm:`).
 
-- [ ] **S1 Navegación al alcance del pulgar:** en `phone`, el pie de `PreviewForm` (Anterior · Paso
-      N de M · Siguiente/Enviar) queda fijo abajo, con la zona segura.
-- [ ] **S2 Toques e inputs:**
-  - B3 en todos los controles.
+- [x] ~~**S1 Navegación al alcance del pulgar:**~~ (2026-11-27, 569c6823) en `phone`, el pie de
+      `PreviewForm` (Anterior · Paso N de M · Siguiente/Enviar) queda fijo abajo, con la zona segura.
+  - `sticky` dentro de la tarjeta, no `fixed`: el modal de entrada lo sigue tapando y, pasada la
+    tarjeta, vuelve a su lugar. `-bottom-4` compensa el `py-4` del scroll (Chrome mide el sticky
+    dentro de ese padding).
+  - Reiniciar pasa a ícono para que todo entre en una línea a 360 px; al cambiar de paso la tarjeta
+    vuelve arriba; `scroll-pb-20` deja el campo enfocado por encima del pie.
+  - Verificado en Edge headless a 390×844 y a 1280×720 (escritorio igual).
+- [x] ~~**S2 Toques e inputs:**~~ (2026-11-27, 174caf07)
+  - B3 en todos los controles (ya estaba: todos los inputs del simulador tenían `pointer-coarse:text-base`).
   - El `toggle_group` (`py-1 text-xs`), las casillas y las opciones se pueden tocar en toda su fila.
-- [ ] **S3 El teclado correcto en cada campo:**
+  - En `pointer-coarse:` (`PreviewFieldControl.constants.ts`): chips y filas con `min-h-11` (44 px),
+    casilla de 20 px, letra de las filas a 16 px. Tamaño real y no `touch-target`: el `::after` de
+    un chip pisaría al vecino. Medido en Edge headless; el escritorio no cambia.
+- [x] ~~**S3 El teclado correcto en cada campo:**~~ (2026-11-27, beb9f252; el NIT queda en veremos)
   - Revisar `inputMode`, `enterKeyHint` y `autoComplete` por tipo. Número ya usa `decimal`, y la
     máscara de fecha ya usa `numeric`.
   - `tel` y `email` (`PreviewFieldControl.tsx:114`) y el NIT.
   - `enterKeyHint="next"` en los campos que no son el último.
-- [ ] **S4 Resultados en una hoja:** en `phone`, `PreviewResults` (payload, valores, errores) sale
+  - Hecho en `PreviewForm` (`PreviewForm.utils.ts`): "siguiente" en cada campo de texto y "listo" en
+    el último, por paso y en el modal de entrada; en táctil Enter pasa al siguiente o cierra el
+    teclado (fuera de un `<form>` Android no salta solo). Con mouse Enter sigue sin hacer nada.
+    `tel`/`email` ya traían su teclado y número ya usaba `decimal`: sin cambios.
+  - **NIT y documentos: en veremos (decisión del usuario, 2026-11-27).** Se exportan como `text` y
+    que sean solo dígitos vive en el regex dentro del string de Zod. Caminos: deducirlo del regex
+    (frágil, el consumidor copia la deducción) o una opción "Teclado numérico" en el campo (palabra
+    nueva en el JSON: migración, `projectMeta.requires`, consumidor). No bloquea: el teclado de
+    letras deja pasar a números, y la validación no deja avanzar sin un documento válido.
+- [x] ~~**S4 Resultados en una hoja:**~~ (2026-11-27, 1f630608; "Volver al lienzo" queda "Volver"
+      en el celular para que la cabecera entre en 360) en `phone`, `PreviewResults` (payload, valores, errores) sale
       de un botón "Resultados" en la cabecera, en lugar de quedar debajo del formulario largo. Desde
       `lg:` queda igual que hoy.
-- [ ] **S5 Modal de entrada:** el que va dentro de `PreviewForm` (`max-w-2xl`, `max-h-full`) en el
+- [x] ~~**S5 Modal de entrada:**~~ (2026-11-27, 73addac1; en `max-sm:` deja de flotar, esconde el
+      paso de atrás y pega su pie abajo) el que va dentro de `PreviewForm` (`max-w-2xl`, `max-h-full`) en el
       celular ocupa la tarjeta, con sus botones visibles con el teclado abierto.
-- [ ] **S6 Lo que se abre encima:**
+- [x] ~~**S6 Lo que se abre encima:**~~ (2026-11-27, c123b5e8; la lista va a pantalla completa en
+      `max-sm:` y en `dvh`; fecha e ℹ ya estaban)
   - La lista de `PreviewSearchSelect` dentro de la pantalla y por encima del teclado.
   - El selector de fecha (`showPicker`, que tiene respaldo).
   - Los ℹ de `field.tooltip` ya se abren al tocar.
-- [ ] **S7 Atrás cierra el simulador** (B8).
-- [ ] **S8 El consumidor:** lo que el simulador hace en el celular y no va en el JSON (inputs de
+- [x] ~~**S7 Atrás cierra el simulador** (B8).~~ (2026-11-27, 748554a7 y c58ed36a: ya lo hacía en
+      producción; se corrigió el cierre al abrir con `StrictMode` y la lista de `search_select` entró
+      en la pila)
+- [x] ~~**S8 El consumidor:**~~ (2026-11-27, 500b023a; lista completa en Known gaps de `CLAUDE.md`) lo que el simulador hace en el celular y no va en el JSON (inputs de
       16 px, navegación fija, filas apiladas) va a Known gaps para que `FrontAutoliquidable` lo copie.
 - **Meta:**
   - A 360, 390 y 412 px no hay scroll horizontal.
@@ -232,47 +262,62 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 
 ## 3. Fase 2 — Maquetador en tablet y táctil (grilla)
 
-- [ ] **T1 Paneles como cajones:**
+- [x] ~~**T1 Paneles como cajones:**~~ (2026-11-27, ea26755f y 8f7f28e8)
+  - Hecho en `AppLayout` para todo lo que no es `desktop` (el celular también, hasta la fase 3). Con
+    el cajón izquierdo abierto el riel de abajo queda vacío: un solo `Sidebar` montado (dos
+    paletas serían draggables con el mismo id). Arrancan cerrados (`getInitialPanelsOpen`) y se
+    cierran al pasar de escritorio a tablet. Escape con un modal abierto desde el cajón ya no
+    cierra el cajón (`useModalKeyGuard`).
+  - Queda para T2/T3/T6: con el cajón abierto el lienzo está tapado, así que de la paleta se
+    agrega tocando, no arrastrando.
   - En `compact`, el riel queda. El panel izquierdo (320 px) y el derecho (`RightSidebar`, con
     `CanvasTabs` y Proyecto) se abren **encima** del lienzo, con fondo oscuro detrás y uno a la vez.
   - El lienzo conserva su ancho, y el `ResizeObserver` del puerto no se dispara al abrirlos.
   - `AppLayout` elige según el modo. Se reutilizan `isSidebarOpen` e `isRightSidebarOpen`.
   - Ojo con la trampa de B7.
-- [ ] **T2 Sensores táctiles (`hooks/useDragAndDrop`):**
+- [x] ~~**T2 Sensores táctiles (`hooks/useDragAndDrop`):**~~ (2026-11-27, 939375bd; `MousePenSensor`
+      en `useDragAndDrop.utils` ignora `pointerType: 'touch'`; `select-none` en `PaletteChip`)
   - `TouchSensor` con su propia constante de módulo, junto a `POINTER_SENSOR_OPTIONS`: retardo de
     unos 200 ms y tolerancia de unos 8 px, para que la paleta y los paneles sigan desplazándose.
   - El sensor de puntero queda para mouse y lápiz.
   - `touch-action: none` en las tres asas.
   - Se mantienen las invariantes de cascarón delgado y de manejadores estables.
-- [ ] **T3 Arrastrar con el dedo:**
+- [x] ~~**T3 Arrastrar con el dedo:**~~ (2026-11-27, 1be51a46; `FINGER_LIFT_PX` = 24 en
+      `centerOverlayOnCursor`, solo si el arrastre empezó con un `touch*`)
   - La copia que se arrastra va **por encima del dedo** en táctil. Hoy `centerOverlayOnCursor` la
     centra debajo, y el dedo la tapa.
   - El autoscroll de dnd-kit en los bordes ya existe.
   - `onDragCancel` sigue siendo clave, porque en táctil `pointercancel` es frecuente.
-- [ ] **T4 Sin Shift ni Shift+Ctrl:**
+- [x] ~~**T4 Sin Shift ni Shift+Ctrl:**~~ (2026-11-27, 9b055938; selector "Columna de inicio" con
+      `getValidStarts`, solo inicios donde el ancho entra entero; `moveField` acepta la misma fila)
   - Hoy la columna exacta se elige arrastrando con modificadores.
   - En Atributos se agrega un control "Columna de inicio" junto al ancho (`AttributesPanel.tsx:143`
     hoy solo muestra "desde col N"). Usa `moveField(fieldId, rowId, { colStart, colSpan })` con
     `getFreeRuns` y `getMaxSpanAt`. Verificar que `moveField` acepte la misma fila.
   - Se comparte con el celular.
-- [ ] **T5 Sin clic derecho ni doble clic:**
+- [x] ~~**T5 Sin clic derecho ni doble clic:**~~ (2026-11-27, 88015e7c; ⋯ de 24 px arriba a la
+      izquierda del campo fijado, solo `pointer-coarse:`; en el celular la hoja queda para P3)
   - Tocar selecciona y fija el cromo. El campo seleccionado muestra un botón ⋯ que abre
     `FieldContextMenu`, que es todo un editor de pestañas: como menú en la tablet y como hoja en el
     celular.
   - Android también dispara `contextmenu` con la pulsación larga. Safari no, así que el botón es el
     camino seguro.
-- [ ] **T6 Mover a otro paso sin soltar en la pestaña:**
+- [x] ~~**T6 Mover a otro paso sin soltar en la pestaña:**~~ (2026-11-27, 71f25de4; en la fila y en
+      el menú del campo, solo con `WITHOUT_STEP_TABS_CLASSES`: debajo de 1280 px o táctil)
   - Las zonas para soltar viven en el panel derecho, que en `compact` está cerrado mientras se
     arrastra.
   - `MoveToStepMenu` también para la selección de un solo campo (menú ⋯) y en la barra de la fila
     (`moveRowToStep`).
-- [ ] **T7 Selección múltiple:**
+- [x] ~~**T7 Selección múltiple:**~~ (2026-11-27, 51e37258; con el dedo `useCanvasMarquee` no arma
+      marco ni captura el puntero; antes deslizar sumaba campos)
   - En táctil, con la herramienta Selección, tocar suma o quita (ya existe).
   - El marco queda solo para mouse y lápiz: con el dedo gana el desplazamiento.
   - La barra de acciones de la selección ya existe.
-- [ ] **T8 Pellizcar en el lienzo** (B10 en `useCanvasViewport`). La Mano y Espacio sobran en
+- [x] ~~**T8 Pellizcar en el lienzo**~~ (2026-11-27, de46b488; el pellizco ya era de B10; la Mano se
+      oculta en `CanvasToolPicker`, también en la barra del PDF) (B10 en `useCanvasViewport`). La Mano y Espacio sobran en
       táctil, porque el dedo ya desplaza: la Mano se oculta con `pointer-coarse`.
-- [ ] **T9 Barra flotante y chip plegado:**
+- [x] ~~**T9 Barra flotante y chip plegado:**~~ (2026-11-27, 2fdf73c1; revisada a 768, 820, 1024 y
+      1180 px sin desbordes; chip, aviso y etiqueta del paso pasan a `top-safe`/`right-safe`)
   - `CanvasToolbar` ya se compacta con `@container/toolbar`. Se revisa en 640 a 1279, con la zona
     segura y sin quedar debajo de los cajones.
   - `CollapsedRightSidebar` igual.
@@ -283,7 +328,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 
 ## 4. Fase 3 — Maquetador en el celular: la vista de lista
 
-- [ ] **P1 La pantalla:**
+- [x] ~~**P1 La pantalla:**~~ (2026-11-27, 0a42c2e9, c58ece47 y 45a24ca0)
   - **Arriba:** paso anterior y siguiente, el nombre del paso (abre una hoja con `CanvasTabs`),
     `SaveStatus`, **Subir** (el único naranja) y ⋯. El menú ⋯ lleva:
     - Guardar, Simulador, Diseñar PDF, Abrir proyecto y Exportar.
@@ -291,6 +336,15 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     - Modo oscuro y Bajo rendimiento.
   - **Abajo:** + (agregar), Deshacer, Rehacer, Vista y Seleccionar.
   - Sin riel ni paneles: todo va en hojas. Los botones usan `ACTION_TIER_CLASSES`.
+  - **Partido en tres (decisión del usuario, 2026-11-27):** P1a barra de abajo y fuera el riel y la
+    barra flotante; P1b barra de arriba con los pasos; P1c el menú ⋯. El ⋯ lleva una **versión
+    propia del celular** (acciones grandes y debajo `FormSummary` + vista previa del PDF), no
+    `RightSidebar` metido en una hoja.
+  - [x] ~~P1a~~ (2026-11-27, 0a42c2e9: `PhoneBottomBar`; sin riel ni `CanvasToolbar` en `phone`)
+    · [x] ~~P1b~~ (2026-11-27, c58ece47: `PhoneTopBar`; `describeActiveStep` en `lib/stepNavigation`)
+    · [x] ~~P1c~~ (2026-11-27, 45a24ca0: `PhoneMoreMenu` con la hoja "Proyecto"; sin chip flotante en `phone`)
+  - **Pendiente (el usuario, 2026-11-27): revisar el diseño visual de las barras y hojas del
+    celular** una vez esté la fase 3; funcionan, pero el acabado no se ha pulido.
 - [ ] **P2 `organisms/CanvasList` (nuevo):**
   - Su modelo es puro, en `lib/canvasList`, con prueba:
     - Pasos → filas → campos, en orden de `colStart`, como `PreviewRowsGrid`.

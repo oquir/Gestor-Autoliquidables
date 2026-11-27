@@ -6,7 +6,7 @@ import {
   type NamedExoticComponent,
   useCallback,
 } from 'react'
-import { BranchDown, Eye, InfoCircle, Lock, Xmark } from 'reicon-react'
+import { BranchDown, Eye, InfoCircle, Lock, MoreH, Xmark } from 'reicon-react'
 import { GRID_BASE_COLUMNS } from '../../../constants/grid'
 import { CHROME_ON_FIELD_CLASSES, CHROME_PINNED_CLASSES } from '../../../constants/uiClasses'
 import { resolveFieldStyles } from '../../../lib/cssStyles/cssStyles'
@@ -26,6 +26,7 @@ import {
   DESTINATION_COLOR_CLASSES,
   DESTINATION_ICONS,
   DESTINATION_SYMBOL_CLASSES,
+  MENU_BUTTON_CLASSES,
   STATE_ICON_CLASSES,
 } from './CanvasFieldChip.constants'
 import type {
@@ -221,6 +222,17 @@ function CanvasFieldChipBodyBase({
         )}
       </button>
       {showTooltip && field.tooltip && <TooltipBubble tooltip={field.tooltip} />}
+      {pinned && (
+        <IconButton
+          onClick={(event) => onChipContextMenu(event, field.id)}
+          title="Más opciones del campo"
+          aria-label="Más opciones del campo"
+          touchTarget={false}
+          className={MENU_BUTTON_CLASSES}
+        >
+          <MoreH size={12} />
+        </IconButton>
+      )}
       <IconButton
         onClick={() => removeFields([field.id])}
         title="Eliminar campo"

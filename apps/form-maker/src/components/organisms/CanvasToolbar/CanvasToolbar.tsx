@@ -8,6 +8,7 @@ import {
 } from '../../../constants/uiClasses'
 import { useCanvasReveal } from '../../../hooks/useCanvasReveal/useCanvasReveal'
 import { useFormHistory } from '../../../hooks/useFormHistory/useFormHistory'
+import { useLayoutMode } from '../../../hooks/useLayoutMode/useLayoutMode'
 import { getActiveGroups, getActiveRows, useFormStore } from '../../../store/formStore'
 import type { CanvasRow, RepeatableGroup } from '../../../types/formStructure'
 import { MoveToStepMenu } from '../MoveToStepMenu/MoveToStepMenu'
@@ -33,6 +34,7 @@ export function CanvasToolbar() {
   const moveFieldsToStep = useFormStore((state) => state.moveFieldsToStep)
   const { canUndo, canRedo, undo, redo } = useFormHistory()
   const setPendingReveal = useCanvasReveal()
+  const isPhone: boolean = useLayoutMode() === 'phone'
 
   function handleAddRow(): void {
     const before: number = getActiveRows(useFormStore.getState()).length
@@ -52,7 +54,8 @@ export function CanvasToolbar() {
     }
   }
 
-  if (viewMode !== 'canvas') return null
+  // En el celular la reemplaza la barra de abajo (PhoneBottomBar).
+  if (viewMode !== 'canvas' || isPhone) return null
 
   const hasMultiSelection: boolean = selectedFieldIds.length > 1
   const labelClasses: string = hasMultiSelection ? TOOLBAR_COMPACT_LABEL_CLASSES : ''

@@ -1,3 +1,4 @@
+import { useLayoutMode } from '../../../hooks'
 import { useFormStore } from '../../../store'
 import {
   FORM_BADGE_CLASSES,
@@ -7,16 +8,18 @@ import {
   NUMBER_CLASSES,
   TITLE_CLASSES,
 } from './ActiveStepLabel.constants'
-import type { ActiveStepDescription } from './ActiveStepLabel.types'
-import { describeActiveStep } from './ActiveStepLabel.utils'
+import type { ActiveStepDescription } from '../../../types'
+import { describeActiveStep } from '../../../lib'
 
 export function ActiveStepLabel() {
   const formSteps = useFormStore((state) => state.formSteps)
   const introSteps = useFormStore((state) => state.introModal.steps)
   const activeCanvas = useFormStore((state) => state.activeCanvas)
   const viewMode = useFormStore((state) => state.canvasViewMode)
+  // En el celular el paso va en la barra de arriba (PhoneTopBar).
+  const isPhone: boolean = useLayoutMode() === 'phone'
 
-  if (viewMode !== 'canvas') return null
+  if (viewMode !== 'canvas' || isPhone) return null
 
   const step: ActiveStepDescription | null = describeActiveStep(formSteps, introSteps, activeCanvas)
   if (!step) return null

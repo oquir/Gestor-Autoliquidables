@@ -15,4 +15,7 @@ export interface MarqueeGesture {
   base: string[]
   // Pasa a true al superar el umbral; hasta entonces el gesto todavia puede terminar en un clic.
   active: boolean
+  // Con el dedo arrastrar es desplazar: nunca hay marco, y si se movio tampoco es un toque.
+  isTouch: boolean
+  moved: boolean
 }

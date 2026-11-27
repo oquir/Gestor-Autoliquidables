@@ -25,3 +25,5 @@ trustPolicyExclude:
 # repositorios. Un lockfile compartido obligaría a resolver de nuevo las dependencias que las dos
 # apps comparten con distinta versión interna.
 sharedWorkspaceLockfile: false
+overrides:
+  minimatch@>=7.0.0 <11.0.1: ^11.0.1

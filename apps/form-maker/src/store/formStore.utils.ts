@@ -7,6 +7,7 @@ import {
 } from '../lib/baseTemplate/baseTemplate'
 import { pruneDataSourceReferencing } from '../lib/fieldDataSource/fieldDataSource'
 import { collectFieldNames, slugifyFieldName, uniqueFieldName } from '../lib/fieldName/fieldName'
+import { layoutModeFor } from '../lib/layoutMode/layoutMode'
 import { pruneRulesReferencing } from '../lib/fieldRule/fieldRule'
 import { pruneOverridesReferencing } from '../lib/fieldValidationOverride/fieldValidationOverride'
 import type { CanvasField, FieldOption } from '../types/field'
@@ -121,6 +122,14 @@ export function getInitialLowPerformance(): boolean {
   if (stored === 'normal') return false
 
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+// En tablet y celular los paneles son cajones encima del lienzo (T1 de docs/Plan-Movil.md): abiertos
+// de arranque lo taparian al cargar. Sin ventana (las pruebas) arranca como el escritorio.
+export function getInitialPanelsOpen(): boolean {
+  if (typeof window === 'undefined' || typeof window.innerWidth !== 'number') return true
+
+  return layoutModeFor(window.innerWidth) === 'desktop'
 }
 
 // Fuera de industria y comercio no hay plantilla: cada paso arranca con una fila vacia.

@@ -5,6 +5,7 @@ import {
   getFreeRuns,
   getLargestRun,
   getMaxSpanAt,
+  getValidStarts,
   migrateRows,
   repackRow,
   resolvePlacement,
@@ -53,6 +54,21 @@ describe('huecos libres', () => {
     expect(getLargestRun(runs)).toEqual({ start: 7, length: 10 })
     expect(getMaxSpanAt(runs, 10)).toBe(7)
     expect(getMaxSpanAt(runs, 4)).toBe(1)
+  })
+
+  it('getValidStarts ofrece solo los inicios donde el ancho entra entero', () => {
+    // Libres: 1-2, 7-9 y 12-16. Un campo de 3 entra en 7 y de 12 a 14, nunca en 1-2.
+    const runs = getFreeRuns([at('a', 3, 4), at('b', 10, 2)], 16)
+
+    expect(getValidStarts(runs, 3)).toEqual([7, 12, 13, 14])
+    expect(getValidStarts(runs, 1)).toEqual([1, 2, 7, 8, 9, 12, 13, 14, 15, 16])
+    expect(getValidStarts(runs, 6)).toEqual([])
+  })
+
+  it('el campo que se mueve cuenta su propio lugar como libre', () => {
+    const runs = getFreeRuns([at('a', 1, 4), at('b', 9, 8)], 16, 'id-a')
+
+    expect(getValidStarts(runs, 4)).toEqual([1, 2, 3, 4, 5])
   })
 })
 

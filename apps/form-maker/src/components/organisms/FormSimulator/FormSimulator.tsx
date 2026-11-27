@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { ArrowLeft, Moon, Sun } from 'reicon-react'
-import { useBackClose } from '../../../hooks'
+import { useBackClose, useLayoutMode } from '../../../hooks'
 import { useFormPreview } from '../../../hooks/useFormPreview'
 import { useFormStore } from '../../../store'
 import type { FormPreviewApi } from '../../../types'
@@ -7,12 +8,15 @@ import { PreviewForm } from '../preview/PreviewForm'
 import { PreviewResults } from '../preview/PreviewResults'
 import { EXIT_BUTTON_CLASSES, ICON_BUTTON_CLASSES } from './FormSimulator.constants'
 import { Tooltip } from '../../atoms'
+import { BottomSheet } from '../../molecules'
 
 export function FormSimulator() {
   const preview: FormPreviewApi = useFormPreview()
   const setSimulatorOpen = useFormStore((state) => state.setSimulatorOpen)
   const isDarkMode = useFormStore((state) => state.isDarkMode)
   const toggleDarkMode = useFormStore((state) => state.toggleDarkMode)
+  const isPhone: boolean = useLayoutMode() === 'phone'
+  const [isResultsOpen, setResultsOpen] = useState<boolean>(false)
   useBackClose(true, () => setSimulatorOpen(false))
 
   return (
@@ -26,6 +30,15 @@ export function FormSimulator() {
         </div>
 
         <div className="flex items-center gap-2">
+          {isPhone && (
+            <button
+              type="button"
+              onClick={() => setResultsOpen(true)}
+              className={EXIT_BUTTON_CLASSES}
+            >
+              Resultados
+            </button>
+          )}
           <Tooltip content={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}>
             <button
               type="button"
@@ -42,22 +55,35 @@ export function FormSimulator() {
             className={EXIT_BUTTON_CLASSES}
           >
             <ArrowLeft size={14} />
-            Volver al lienzo
+            <span>
+              Volver<span className="max-sm:hidden"> al lienzo</span>
+            </span>
           </button>
         </div>
       </header>
 
-      {/* Desde lg cada panel scrollea por su cuenta; abajo, la pagina entera. */}
-      <div className="min-h-0 flex-1 overflow-auto px-3 py-4 sm:px-6 sm:py-6 lg:overflow-hidden">
+      {/* Desde lg cada panel scrollea por su cuenta; abajo, la pagina entera. En el celular el
+          scroll-pb deja el campo enfocado por encima del pie pegado de PreviewForm. */}
+      <div className="min-h-0 flex-1 overflow-auto px-3 py-4 max-sm:scroll-pb-20 sm:px-6 sm:py-6 lg:overflow-hidden">
         <div className="mx-auto grid max-w-7xl gap-4 lg:h-full lg:grid-cols-[minmax(0,2fr)_minmax(0,420px)]">
           <div className="min-w-0 lg:min-h-0 lg:overflow-auto">
             <PreviewForm preview={preview} />
           </div>
-          <div className="min-w-0 lg:min-h-0">
-            <PreviewResults preview={preview} />
-          </div>
+          {/* En el celular los resultados van en una hoja: debajo de un formulario largo nadie los
+              encuentra. */}
+          {!isPhone && (
+            <div className="min-w-0 lg:min-h-0">
+              <PreviewResults preview={preview} />
+            </div>
+          )}
         </div>
       </div>
+
+      {isPhone && isResultsOpen && (
+        <BottomSheet title="Resultados" size="full" onClose={() => setResultsOpen(false)}>
+          <PreviewResults preview={preview} />
+        </BottomSheet>
+      )}
     </div>
   )
 }

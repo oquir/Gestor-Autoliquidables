@@ -20,6 +20,11 @@ import type { BackLayerClose, BackLayerPop } from '../../types'
 let stack: string[] = []
 const closers: Map<string, () => void> = new Map()
 let isListening: boolean = false
+// Cierres esperando un microtask. StrictMode (dev) monta, limpia y vuelve a montar cada efecto en
+// la misma tarea: un history.back() inmediato llegaba despues del segundo pushState, Chrome volvia a
+// la entrada de carga (piso 0) y popstate cerraba la capa recien abierta. Si la misma capa se vuelve
+// a montar antes del microtask, el cierre se cancela y conserva su entrada.
+const pendingCloses: Set<string> = new Set()
 
 function handlePopState(event: PopStateEvent): void {
   const result: BackLayerPop = popBackLayers(stack, readBackDepth(event.state))
@@ -39,16 +44,22 @@ export function useBackClose(isOpen: boolean, onClose: () => void): void {
       isListening = true
     }
     closers.set(id, () => close())
-    stack = openBackLayer(stack, id)
-    window.history.pushState(backEntryState(stack.length), '')
+    if (!pendingCloses.delete(id)) {
+      stack = openBackLayer(stack, id)
+      window.history.pushState(backEntryState(stack.length), '')
+    }
 
     return () => {
-      closers.delete(id)
-      // Cerrada desde la interfaz (X, fondo, Escape): se gasta su entrada para que el proximo Atras
-      // cierre la capa de abajo y no quede un toque muerto.
-      const result: BackLayerClose = closeBackLayer(stack, id)
-      stack = result.stack
-      if (result.goBack) window.history.back()
+      pendingCloses.add(id)
+      queueMicrotask(() => {
+        if (!pendingCloses.delete(id)) return
+        closers.delete(id)
+        // Cerrada desde la interfaz (X, fondo, Escape): se gasta su entrada para que el proximo
+        // Atras cierre la capa de abajo y no quede un toque muerto.
+        const result: BackLayerClose = closeBackLayer(stack, id)
+        stack = result.stack
+        if (result.goBack) window.history.back()
+      })
     }
   }, [isOpen, id])
 }

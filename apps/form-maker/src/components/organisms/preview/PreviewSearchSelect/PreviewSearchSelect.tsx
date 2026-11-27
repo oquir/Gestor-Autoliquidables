@@ -3,7 +3,10 @@ import { Magnifier } from 'reicon-react'
 import { usePreviewSearchSelect } from '../../../../hooks/usePreviewSearchSelect/usePreviewSearchSelect'
 import {
   FOOTER_BUTTON_CLASSES,
+  FOOTER_CLASSES,
   OPTION_BUTTON_CLASSES,
+  OVERLAY_CLASSES,
+  PANEL_CLASSES,
   SEARCH_INPUT_CLASSES,
   TARIFA_BADGE_CLASSES,
   TARIFA_MISSING_CLASSES,
@@ -43,12 +46,12 @@ export function PreviewSearchSelect({
       </button>
 
       {search.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className={OVERLAY_CLASSES}>
           <div
             role="dialog"
             aria-modal="true"
             aria-label={`Buscar ${label}`}
-            className="flex max-h-[80vh] w-full max-w-xl flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-2xl"
+            className={PANEL_CLASSES}
           >
             <header className="shrink-0 bg-brand px-5 py-4">
               <h2 className="text-base font-semibold text-white">Buscar {label}</h2>
@@ -104,7 +107,7 @@ export function PreviewSearchSelect({
               </ul>
             )}
 
-            <footer className="flex shrink-0 items-center justify-between gap-2 border-t border-border px-4 py-3">
+            <footer className={FOOTER_CLASSES}>
               <span className="text-[11px] text-fg-subtle">
                 {search.results.length} de {options.length}
               </span>

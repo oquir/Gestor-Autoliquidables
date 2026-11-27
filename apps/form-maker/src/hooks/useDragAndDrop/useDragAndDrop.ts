@@ -1,5 +1,5 @@
 import type { DragEndEvent, DragMoveEvent, DragStartEvent, Modifier } from '@dnd-kit/core'
-import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { GRID_BASE_COLUMNS } from '../../constants'
 import { getBandElement, getRowElement } from '../../lib'
@@ -12,13 +12,14 @@ import type { CanvasField } from '../../types'
 import type { FieldTypeDef } from '../../types'
 import type { CanvasRow } from '../../types'
 import type { CanvasTarget, DragPlacement, RowDropTarget } from '../../types'
-import { POINTER_SENSOR_OPTIONS } from './useDragAndDrop.constants'
+import { POINTER_SENSOR_OPTIONS, TOUCH_SENSOR_OPTIONS } from './useDragAndDrop.constants'
 import type { PointerPosition } from './useDragAndDrop.types'
 import {
   centerOverlayOnCursor,
   getColumnAtPointer,
   getDropEdgeAtPointer,
   measureRow,
+  MousePenSensor,
   pointerFirstCollision,
   sameCanvasTarget,
   samePlacement,
@@ -58,7 +59,10 @@ export function useDragAndDrop(): DragAndDropReturn {
   const modifiersRef = useRef({ shift: false, ctrl: false })
   const anchorRef = useRef<number | null>(null)
 
-  const sensors = useSensors(useSensor(PointerSensor, POINTER_SENSOR_OPTIONS))
+  const sensors = useSensors(
+    useSensor(MousePenSensor, POINTER_SENSOR_OPTIONS),
+    useSensor(TouchSensor, TOUCH_SENSOR_OPTIONS),
+  )
 
   const getDraggedSpan = useCallback((drag: ActiveDrag | null): number => {
     if (!drag) return GRID_BASE_COLUMNS

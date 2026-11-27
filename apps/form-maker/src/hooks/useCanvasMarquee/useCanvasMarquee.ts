@@ -34,6 +34,12 @@ export function useCanvasMarquee(enabled: boolean): SelectionRect | null {
           current.y - gesture.origin.y,
         )
         if (distance < MARQUEE_ACTIVATION_PX) return
+        // El marco es de mouse y lapiz (T7 de docs/Plan-Movil.md): el navegador desplaza unos px
+        // despues, y para entonces el marco ya habria sumado campos a la seleccion.
+        if (gesture.isTouch) {
+          gesture.moved = true
+          return
+        }
         gesture.active = true
       }
 
@@ -73,8 +79,10 @@ export function useCanvasMarquee(enabled: boolean): SelectionRect | null {
       if (event.button !== 0 || event.target === port || !(event.target instanceof Element)) return
 
       const offset: ScrollPoint = scrollOffset(port)
+      const isTouch: boolean = event.pointerType === 'touch'
 
-      event.target.setPointerCapture(event.pointerId)
+      // El dedo no se captura: su gesto es del desplazamiento nativo (touch-action del puerto).
+      if (!isTouch) event.target.setPointerCapture(event.pointerId)
       gesture = {
         pointerId: event.pointerId,
         target: event.target,
@@ -83,6 +91,8 @@ export function useCanvasMarquee(enabled: boolean): SelectionRect | null {
         clientY: event.clientY,
         base: useFormStore.getState().selectedFieldIds,
         active: false,
+        isTouch,
+        moved: false,
       }
     }
 
@@ -97,7 +107,7 @@ export function useCanvasMarquee(enabled: boolean): SelectionRect | null {
     function handlePointerUp(event: PointerEvent): void {
       if (!gesture || event.pointerId !== gesture.pointerId) return
 
-      const wasMarquee: boolean = gesture.active
+      const wasMarquee: boolean = gesture.active || gesture.moved
       endGesture()
       if (wasMarquee) return
 

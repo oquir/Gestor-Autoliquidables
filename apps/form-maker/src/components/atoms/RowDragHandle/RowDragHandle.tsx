@@ -8,7 +8,7 @@ export function RowDragHandle({ listeners, attributes }: RowDragHandleProps) {
       {...listeners}
       {...attributes}
       title="Arrastrar para reordenar la fila"
-      className={`${ROW_TOOLBAR_ICON_ITEM_CLASSES} cursor-grab active:cursor-grabbing active:text-brand-fg`}
+      className={`${ROW_TOOLBAR_ICON_ITEM_CLASSES} cursor-grab touch-none active:cursor-grabbing active:text-brand-fg`}
     >
       <SortV size={12} />
     </div>

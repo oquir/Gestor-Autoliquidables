@@ -4,10 +4,13 @@ import {
   CHROME_ON_ROW_CLASSES,
   CHROME_PINNED_CLASSES,
   ROW_TOOLBAR_ICON_ITEM_CLASSES,
+  ROW_TOOLBAR_ITEM_CLASSES,
+  WITHOUT_STEP_TABS_CLASSES,
 } from '../../../constants'
 import { useFormStore } from '../../../store'
 import { IconButton } from '../../atoms'
 import { RowDragHandle } from '../../atoms'
+import { MoveToStepMenu } from '../MoveToStepMenu'
 import { RowColumnsMenu } from '../RowColumnsMenu'
 import { RowStylesMenu } from '../RowStylesMenu'
 import {
@@ -20,6 +23,7 @@ import type { RowToolbarMenu, RowToolbarProps } from './RowToolbar.types'
 
 function RowToolbarBase({ row, listeners, attributes, pinned }: RowToolbarProps) {
   const removeRow = useFormStore((state) => state.removeRow)
+  const moveRowToStep = useFormStore((state) => state.moveRowToStep)
   // El estado de los menus vive aca: son excluyentes y la barra no se desvanece mientras hay uno
   // abierto.
   const [openMenu, setOpenMenu] = useState<RowToolbarMenu | null>(null)
@@ -55,6 +59,23 @@ function RowToolbarBase({ row, listeners, attributes, pinned }: RowToolbarProps)
           onToggle={() => toggleMenu('styles')}
           onClose={() => setOpenMenu(null)}
         />
+
+        <div className={WITHOUT_STEP_TABS_CLASSES}>
+          <MoveToStepMenu
+            onSelect={(target) => moveRowToStep(row.id, target)}
+            tooltip={
+              row.groupId === undefined
+                ? 'Mover la fila a otro paso'
+                : 'Una fila no sale de su grupo repetible'
+            }
+            triggerClassName={`${ROW_TOOLBAR_ITEM_CLASSES} gap-0.5 disabled:cursor-not-allowed disabled:opacity-40`}
+            placement="down"
+            disabled={row.groupId !== undefined}
+            isOpen={openMenu === 'move'}
+            onToggle={() => toggleMenu('move')}
+            onClose={() => setOpenMenu(null)}
+          />
+        </div>
 
         <IconButton
           onClick={() => removeRow(row.id)}

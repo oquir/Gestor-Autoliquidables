@@ -1,7 +1,8 @@
 import type { CollisionDetection, Modifier } from '@dnd-kit/core'
-import { pointerWithin, rectIntersection } from '@dnd-kit/core'
+import { PointerSensor, pointerWithin, rectIntersection } from '@dnd-kit/core'
 import { getEventCoordinates } from '@dnd-kit/utilities'
 import { GRID_GAP_PX } from '../../constants'
+import { FINGER_LIFT_PX } from './useDragAndDrop.constants'
 import { getRowElement } from '../../lib'
 import { getCanvasScale } from '../../lib'
 import type {
@@ -13,6 +14,18 @@ import type {
 } from '../../types'
 
 // Medidas del arrastre contra el DOM real: la grilla la dibuja CSS.
+
+// El sensor de puntero de siempre, solo para mouse y lapiz: el dedo lo atiende TouchSensor con su
+// espera. Si los dos escucharan el dedo, este arrancaria a los 4 px y el desplazamiento no existiria.
+export class MousePenSensor extends PointerSensor {
+  static activators: typeof PointerSensor.activators = PointerSensor.activators.map(
+    (activator) => ({
+      ...activator,
+      handler: (event, options) =>
+        event.nativeEvent.pointerType !== 'touch' && activator.handler(event, options),
+    }),
+  )
+}
 
 // Centra la previsualizacion: sin esto, al soltar cerca de un borde cae en otra columna de la que
 // se ve.
@@ -30,11 +43,14 @@ export const centerOverlayOnCursor: Modifier = ({
   const rect = overlayNodeRect ?? draggingNodeRect
   const grabOffsetX: number = coordinates.x - draggingNodeRect.left
   const grabOffsetY: number = coordinates.y - draggingNodeRect.top
+  // Lo que se suelta sigue siendo lo que esta bajo el dedo (pointerRef): solo se mueve el dibujo.
+  const isFinger: boolean = activatorEvent.type.startsWith('touch')
+  const liftY: number = isFinger ? rect.height + FINGER_LIFT_PX : rect.height / 2
 
   return {
     ...transform,
     x: transform.x + grabOffsetX - rect.width / 2,
-    y: transform.y + grabOffsetY - rect.height / 2,
+    y: transform.y + grabOffsetY - liftY,
   }
 }
 

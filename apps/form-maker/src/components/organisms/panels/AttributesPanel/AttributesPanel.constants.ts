@@ -13,7 +13,7 @@ export const PLACEHOLDER_DESCRIPTION: string =
 export const PLACEHOLDER_EXAMPLE: string = 'Ej: Ingrese el NIT sin dígito de verificación'
 
 export const LAYOUT_DESCRIPTION: string =
-  'Cuánto ocupa el campo dentro de su fila, en columnas de la grilla. Para cambiarlo de lugar arrastralo en el lienzo; con Shift elegís la columna exacta donde empieza.'
+  'Cuánto ocupa el campo dentro de su fila, en columnas de la grilla. Para cambiarlo de lugar elegí la columna de inicio o arrastralo en el lienzo; con Shift elegís la columna exacta donde empieza.'
 
 export const OPTIONS_SOURCE_DESCRIPTION: string =
   'De dónde salen las opciones de esta lista. Solo se escriben a mano en un campo excluido del payload y sin catálogo; en los demás las trae el aplicativo que recibe el JSON.'

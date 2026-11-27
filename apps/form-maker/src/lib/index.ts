@@ -4,6 +4,7 @@
 export * from './backStack'
 export * from './baseTemplate'
 export * from './canvasDom'
+export * from './canvasList'
 export * from './canvasSelection'
 export * from './canvasViewport'
 export * from './canvasZoom'

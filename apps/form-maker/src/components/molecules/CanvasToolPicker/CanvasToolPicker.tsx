@@ -4,12 +4,14 @@ import {
   CANVAS_TOOL_BUTTON_BASE_CLASSES,
   CANVAS_TOOL_BUTTON_INACTIVE_CLASSES,
   CANVAS_TOOLBAR_GROUP_CLASSES,
+  MOUSE_ONLY_CLASSES,
 } from '../../../constants/uiClasses'
 import { Tooltip } from '../../atoms'
 import { TOOL_ICONS } from './CanvasToolPicker.constants'
 import type { CanvasToolPickerProps } from './CanvasToolPicker.types'
 
-// Lo comparten las barras del formulario y del PDF; quien lo monta guarda la herramienta.
+// Lo comparten las barras del formulario y del PDF; quien lo monta guarda la herramienta. La Mano
+// no se muestra en tactil: el dedo ya desplaza (T8 y D5 de docs/Plan-Movil.md).
 export function CanvasToolPicker({ tool, onSelect }: CanvasToolPickerProps) {
   return (
     <div className={CANVAS_TOOLBAR_GROUP_CLASSES}>
@@ -26,7 +28,7 @@ export function CanvasToolPicker({ tool, onSelect }: CanvasToolPickerProps) {
               aria-label={item.label}
               className={`${CANVAS_TOOL_BUTTON_BASE_CLASSES} ${
                 isActive ? CANVAS_TOOL_BUTTON_ACTIVE_CLASSES : CANVAS_TOOL_BUTTON_INACTIVE_CLASSES
-              }`}
+              } ${item.tool === 'hand' ? MOUSE_ONLY_CLASSES : ''}`}
             >
               <Icon size={16} />
             </button>

@@ -2,6 +2,7 @@ import {
   CANVAS_TOOLBAR_DIVIDER_CLASSES,
   CANVAS_TOOLBAR_ICON_ACTION_CLASSES,
 } from '../../../constants/uiClasses'
+import { useLayoutMode } from '../../../hooks/useLayoutMode/useLayoutMode'
 import { useFormStore } from '../../../store/formStore'
 import { CanvasZoomControl } from '../../molecules/CanvasZoomControl/CanvasZoomControl'
 import { RightPanelToggle } from '../../molecules/RightPanelToggle/RightPanelToggle'
@@ -15,8 +16,11 @@ import { CHIP_CLASSES, NOTICE_CLASSES } from './CollapsedRightSidebar.constants'
 
 export function CollapsedRightSidebar() {
   const isRightSidebarOpen: boolean = useFormStore((state) => state.isRightSidebarOpen)
+  const isPhone: boolean = useLayoutMode() === 'phone'
 
   if (isRightSidebarOpen) return null
+  // En el celular las acciones van en la barra de arriba y su menu (PhoneTopBar): queda solo el aviso.
+  if (isPhone) return <TransferNotice className={NOTICE_CLASSES} />
 
   return (
     <>

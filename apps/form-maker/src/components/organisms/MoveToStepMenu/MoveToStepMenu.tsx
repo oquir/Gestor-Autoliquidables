@@ -15,35 +15,55 @@ import { buildMoveSections } from './MoveToStepMenu.utils'
 import { Tooltip } from '../../atoms'
 import { MenuSurface } from '../../molecules'
 
-export function MoveToStepMenu({ onSelect }: MoveToStepMenuProps) {
+export function MoveToStepMenu({
+  onSelect,
+  tooltip = 'Mover los campos seleccionados a otro paso',
+  triggerClassName = CANVAS_TOOLBAR_ACTION_CLASSES,
+  placement = 'up',
+  disabled = false,
+  isOpen: controlledOpen,
+  onToggle,
+  onClose,
+}: MoveToStepMenuProps) {
   const formSteps = useFormStore((state) => state.formSteps)
   const introSteps = useFormStore((state) => state.introModal.steps)
   const activeCanvas = useFormStore((state) => state.activeCanvas)
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [ownOpen, setOwnOpen] = useState<boolean>(false)
+  const isOpen: boolean = controlledOpen ?? ownOpen
   const containerRef = useRef<HTMLDivElement | null>(null)
   // En el celular el menu es una hoja en un portal: un toque adentro contaria como afuera.
   const isPhone: boolean = useLayoutMode() === 'phone'
 
-  useClickOutside(containerRef, () => setIsOpen(false), isOpen && !isPhone)
+  function close(): void {
+    if (onClose) onClose()
+    else setOwnOpen(false)
+  }
+
+  function toggle(): void {
+    if (onToggle) onToggle()
+    else setOwnOpen((open) => !open)
+  }
+
+  useClickOutside(containerRef, close, isOpen && !isPhone)
 
   const sections: MoveTargetSection[] = buildMoveSections(formSteps, introSteps, activeCanvas)
 
   function apply(target: CanvasTarget): void {
     onSelect(target)
-    setIsOpen(false)
+    close()
   }
 
   return (
     <div ref={containerRef} className="relative">
-      <Tooltip content="Mover los campos seleccionados a otro paso">
+      <Tooltip content={tooltip}>
         <span className="inline-flex">
           <button
             type="button"
-            onClick={() => setIsOpen((open) => !open)}
-            disabled={sections.length === 0}
+            onClick={toggle}
+            disabled={disabled || sections.length === 0}
             aria-haspopup="menu"
             aria-expanded={isOpen}
-            className={CANVAS_TOOLBAR_ACTION_CLASSES}
+            className={triggerClassName}
           >
             Mover a paso
             <AngleDown2 size={12} />
@@ -54,8 +74,8 @@ export function MoveToStepMenu({ onSelect }: MoveToStepMenuProps) {
       {isOpen && (
         <MenuSurface
           title="Mover a paso"
-          onClose={() => setIsOpen(false)}
-          popoverClassName={MENU_CLASSES}
+          onClose={close}
+          popoverClassName={MENU_CLASSES[placement]}
           sheetContentClassName="flex flex-col"
         >
           {sections.map((section) => (
