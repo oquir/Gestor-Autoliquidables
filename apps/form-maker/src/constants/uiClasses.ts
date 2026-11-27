@@ -83,7 +83,7 @@ export const CANVAS_TOOLBAR_DIVIDER_CLASSES: string = 'mx-0.5 h-5 w-px bg-border
 export const CANVAS_TOOLBAR_BOX_CLASSES: string =
   'flex w-max items-center gap-1 rounded-xl border border-border bg-surface p-1 shadow-lg dark:bg-surface-raised'
 
-export const CANVAS_TOOLBAR_CLASSES: string = `absolute bottom-4 left-1/2 z-30 -translate-x-1/2 ${CANVAS_TOOLBAR_BOX_CLASSES}`
+export const CANVAS_TOOLBAR_CLASSES: string = `absolute bottom-safe-4 left-1/2 z-30 -translate-x-1/2 ${CANVAS_TOOLBAR_BOX_CLASSES}`
 
 export const CANVAS_TOOLBAR_GROUP_CLASSES: string = 'flex items-center gap-0.5'
 

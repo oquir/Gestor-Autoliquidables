@@ -362,6 +362,35 @@
   }
 }
 
+/* Zonas seguras: la distancia de siempre mas lo que tapan la muesca, las esquinas redondeadas o la
+   barra de gestos (`env(safe-area-inset-*)`, que existe por viewport-fit=cover en index.html). En
+   el escritorio env() vale 0 y quedan iguales a bottom-4, right-4... Para lo que va pegado a una
+   orilla de la ventana (barras flotantes, hojas, barras de abajo), nunca dentro del lienzo. */
+@utility top-safe-* {
+  top: calc(var(--spacing) * --value(integer) + env(safe-area-inset-top, 0px));
+}
+
+@utility right-safe-* {
+  right: calc(var(--spacing) * --value(integer) + env(safe-area-inset-right, 0px));
+}
+
+@utility bottom-safe-* {
+  bottom: calc(var(--spacing) * --value(integer) + env(safe-area-inset-bottom, 0px));
+}
+
+@utility left-safe-* {
+  left: calc(var(--spacing) * --value(integer) + env(safe-area-inset-left, 0px));
+}
+
+@utility pb-safe-* {
+  padding-bottom: calc(var(--spacing) * --value(integer) + env(safe-area-inset-bottom, 0px));
+}
+
+@utility px-safe-* {
+  padding-left: calc(var(--spacing) * --value(integer) + env(safe-area-inset-left, 0px));
+  padding-right: calc(var(--spacing) * --value(integer) + env(safe-area-inset-right, 0px));
+}
+
 /* Loader origami: una hoja que se dobla por cuartos (la idea del "Folding Cube" de SpinKit,
    escrita aparte). Aqui si va `transform`: es un elemento aislado, sin modales ni dnd-kit dentro.
    Cada cuarto es un casillero de una cuadricula 2x2 girada 45 grados; su ::before es el pliegue. */

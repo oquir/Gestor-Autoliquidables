@@ -40,7 +40,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
 
 ## 1. Fase 0 — Base común (antes de todo)
 
-### [ ] B1 Altura y viewport
+### [x] ~~B1 Altura y viewport~~ (2026-11-26, 33a941a4)
 
 - **Qué pasa:**
   - `h-screen w-screen` (`100vh`/`100vw`) en `layout/AppLayout.tsx:9`, `PdfDesigner.tsx:65`,

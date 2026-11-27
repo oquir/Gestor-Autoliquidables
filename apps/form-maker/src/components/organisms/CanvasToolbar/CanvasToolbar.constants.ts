@@ -4,7 +4,7 @@ import { CANVAS_TOOLBAR_BOX_CLASSES } from '../../../constants/uiClasses'
 // container-type vuelve al elemento bloque contenedor de los fixed, y en el envoltorio de AppLayout
 // vive el chip que abre ModalShell. Sin pointer-events la capa no roba clics.
 export const TOOLBAR_LAYER_CLASSES: string =
-  '@container/toolbar pointer-events-none absolute inset-x-0 bottom-4 z-30 flex justify-center'
+  '@container/toolbar pointer-events-none absolute inset-x-0 bottom-safe-4 z-30 flex justify-center'
 
 export const TOOLBAR_CLASSES: string = `pointer-events-auto ${CANVAS_TOOLBAR_BOX_CLASSES}`
 

@@ -31,9 +31,14 @@ export const TOAST_ICONS: ToasterProps['icons'] = {
 }
 
 // Esquina inferior derecha (decision del usuario): arriba tapaba la fila de acciones del panel.
-export const TOAST_OFFSET: { bottom: number; right: number } = { bottom: 24, right: 24 }
-export const TOAST_MOBILE_OFFSET: { bottom: number; right: number; left: number } = {
-  bottom: 16,
-  right: 16,
-  left: 16,
+// Sonner pasa los textos tal cual a sus variables CSS, asi que la zona segura entra con calc (en el
+// escritorio env() vale 0 y quedan los 24 y 16 px de antes).
+export const TOAST_OFFSET: { bottom: string; right: string } = {
+  bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+  right: 'calc(24px + env(safe-area-inset-right, 0px))',
+}
+export const TOAST_MOBILE_OFFSET: { bottom: string; right: string; left: string } = {
+  bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
+  right: 'calc(16px + env(safe-area-inset-right, 0px))',
+  left: 'calc(16px + env(safe-area-inset-left, 0px))',
 }
