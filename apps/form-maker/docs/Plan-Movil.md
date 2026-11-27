@@ -157,7 +157,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
   (el PDF con imágenes en base64). Se sugiere exportar el proyecto. La salida ya prevista en
   `Decisiones.md` es IndexedDB.
 
-### [ ] B10 Pellizcar para hacer zoom
+### [x] ~~B10 Pellizcar para hacer zoom~~ (2026-11-26, 4811ed95)
 
 - **Qué pasa:** el zoom de los dos lienzos es Ctrl+rueda (`useCanvasViewport.ts`, `PdfCanvas.tsx`).
   En el celular, pellizcar acerca **la página entera**.
@@ -168,7 +168,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
   - El ancla del PDF ya existe (`restoreZoomAnchor`).
   - Ctrl+rueda sigue igual en el escritorio.
 
-### [ ] B11 Cómo se prueba en el celular
+### [x] ~~B11 Cómo se prueba en el celular~~ (2026-11-26, sin código: receta verificada y ampliada)
 
 - Android por USB: depuración USB y `chrome://inspect` → Port forwarding `5174 → localhost:5174`.
   En el celular se abre `http://localhost:5174`.
@@ -178,6 +178,25 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
 - Emulación en Chrome o Edge:
   - Celulares: 360×800, 390×844 (iPhone) y 412×915.
   - Tablets: 768×1024, 820×1180 vertical y horizontal, 1280×800 táctil.
+- Verificado el 2026-11-26 contra el código: `vite.config.ts` fija `5174` con `strictPort` en dev y
+  en preview, y `lib/clipboard` (`copyTextOrWarn`) avisa con un toast si `navigator.clipboard` no
+  existe o rechaza.
+- Cómo se verificó B1–B10 sin celular (Chrome headless por DevTools protocol, scripts de un solo uso
+  en el scratchpad, como en `Decisiones.md`):
+  - `vite preview --port 5199 --strictPort` aparte, para no tocar el dev server del usuario. Abre en
+    `localhost`, no en `127.0.0.1` (ahí rechaza la conexión).
+  - Ancho: `Emulation.setDeviceMetricsOverride` (`mobile: true` para celular y tablet).
+  - Dedo: `Emulation.setTouchEmulationEnabled` hace que `pointer: coarse` sea verdad;
+    `Input.dispatchTouchEvent` da toques y pellizcos (dos `touchPoints`) reales.
+  - Atrás de Android: `history.back()` en la página dispara el mismo `popstate`.
+  - Página oculta: redefinir `document.visibilityState` y disparar `visibilitychange` o `pagehide`.
+  - Lo que todavía no existe en la app se probó en una página temporal en la raíz
+    (`__demo.html` + `.tsx` servidos por `vite`), borrada al terminar.
+  - Comparar contra la versión anterior: `git stash push -- src`, `vite build` y correr; después
+    `git stash pop`, `vite build` y volver a correr. Así se ve que la prueba detecta el cambio.
+  - **Lo que la emulación no muestra** y queda para el Android real: la barra del navegador que se
+    esconde (`dvh`), las zonas seguras reales, el teclado que achica la pantalla, la pulsación larga
+    y el doble toque, `storage.persist()` y si Android mata la pestaña de fondo.
 
 ## 2. Fase 1 — Simulador (lo más sencillo)
 
