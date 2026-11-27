@@ -97,6 +97,20 @@ export function getMaxSpanAt(runs: FreeRun[], colStart: number): number {
   return 1
 }
 
+// Columnas donde puede empezar un campo de este ancho sin pisar a nadie: lo que ofrece el control
+// "Columna de inicio" (T4 de docs/Plan-Movil.md), el Shift del dedo. Solo inicios donde entra
+// entero: resolvePlacement deslizaria uno que no entra, y se aplicaria otro distinto al elegido.
+export function getValidStarts(runs: FreeRun[], colSpan: number): number[] {
+  const starts: number[] = []
+  for (const run of runs) {
+    for (let start = run.start; start + colSpan <= run.start + run.length; start++) {
+      starts.push(start)
+    }
+  }
+
+  return starts
+}
+
 // Tres intentos: deslizar lo pedido al hueco mas cercano; sin pedido, el primer sitio donde entre;
 // por ultimo, recortado en el tramo mas ancho. null solo con la fila llena.
 export function resolvePlacement(

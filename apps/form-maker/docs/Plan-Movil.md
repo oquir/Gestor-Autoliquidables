@@ -282,7 +282,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - El sensor de puntero queda para mouse y lápiz.
   - `touch-action: none` en las tres asas.
   - Se mantienen las invariantes de cascarón delgado y de manejadores estables.
-- [ ] **T3 Arrastrar con el dedo:**
+- [x] ~~**T3 Arrastrar con el dedo:**~~ (2026-11-27, 1be51a46; `FINGER_LIFT_PX` = 24 en
+      `centerOverlayOnCursor`, solo si el arrastre empezó con un `touch*`)
   - La copia que se arrastra va **por encima del dedo** en táctil. Hoy `centerOverlayOnCursor` la
     centra debajo, y el dedo la tapa.
   - El autoscroll de dnd-kit en los bordes ya existe.
