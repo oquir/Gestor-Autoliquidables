@@ -2,6 +2,7 @@
 export * from './activeDrag'
 export * from './backStack'
 export * from './banksSlice'
+export * from './canvasList'
 export * from './canvasSelection'
 export * from './canvasViewport'
 export * from './canvasReveal'

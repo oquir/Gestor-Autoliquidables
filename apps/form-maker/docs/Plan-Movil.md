@@ -328,7 +328,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 
 ## 4. Fase 3 — Maquetador en el celular: la vista de lista
 
-- [ ] **P1 La pantalla:**
+- [x] ~~**P1 La pantalla:**~~ (2026-11-27, 0a42c2e9, c58ece47 y 45a24ca0)
   - **Arriba:** paso anterior y siguiente, el nombre del paso (abre una hoja con `CanvasTabs`),
     `SaveStatus`, **Subir** (el único naranja) y ⋯. El menú ⋯ lleva:
     - Guardar, Simulador, Diseñar PDF, Abrir proyecto y Exportar.
@@ -342,7 +342,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     `RightSidebar` metido en una hoja.
   - [x] ~~P1a~~ (2026-11-27, 0a42c2e9: `PhoneBottomBar`; sin riel ni `CanvasToolbar` en `phone`)
     · [x] ~~P1b~~ (2026-11-27, c58ece47: `PhoneTopBar`; `describeActiveStep` en `lib/stepNavigation`)
-    · [x] ~~P1c~~ (2026-11-27: `PhoneMoreMenu` con la hoja "Proyecto"; sin chip flotante en `phone`)
+    · [x] ~~P1c~~ (2026-11-27, 45a24ca0: `PhoneMoreMenu` con la hoja "Proyecto"; sin chip flotante en `phone`)
   - **Pendiente (el usuario, 2026-11-27): revisar el diseño visual de las barras y hojas del
     celular** una vez esté la fase 3; funcionan, pero el acabado no se ha pulido.
 - [ ] **P2 `organisms/CanvasList` (nuevo):**
