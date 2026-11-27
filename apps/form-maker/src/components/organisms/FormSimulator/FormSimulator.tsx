@@ -55,7 +55,9 @@ export function FormSimulator() {
             className={EXIT_BUTTON_CLASSES}
           >
             <ArrowLeft size={14} />
-            Volver<span className="max-sm:hidden"> al lienzo</span>
+            <span>
+              Volver<span className="max-sm:hidden"> al lienzo</span>
+            </span>
           </button>
         </div>
       </header>
