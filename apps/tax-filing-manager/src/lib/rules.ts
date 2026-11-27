@@ -327,6 +327,44 @@ export const replaced = (
     ),
   )
 
+/** partiendo de cualquier declaración (sea la inicial o una corrección intermedia), encontrar todas
+ * las declaraciones que pertenecen a esa misma cadena del periodo y devolverlas ordenadas por fecha. */
+export const correctionChain = (d: Declaration, declarations: Declaration[]): Declaration[] => {
+  const byId = new Map(declarations.map((x) => [x.id, x]))
+  const ids = new Set<string>()
+  let root = d
+  // El conjunto corta también una cadena mal cargada que apunte hacia atrás.
+  while (root.correctsId && !ids.has(root.id) && byId.has(root.correctsId)) {
+    ids.add(root.id)
+    root = byId.get(root.correctsId)!
+  }
+  ids.add(root.id)
+  const pending = [root]
+  while (pending.length > 0) {
+    const x = pending.pop()!
+    for (const y of declarations)
+      if (y.correctsId === x.id && !ids.has(y.id)) {
+        ids.add(y.id)
+        pending.push(y)
+      }
+  }
+  return declarations
+    .filter((x) => ids.has(x.id))
+    .sort((a, b) => a.filingDate.localeCompare(b.filingDate))
+}
+
+/** tomar la cadena ordenada que devolvió correctionChain() y dice cuál de todas esas declaraciones es
+ * la que está vigente hoy. */
+export const currentOfChain = (
+  chain: Declaration[],
+  situation: (d: Declaration) => CorrectionSituation | undefined,
+) =>
+  chain.find(
+    (x) =>
+      currentCorrection(situation(x)) &&
+      !chain.some((y) => y.correctsId === x.id && currentCorrection(situation(y))),
+  )
+
 export const roundToThousand = (value: number) => Math.round(value / 1000) * 1000
 
 /** Renglones de subtotal y total de la liquidación (se resaltan en pantalla y en el PDF). */
