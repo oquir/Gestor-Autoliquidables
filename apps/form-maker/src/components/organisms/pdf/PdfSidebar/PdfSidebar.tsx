@@ -1,8 +1,10 @@
 import {
+  MOUSE_ONLY_CLASSES,
   SWITCH_ITEM_ACTIVE_CLASSES,
   SWITCH_ITEM_BASE_CLASSES,
   SWITCH_ITEM_INACTIVE_CLASSES,
   SWITCH_TRACK_CLASSES,
+  TOUCH_ONLY_CLASSES,
 } from '../../../../constants'
 import { usePdfDesignStore } from '../../../../store/pdfDesignStore'
 import { PdfCellPanel } from '../PdfCellPanel'
@@ -51,8 +53,14 @@ export function PdfSidebar() {
           {selectionKind === 'block' && <PdfHtmlBlockPanel />}
           {selectionKind === null && (
             <p className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-[11px] text-fg-muted">
-              Haz clic en una celda o en un bloque de la hoja para editarlo. Shift+clic en otra
-              celda selecciona el rectángulo entre las dos.
+              <span className={MOUSE_ONLY_CLASSES}>
+                Haz clic en una celda o en un bloque de la hoja para editarlo. Shift+clic en otra
+                celda selecciona el rectángulo entre las dos.
+              </span>
+              <span className={TOUCH_ONLY_CLASSES}>
+                Toca una celda o un bloque de la hoja para editarlo. Con Selección múltiple, toca
+                otra celda para elegir el rectángulo entre las dos.
+              </span>
             </p>
           )}
         </>

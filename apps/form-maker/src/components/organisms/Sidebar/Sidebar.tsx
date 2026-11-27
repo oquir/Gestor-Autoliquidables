@@ -17,7 +17,7 @@ import { MaxDatesPanel } from '../panels/MaxDatesPanel'
 import { StylesPanel } from '../panels/StylesPanel'
 import { ValidationsPanel } from '../panels/ValidationsPanel'
 import { BANK_TABS, FIELD_TABS, RAIL_DIVIDER_BEFORE, TABS } from './Sidebar.constants'
-import { ENTER_RISE_CLASSES } from '../../../constants'
+import { ENTER_RISE_CLASSES, MOUSE_ONLY_CLASSES, TOUCH_ONLY_CLASSES } from '../../../constants'
 
 export function Sidebar() {
   const activeTab = useFormStore((state) => state.sidebarTab)
@@ -64,7 +64,10 @@ export function Sidebar() {
           title={activeTabDef?.label ?? ''}
           subtitle={
             activeTab === 'fields' ? (
-              'Haz clic o arrastra un campo al lienzo'
+              <>
+                <span className={MOUSE_ONLY_CLASSES}>Haz clic o arrastra un campo al lienzo</span>
+                <span className={TOUCH_ONLY_CLASSES}>Toca un campo para agregarlo al lienzo</span>
+              </>
             ) : BANK_TABS.includes(activeTab) ? (
               'Datos de prueba del simulador'
             ) : isMultiSelection && isFieldTab ? (
@@ -99,8 +102,14 @@ export function Sidebar() {
                 // Un clic en un campo no abre esta pestana (decision del usuario): el vacio dice
                 // que gestos la abren.
                 <p>
-                  Sin campo seleccionado. Haz doble clic en un campo del lienzo para editarlo aquí,
-                  o clic derecho para abrir su menú.
+                  <span className={MOUSE_ONLY_CLASSES}>
+                    Sin campo seleccionado. Haz doble clic en un campo del lienzo para editarlo
+                    aquí, o clic derecho para abrir su menú.
+                  </span>
+                  <span className={TOUCH_ONLY_CLASSES}>
+                    Sin campo seleccionado. Toca dos veces un campo del lienzo para editarlo aquí, o
+                    mantenlo presionado para abrir su menú.
+                  </span>
                 </p>
               )}
             {selectedField && activeTab === 'attributes' && (

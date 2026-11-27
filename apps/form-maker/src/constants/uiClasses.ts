@@ -41,8 +41,10 @@ export const ADD_LINK_CLASSES: string =
 export const CHROME_ON_FIELD_CLASSES: string =
   'opacity-0 group-hover/field:opacity-100 group-focus-within/field:opacity-100'
 
+// En tactil la barra de la fila se ve siempre (B5 de docs/Plan-Movil.md): una fila vacia no tiene
+// nada que enfocar y su barra quedaba inalcanzable.
 export const CHROME_ON_ROW_CLASSES: string =
-  'opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100'
+  'opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100 pointer-coarse:opacity-100'
 
 export const CHROME_PINNED_CLASSES: string = 'opacity-100'
 
@@ -50,9 +52,11 @@ export const CHROME_PINNED_CLASSES: string = 'opacity-100'
 // oculto con opacidad sigue recibiendo toques y robaria los de al lado.
 export const TOUCH_TARGET_CLASSES: string = 'touch-target'
 
-// La barra de la fila esta oculta hasta el hover: sus botones crecen solo con la barra a la vista
-// (RowToolbar pone data-chrome="pinned").
-export const ROW_TOUCH_TARGET_CLASSES: string = 'in-data-[chrome=pinned]:touch-target'
+// Textos que nombran un gesto: uno para mouse y otro para el dedo, sin JS. Se muestra siempre
+// exactamente uno (con pointer: none queda el de mouse).
+export const MOUSE_ONLY_CLASSES: string = 'pointer-coarse:hidden'
+
+export const TOUCH_ONLY_CLASSES: string = 'hidden pointer-coarse:inline'
 
 // Container query sobre el ancho real del chip: esconde el icono del control de muestra cuando no
 // entra ni el texto.
@@ -68,9 +72,9 @@ export const PREVIEW_FIELD_STACK_CLASSES: string =
   '@max-[40rem]/form:col-span-full! @max-[40rem]/form:row-auto!'
 
 // Compartidas con RowColumnsMenu y RowStylesMenu.
-export const ROW_TOOLBAR_ITEM_CLASSES: string = `flex h-5 items-center justify-center rounded-md px-1.5 text-[10px] font-medium text-fg-muted transition-colors hover:bg-surface-raised hover:text-fg-strong hover:cursor-pointer dark:hover:bg-surface-inset ${ROW_TOUCH_TARGET_CLASSES}`
+export const ROW_TOOLBAR_ITEM_CLASSES: string = `flex h-5 items-center justify-center rounded-md px-1.5 text-[10px] font-medium text-fg-muted transition-colors hover:bg-surface-raised hover:text-fg-strong hover:cursor-pointer dark:hover:bg-surface-inset ${TOUCH_TARGET_CLASSES}`
 
-export const ROW_TOOLBAR_ICON_ITEM_CLASSES: string = `flex h-5 w-5 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-surface-raised hover:text-fg-strong hover:cursor-pointer dark:hover:bg-surface-inset ${ROW_TOUCH_TARGET_CLASSES}`
+export const ROW_TOOLBAR_ICON_ITEM_CLASSES: string = `flex h-5 w-5 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-surface-raised hover:text-fg-strong hover:cursor-pointer dark:hover:bg-surface-inset ${TOUCH_TARGET_CLASSES}`
 
 // Abre hacia la izquierda: la barra esta pegada al borde derecho de la fila.
 export const ROW_TOOLBAR_POPOVER_CLASSES: string = `absolute right-0 top-6 z-20 flex w-72 origin-top-right flex-col gap-2 rounded-md border border-border bg-surface p-3 shadow-lg dark:bg-surface-raised ${ENTER_POP_CLASSES}`

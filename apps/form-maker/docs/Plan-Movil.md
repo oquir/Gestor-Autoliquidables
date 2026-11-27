@@ -71,7 +71,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
 - **Arreglo:** `pointer-coarse:text-base` en esas constantes. El tema de CodeMirror en
   `molecules/ScriptEditor` sube a 16 px en táctil.
 
-### [ ] B4 Áreas de toque
+### [x] ~~B4 Áreas de toque~~ (2026-11-26, 722528aa)
 
 - **Qué pasa:** hay muchos botones de 13 a 16 px de ícono y textos de `text-[11px]`: `IconButton`,
   la X de `StepTabChip`, las asas (`FieldDragHandle`, `RowDragHandle`, `FieldResizeHandle`), la
