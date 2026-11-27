@@ -6,7 +6,7 @@ export const TRIGGER_IDLE_CLASSES: string = 'border-border hover:border-brand-bo
 export const TRIGGER_INVALID_CLASSES: string = 'border-danger-soft'
 
 export const SEARCH_INPUT_CLASSES: string =
-  'w-full rounded-md border border-border bg-field py-2 pr-3 pl-9 text-sm text-fg outline-none focus:border-brand-border'
+  'w-full rounded-md border border-border bg-field py-2 pr-3 pl-9 text-sm text-fg outline-none pointer-coarse:text-base focus:border-brand-border'
 
 export const OPTION_BUTTON_CLASSES: string =
   'flex w-full items-start justify-between gap-3 px-5 py-3 text-left transition-colors hover:cursor-pointer hover:bg-surface-raised'

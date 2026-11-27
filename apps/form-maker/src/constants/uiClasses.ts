@@ -20,12 +20,12 @@ export const BADGE_EMPTY_CLASSES: string =
   'rounded-md border border-border bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-fg-muted'
 
 export const INPUT_CLASSES: string =
-  'w-full rounded-md border border-border bg-field px-2 py-1 text-xs text-fg outline-none focus:border-brand-border'
+  'w-full rounded-md border border-border bg-field px-2 py-1 text-xs text-fg outline-none focus:border-brand-border pointer-coarse:text-base'
 
 export const TEXTAREA_CLASSES: string = `${INPUT_CLASSES} h-24 resize-y font-mono`
 
 export const SELECT_CLASSES: string =
-  'min-w-0 flex-1 rounded-md border border-border bg-field px-2 py-1 text-xs text-fg outline-none focus:border-brand-border'
+  'min-w-0 flex-1 rounded-md border border-border bg-field px-2 py-1 text-xs text-fg outline-none focus:border-brand-border pointer-coarse:text-base'
 
 export const ACTION_CLASSES: string =
   'shrink-0 text-xs font-medium text-brand-strong hover:cursor-pointer hover:underline'

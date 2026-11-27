@@ -56,7 +56,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
     lienzos (B10).
 - **Meta:** a 360×800 y 412×915 no queda nada escondido detrás de la barra del navegador.
 
-### [ ] B2 Zonas seguras
+### [x] ~~B2 Zonas seguras~~ (2026-11-26, 3565de40)
 
 - `viewport-fit=cover` + `env(safe-area-inset-*)`, con utilidades propias en `src/index.css`
   (`@utility`).

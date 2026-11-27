@@ -19,6 +19,11 @@ export const SCRIPT_THEME = EditorView.theme({
     // inalcanzables.
     overflow: 'auto',
   },
+  // En tactil a 16px, como los inputs (pointer-coarse:text-base): con menos, Safari acerca la
+  // pagina al enfocar. TRAMPA: style-mod no acepta @media dentro de '&' (lanza RangeError al crear
+  // el tema) ni '&' dentro de @media (pierde el selector); va sobre .cm-scroller, que envuelve
+  // texto y numeros de linea.
+  '@media (pointer: coarse)': { '.cm-scroller': { fontSize: '16px' } },
   '.cm-content': { padding: '6px 0' },
   '.cm-line': { padding: '0 8px' },
   '.cm-gutters': {

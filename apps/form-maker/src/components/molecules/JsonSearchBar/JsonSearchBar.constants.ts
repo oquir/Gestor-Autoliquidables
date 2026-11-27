@@ -7,7 +7,7 @@ export const SEARCH_ICON_CLASSES: string = 'hidden shrink-0 text-fg-subtle @xs:b
 
 // min-w-0: se encoge el input, no los botones.
 export const SEARCH_INPUT_CLASSES: string =
-  'min-w-0 flex-1 bg-transparent py-0.5 text-xs text-fg-strong outline-none placeholder:text-fg-subtle'
+  'min-w-0 flex-1 bg-transparent py-0.5 text-xs text-fg-strong outline-none pointer-coarse:text-base placeholder:text-fg-subtle'
 
 export const SEARCH_COUNT_CLASSES: string =
   'shrink-0 whitespace-nowrap px-1 text-right text-[11px] tabular-nums text-fg-muted'
