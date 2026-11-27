@@ -1,8 +1,10 @@
 import { ENTER_FADE_CLASSES, ENTER_MODAL_CLASSES } from '../../../constants'
-export const OVERLAY_CLASSES: string = `fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 ${ENTER_FADE_CLASSES}`
+// En el celular (max-sm, bajo 640px) el modal ocupa la pantalla entera: sin margen, sin bordes ni
+// esquinas, y le gana al max-w-* que pasa cada modal (B7 de docs/Plan-Movil.md).
+export const OVERLAY_CLASSES: string = `fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 max-sm:p-0 ${ENTER_FADE_CLASSES}`
 
 // Solo el cuerpo hace scroll. text-fg porque el modal no usa portal y heredaria el gris del panel.
-export const PANEL_CLASSES: string = `flex max-h-full w-full flex-col overflow-hidden rounded-xl border border-border bg-surface text-fg shadow-2xl ${ENTER_MODAL_CLASSES}`
+export const PANEL_CLASSES: string = `flex max-h-full w-full flex-col overflow-hidden rounded-xl border border-border bg-surface text-fg shadow-2xl max-sm:h-dvh max-sm:max-w-none max-sm:rounded-none max-sm:border-0 ${ENTER_MODAL_CLASSES}`
 
 export const HEADER_CLASSES: string =
   'flex shrink-0 items-start justify-between gap-4 border-b border-border px-6 pt-5 pb-4'
@@ -17,6 +19,9 @@ export const DESCRIPTION_CLASSES: string = 'text-sm leading-relaxed text-fg-mute
 export const CLOSE_BUTTON_CLASSES: string =
   '-mt-1 -mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-fg-muted transition-colors hover:cursor-pointer hover:bg-surface-raised hover:text-fg-strong'
 
-export const BODY_CLASSES: string = 'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 py-5'
+// last: sin pie, el cuerpo es lo que toca el borde de abajo y se aparta de la barra de gestos.
+export const BODY_CLASSES: string =
+  'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 py-5 max-sm:last:pb-safe-5'
 
-export const FOOTER_CLASSES: string = 'shrink-0 border-t border-border bg-surface-sunken px-6 py-4'
+export const FOOTER_CLASSES: string =
+  'shrink-0 border-t border-border bg-surface-sunken px-6 py-4 max-sm:pb-safe-4'

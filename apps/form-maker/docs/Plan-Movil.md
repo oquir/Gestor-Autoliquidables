@@ -100,7 +100,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
     - "doble clic… clic derecho" (el vacío de `Sidebar.tsx`).
     - "Shift+clic en otra celda" (`PdfSidebar.tsx`).
 
-### [ ] B6 Globos de ayuda en táctil
+### [x] ~~B6 Globos de ayuda en táctil~~ (2026-11-26, 6f2a4573)
 
 - **Qué pasa:** en `atoms/Tooltip`, `useClick({ ignoreMouse: true })` abre el globo al tocar. En un
   botón, un mismo toque ejecuta la acción **y además** abre el globo.
