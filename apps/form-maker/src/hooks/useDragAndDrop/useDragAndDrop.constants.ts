@@ -14,3 +14,7 @@ export const POINTER_SENSOR_OPTIONS: PointerSensorOptions = {
 export const TOUCH_SENSOR_OPTIONS: TouchSensorOptions = {
   activationConstraint: { delay: 200, tolerance: 8 },
 }
+
+// Con el dedo la copia que se arrastra va encima de la yema y no debajo, donde el dedo la tapa
+// (T3 de docs/Plan-Movil.md): su borde de abajo queda a esta distancia del punto de contacto.
+export const FINGER_LIFT_PX: number = 24

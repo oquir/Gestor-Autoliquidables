@@ -2,6 +2,7 @@ import type { CollisionDetection, Modifier } from '@dnd-kit/core'
 import { PointerSensor, pointerWithin, rectIntersection } from '@dnd-kit/core'
 import { getEventCoordinates } from '@dnd-kit/utilities'
 import { GRID_GAP_PX } from '../../constants'
+import { FINGER_LIFT_PX } from './useDragAndDrop.constants'
 import { getRowElement } from '../../lib'
 import { getCanvasScale } from '../../lib'
 import type {
@@ -42,11 +43,14 @@ export const centerOverlayOnCursor: Modifier = ({
   const rect = overlayNodeRect ?? draggingNodeRect
   const grabOffsetX: number = coordinates.x - draggingNodeRect.left
   const grabOffsetY: number = coordinates.y - draggingNodeRect.top
+  // Lo que se suelta sigue siendo lo que esta bajo el dedo (pointerRef): solo se mueve el dibujo.
+  const isFinger: boolean = activatorEvent.type.startsWith('touch')
+  const liftY: number = isFinger ? rect.height + FINGER_LIFT_PX : rect.height / 2
 
   return {
     ...transform,
     x: transform.x + grabOffsetX - rect.width / 2,
-    y: transform.y + grabOffsetY - rect.height / 2,
+    y: transform.y + grabOffsetY - liftY,
   }
 }
 

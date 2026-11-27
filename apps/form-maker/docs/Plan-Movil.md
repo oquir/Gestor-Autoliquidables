@@ -275,7 +275,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - El lienzo conserva su ancho, y el `ResizeObserver` del puerto no se dispara al abrirlos.
   - `AppLayout` elige según el modo. Se reutilizan `isSidebarOpen` e `isRightSidebarOpen`.
   - Ojo con la trampa de B7.
-- [ ] **T2 Sensores táctiles (`hooks/useDragAndDrop`):**
+- [x] ~~**T2 Sensores táctiles (`hooks/useDragAndDrop`):**~~ (2026-11-27, 939375bd; `MousePenSensor`
+      en `useDragAndDrop.utils` ignora `pointerType: 'touch'`; `select-none` en `PaletteChip`)
   - `TouchSensor` con su propia constante de módulo, junto a `POINTER_SENSOR_OPTIONS`: retardo de
     unos 200 ms y tolerancia de unos 8 px, para que la paleta y los paneles sigan desplazándose.
   - El sensor de puntero queda para mouse y lápiz.
