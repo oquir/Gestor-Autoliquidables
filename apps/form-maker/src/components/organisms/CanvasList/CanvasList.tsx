@@ -1,5 +1,14 @@
-import { type ComponentType, type PointerEvent, useMemo, useRef, useState } from 'react'
 import {
+  type ComponentType,
+  type PointerEvent,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import {
+  AngleDown2,
+  AngleUp2,
   BranchDown,
   Eye,
   Grid,
@@ -18,6 +27,7 @@ import {
   MAX_ROW_COLUMNS,
   MIN_ROW_COLUMNS,
 } from '../../../constants'
+import { useCanvasReveal } from '../../../hooks'
 import { buildCanvasList, buildLinkedLabelIndex, hasTooltip } from '../../../lib'
 import {
   findFieldById,
@@ -33,6 +43,7 @@ import type {
   ContextMenuTab,
   FieldTypeDef,
   IconProps,
+  RowDropTarget,
 } from '../../../types'
 import {
   FieldTypeBadge,
@@ -70,6 +81,7 @@ import {
   ROW_CARD_CLASSES,
   ROW_HEADER_CLASSES,
   ROW_MORE_BUTTON_CLASSES,
+  ROW_MOVE_BUTTON_CLASSES,
   ROW_TITLE_CLASSES,
   SHEET_ACTION_CLASSES,
   SHEET_DANGER_ACTION_CLASSES,
@@ -82,6 +94,7 @@ import type {
 } from './CanvasList.types'
 import {
   buildMoveSections,
+  canPlaceFieldInRow,
   getDestinationTitle,
   getFieldDestination,
   hasRowFreeSpace,
@@ -91,10 +104,13 @@ function CanvasListRowCard({
   row,
   rowNumber,
   fields,
+  moveUp,
+  moveDown,
   linkedLabels,
   selectedSet,
   onFieldClick,
   onFieldLongPress,
+  onMoveRow,
   onOpenRowMenu,
 }: CanvasListRowCardProps) {
   const columnsLabel: string = row.columns === 1 ? '1 columna' : `${row.columns} columnas`
@@ -140,14 +156,34 @@ function CanvasListRowCard({
         <span className={ROW_TITLE_CLASSES}>
           Fila {rowNumber} · {columnsLabel}
         </span>
-        <IconButton
-          onClick={() => onOpenRowMenu(row.id)}
-          title="Acciones de la fila"
-          aria-label={`Acciones de la fila ${rowNumber}`}
-          className={ROW_MORE_BUTTON_CLASSES}
-        >
-          <MoreH size={16} />
-        </IconButton>
+        <div className="flex items-center gap-0.5">
+          <IconButton
+            onClick={() => moveUp && onMoveRow(row.id, moveUp)}
+            disabled={!moveUp}
+            title="Subir fila"
+            aria-label={`Subir fila ${rowNumber}`}
+            className={ROW_MOVE_BUTTON_CLASSES}
+          >
+            <AngleUp2 size={15} />
+          </IconButton>
+          <IconButton
+            onClick={() => moveDown && onMoveRow(row.id, moveDown)}
+            disabled={!moveDown}
+            title="Bajar fila"
+            aria-label={`Bajar fila ${rowNumber}`}
+            className={ROW_MOVE_BUTTON_CLASSES}
+          >
+            <AngleDown2 size={15} />
+          </IconButton>
+          <IconButton
+            onClick={() => onOpenRowMenu(row.id)}
+            title="Acciones de la fila"
+            aria-label={`Acciones de la fila ${rowNumber}`}
+            className={ROW_MORE_BUTTON_CLASSES}
+          >
+            <MoreH size={16} />
+          </IconButton>
+        </div>
       </div>
 
       {fields.length === 0 ? (
@@ -265,15 +301,22 @@ export function CanvasList() {
   const toggleFieldSelection = useFormStore((state) => state.toggleFieldSelection)
   const removeFields = useFormStore((state) => state.removeFields)
   const moveFieldsToStep = useFormStore((state) => state.moveFieldsToStep)
+  const moveRow = useFormStore((state) => state.moveRow)
+  const moveField = useFormStore((state) => state.moveField)
   const updateRowColumns = useFormStore((state) => state.updateRowColumns)
   const updateRowStyles = useFormStore((state) => state.updateRowStyles)
   const moveRowToStep = useFormStore((state) => state.moveRowToStep)
   const removeRow = useFormStore((state) => state.removeRow)
   const addFieldToRow = useFormStore((state) => state.addFieldToRow)
+  const isLowPerformance = useFormStore((state) => state.isLowPerformance)
+  const reveal = useCanvasReveal()
 
+  const listRef = useRef<HTMLDivElement | null>(null)
+  const pendingFlipRef = useRef<Map<string, number> | null>(null)
   const [rowSheet, setRowSheet] = useState<RowSheetState | null>(null)
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null)
   const [editingTab, setEditingTab] = useState<ContextMenuTab>('attributes')
+  const [isMoveFieldRowOpen, setMoveFieldRowOpen] = useState<boolean>(false)
 
   const items: CanvasListItem[] = useMemo(
     () => buildCanvasList(activeRows, activeGroups),
@@ -309,15 +352,68 @@ export function CanvasList() {
     if (canvasTool === 'select') return
     selectField(fieldId)
     setEditingTab('attributes')
+    setMoveFieldRowOpen(false)
     setEditingFieldId(fieldId)
   }
+
+  function handleMoveRow(rowId: string, target: RowDropTarget): void {
+    if (!isLowPerformance && listRef.current) {
+      const snapshot: Map<string, number> = new Map()
+      for (const el of listRef.current.querySelectorAll<HTMLElement>('[data-row-id]')) {
+        const id: string | undefined = el.dataset.rowId
+        if (id) snapshot.set(id, el.getBoundingClientRect().top)
+      }
+      pendingFlipRef.current = snapshot
+    }
+    moveRow(rowId, target)
+    reveal({ kind: 'row', id: rowId })
+  }
+
+  useLayoutEffect(() => {
+    const snapshot: Map<string, number> | null = pendingFlipRef.current
+    pendingFlipRef.current = null
+    if (!snapshot || isLowPerformance || !listRef.current) return
+
+    const animated: HTMLElement[] = []
+    for (const el of listRef.current.querySelectorAll<HTMLElement>('[data-row-id]')) {
+      const id: string | undefined = el.dataset.rowId
+      if (!id) continue
+      const prevTop: number | undefined = snapshot.get(id)
+      if (prevTop === undefined) continue
+      const deltaY: number = prevTop - el.getBoundingClientRect().top
+      if (Math.abs(deltaY) < 1) continue
+
+      el.style.transition = 'none'
+      el.style.transform = `translateY(${deltaY}px)`
+      animated.push(el)
+    }
+
+    if (animated.length === 0) return
+    void listRef.current.offsetHeight
+
+    const frame: number = requestAnimationFrame(() => {
+      for (const el of animated) {
+        el.style.transition = 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)'
+        el.style.transform = ''
+        el.addEventListener(
+          'transitionend',
+          () => {
+            el.style.transition = ''
+          },
+          { once: true },
+        )
+      }
+    })
+
+    return () => cancelAnimationFrame(frame)
+  }, [activeRows, isLowPerformance])
 
   function closeSheet(): void {
     setRowSheet(null)
   }
 
   return (
-    <div className={LIST_CONTAINER_CLASSES}>
+    <div ref={listRef} className={LIST_CONTAINER_CLASSES}>
       {activeCanvas.type === 'introStep' && (
         <div className={INTRO_BANNER_CLASSES}>
           <span className="h-2 w-2 rounded-full bg-brand" />
@@ -338,10 +434,13 @@ export function CanvasList() {
                 row={item.row.row}
                 rowNumber={item.row.number}
                 fields={item.row.fields}
+                moveUp={item.row.moveUp}
+                moveDown={item.row.moveDown}
                 linkedLabels={linkedLabels}
                 selectedSet={selectedSet}
                 onFieldClick={handleFieldClick}
                 onFieldLongPress={handleFieldLongPress}
+                onMoveRow={handleMoveRow}
                 onOpenRowMenu={(rowId) => setRowSheet({ rowId, mode: 'actions' })}
               />
             )
@@ -369,10 +468,13 @@ export function CanvasList() {
                     row={listRow.row}
                     rowNumber={listRow.number}
                     fields={listRow.fields}
+                    moveUp={listRow.moveUp}
+                    moveDown={listRow.moveDown}
                     linkedLabels={linkedLabels}
                     selectedSet={selectedSet}
                     onFieldClick={handleFieldClick}
                     onFieldLongPress={handleFieldLongPress}
+                    onMoveRow={handleMoveRow}
                     onOpenRowMenu={(rowId) => setRowSheet({ rowId, mode: 'actions' })}
                   />
                 ))}
@@ -593,11 +695,22 @@ export function CanvasList() {
         <BottomSheet
           title={editingField.label || 'Editar campo'}
           size="full"
-          onClose={() => setEditingFieldId(null)}
+          onClose={() => {
+            setMoveFieldRowOpen(false)
+            setEditingFieldId(null)
+          }}
         >
-          <div className="mb-3 flex items-center justify-between gap-2 border-b border-border pb-3">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
             <span className="truncate font-mono text-xs text-fg-muted">{editingField.name}</span>
             <div className="flex shrink-0 items-center gap-1.5">
+              <button
+                type="button"
+                disabled={activeRows.length < 2}
+                onClick={() => setMoveFieldRowOpen(true)}
+                className={ACTION_TIER_CLASSES.tertiary.compact}
+              >
+                Mover a fila…
+              </button>
               <MoveToStepMenu
                 onSelect={(target) => {
                   moveFieldsToStep([editingField.id], target)
@@ -627,6 +740,51 @@ export function CanvasList() {
             onSelectTab={setEditingTab}
             bodyClassName="pt-3"
           />
+        </BottomSheet>
+      )}
+
+      {isMoveFieldRowOpen && editingField && (
+        <BottomSheet
+          title="Mover a otra fila"
+          size="half"
+          onClose={() => setMoveFieldRowOpen(false)}
+        >
+          <div className="flex flex-col gap-1">
+            {activeRows.map((candidateRow, index) => {
+              const isCurrent: boolean = candidateRow.fields.some(
+                (candidateField) => candidateField.id === editingField.id,
+              )
+              if (isCurrent) return null
+
+              const fits: boolean = canPlaceFieldInRow(candidateRow, editingField)
+              const groupTitle: string | undefined = candidateRow.groupId
+                ? activeGroups.find((g) => g.id === candidateRow.groupId)?.title.trim() ||
+                  'Grupo repetible'
+                : undefined
+
+              return (
+                <button
+                  key={candidateRow.id}
+                  type="button"
+                  disabled={!fits}
+                  onClick={() => {
+                    moveField(editingField.id, candidateRow.id)
+                    setMoveFieldRowOpen(false)
+                    setEditingFieldId(null)
+                    reveal({ kind: 'row', id: candidateRow.id })
+                  }}
+                  className={SHEET_ACTION_CLASSES}
+                >
+                  <span className={MOVE_NUMBER_CLASSES}>{index + 1}</span>
+                  <span className="min-w-0 flex-1 truncate">
+                    Fila {index + 1} · {candidateRow.columns} col
+                    {groupTitle ? ` · ${groupTitle}` : ''}
+                  </span>
+                  {!fits && <span className="shrink-0 text-xs text-fg-subtle">Sin espacio</span>}
+                </button>
+              )
+            })}
+          </div>
         </BottomSheet>
       )}
     </div>

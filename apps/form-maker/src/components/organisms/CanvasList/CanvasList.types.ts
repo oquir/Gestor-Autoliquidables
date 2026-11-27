@@ -1,6 +1,6 @@
 import type { CanvasField } from '../../../types/field'
 import type { CanvasRow } from '../../../types/formStructure'
-import type { CanvasTarget } from '../../../types/placement'
+import type { CanvasTarget, RowDropTarget } from '../../../types/placement'
 
 export type RowSheetMode = 'actions' | 'columns' | 'styles' | 'move' | 'addField'
 
@@ -27,9 +27,12 @@ export interface CanvasListRowCardProps {
   row: CanvasRow
   rowNumber: number
   fields: CanvasField[]
+  moveUp: RowDropTarget | null
+  moveDown: RowDropTarget | null
   linkedLabels: Map<string, CanvasField>
   selectedSet: Set<string>
   onFieldClick: (fieldId: string) => void
   onFieldLongPress: (fieldId: string) => void
+  onMoveRow: (rowId: string, target: RowDropTarget) => void
   onOpenRowMenu: (rowId: string) => void
 }

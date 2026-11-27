@@ -28,6 +28,9 @@ export const ROW_TITLE_CLASSES: string = 'text-xs font-semibold text-fg-muted'
 export const ROW_MORE_BUTTON_CLASSES: string =
   'flex h-8 w-8 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg-strong'
 
+export const ROW_MOVE_BUTTON_CLASSES: string =
+  'flex h-8 w-8 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg-strong disabled:cursor-not-allowed disabled:opacity-30'
+
 export const FIELD_BUTTON_CLASSES: string =
   'flex min-h-11 w-full select-none items-center justify-between gap-3 rounded-lg border px-3 py-2 text-left transition-colors active:scale-[0.99]'
 

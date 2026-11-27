@@ -364,7 +364,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     `appendFieldToActiveCanvas`, que ya existe.
   - En el menú de una fila, "Agregar campo aquí" usa `addFieldToRow(rowId, tipo)`.
   - En la misma hoja van + Fila y + Grupo repetible.
-- [ ] **P5 Reordenar y mover:**
+- [x] ~~**P5 Reordenar y mover:**~~ (2026-11-27)
   - Filas con ↑↓ (`moveRow` con un `RowDropTarget`).
   - Campos con "Mover a otra fila…" (`moveField`).
   - Pasos con `moveRowToStep` y `moveFieldsToStep`.

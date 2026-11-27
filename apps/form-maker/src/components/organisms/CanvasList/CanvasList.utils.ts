@@ -1,5 +1,5 @@
 import { isPresentationalField } from '../../../lib/fieldKind/fieldKind'
-import { getFreeRuns } from '../../../lib/rowLayout/rowLayout'
+import { getFreeRuns, resolvePlacement } from '../../../lib/rowLayout/rowLayout'
 import type { CanvasField } from '../../../types/field'
 import type { CanvasRow, FormStep, IntroModalStep } from '../../../types/formStructure'
 import type { CanvasTarget } from '../../../types/placement'
@@ -24,6 +24,10 @@ export function getDestinationTitle(field: CanvasField, destination: FieldDestin
 
 export function hasRowFreeSpace(row: CanvasRow): boolean {
   return getFreeRuns(row.fields, row.columns).length > 0
+}
+
+export function canPlaceFieldInRow(row: CanvasRow, field: CanvasField): boolean {
+  return resolvePlacement(row, field.colSpan, undefined, field.id) !== null
 }
 
 export function buildMoveSections(
