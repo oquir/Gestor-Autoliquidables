@@ -79,11 +79,15 @@ describe('márgenes, caja y zoom', () => {
     expect(clampPdfZoom(1.2500000001)).toBe(1.25)
   })
 
-  it('ajustar al ancho redondea hacia abajo a 5%', () => {
+  it('ajustar al ancho redondea hacia abajo a 5% y acepta margen y piso propios', () => {
     const zoom: number = fitPdfZoom(1000)
 
     expect(Math.round(zoom * 100) % 5).toBe(0)
     expect(fitPdfZoom(0)).toBe(PDF_ZOOM_MIN)
+    expect(fitPdfZoom(390, 24, 0.25)).toBeLessThanOrEqual(0.45)
+    expect(fitPdfZoom(390, 24, 0.25)).toBeGreaterThanOrEqual(0.25)
+    expect(fitPdfZoom(0, 24, 0.25)).toBe(0.25)
+    expect(clampPdfZoom(0.1, 0.25)).toBe(0.25)
   })
 })
 

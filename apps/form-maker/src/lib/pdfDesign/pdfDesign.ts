@@ -16,8 +16,10 @@ import {
   PDF_STYLE_KEYS,
   PDF_TABLE_CLASS,
   PDF_WEB_PAGE_WIDTH_PX,
+  FIT_GUTTER_PHONE_PX,
   PDF_ZOOM_MAX,
   PDF_ZOOM_MIN,
+  PDF_ZOOM_MIN_PHONE,
   PDF_ZOOM_STEP,
   PDF_ZOOM_WHEEL_FACTOR,
 } from '../../constants'
@@ -200,31 +202,47 @@ export function documentStyleMap(design: PdfDesign): CssStyleMap {
   }
 }
 
+export function minPdfZoom(isPhone: boolean): number {
+  return isPhone ? PDF_ZOOM_MIN_PHONE : PDF_ZOOM_MIN
+}
+
+export function fitPdfGutter(isPhone: boolean): number {
+  return isPhone ? FIT_GUTTER_PHONE_PX : FIT_GUTTER_PX
+}
+
 // El zoom del lienzo, siempre dentro del rango y sin colas de coma flotante (1.2500000001).
-export function clampPdfZoom(zoom: number): number {
+export function clampPdfZoom(zoom: number, minZoom: number = PDF_ZOOM_MIN): number {
   if (!Number.isFinite(zoom)) return 1
-  const clamped: number = Math.min(PDF_ZOOM_MAX, Math.max(PDF_ZOOM_MIN, zoom))
+  const clamped: number = Math.min(PDF_ZOOM_MAX, Math.max(minZoom, zoom))
   return Math.round(clamped * 100) / 100
 }
 
 // Botones y Ctrl +/- saltan al siguiente multiplo del paso (de 113% a 125%).
-export function stepPdfZoom(zoom: number, direction: 1 | -1): number {
+export function stepPdfZoom(
+  zoom: number,
+  direction: 1 | -1,
+  minZoom: number = PDF_ZOOM_MIN,
+): number {
   const steps: number = zoom / PDF_ZOOM_STEP
   const next: number = direction === 1 ? Math.floor(steps + 1e-9) + 1 : Math.ceil(steps - 1e-9) - 1
-  return clampPdfZoom(next * PDF_ZOOM_STEP)
+  return clampPdfZoom(next * PDF_ZOOM_STEP, minZoom)
 }
 
 // Ajustar al ancho y zoom al abrir, hacia abajo a 5% para no tener scroll horizontal.
-export function fitPdfZoom(viewportWidth: number): number {
+export function fitPdfZoom(
+  viewportWidth: number,
+  gutterPx: number = FIT_GUTTER_PX,
+  minZoom: number = PDF_ZOOM_MIN,
+): number {
   const paperPx: number = PDF_PAPER_WIDTH_MM * PDF_PX_PER_MM
-  const raw: number = (viewportWidth - FIT_GUTTER_PX) / paperPx
-  if (!Number.isFinite(raw) || raw <= 0) return clampPdfZoom(PDF_ZOOM_MIN)
-  return clampPdfZoom(Math.floor(raw / FIT_STEP + 1e-9) * FIT_STEP)
+  const raw: number = (viewportWidth - gutterPx) / paperPx
+  if (!Number.isFinite(raw) || raw <= 0) return clampPdfZoom(minZoom, minZoom)
+  return clampPdfZoom(Math.floor(raw / FIT_STEP + 1e-9) * FIT_STEP, minZoom)
 }
 
 // La rueda es continua: proporcional al zoom de ahora, para que se sienta igual de lejos que de cerca.
-export function wheelPdfZoom(zoom: number, deltaY: number): number {
-  return clampPdfZoom(zoom * (1 - deltaY * PDF_ZOOM_WHEEL_FACTOR))
+export function wheelPdfZoom(zoom: number, deltaY: number, minZoom: number = PDF_ZOOM_MIN): number {
+  return clampPdfZoom(zoom * (1 - deltaY * PDF_ZOOM_WHEEL_FACTOR), minZoom)
 }
 
 // Lienzo y generador lo toman de aca, o el borde derecho se perderia en uno de los dos.

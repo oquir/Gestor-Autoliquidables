@@ -3,12 +3,11 @@ import { AngleDown2, Check, Minus, Plus } from 'reicon-react'
 import {
   CANVAS_TOOLBAR_ICON_ACTION_CLASSES,
   PDF_ZOOM_MAX,
-  PDF_ZOOM_MIN,
   PDF_ZOOM_PRESETS,
 } from '../../../../constants'
 import { useClickOutside, useLayoutMode } from '../../../../hooks'
 import { formatZoom, getCanvasScrollPort } from '../../../../lib'
-import { fitPdfZoom, stepPdfZoom } from '../../../../lib/pdfDesign'
+import { fitPdfGutter, fitPdfZoom, minPdfZoom, stepPdfZoom } from '../../../../lib/pdfDesign'
 import { usePdfDesignStore } from '../../../../store/pdfDesignStore'
 import { Tooltip } from '../../../atoms'
 import { MenuSurface } from '../../../molecules'
@@ -28,12 +27,13 @@ export function PdfZoomControl() {
   const containerRef = useRef<HTMLDivElement | null>(null)
   // En el celular el menu es una hoja en un portal: un toque adentro contaria como afuera.
   const isPhone: boolean = useLayoutMode() === 'phone'
+  const minZoom: number = minPdfZoom(isPhone)
 
   useClickOutside(containerRef, () => setIsOpen(false), isOpen && !isPhone)
 
   function fitWidth(): void {
     const port: HTMLElement | null = getCanvasScrollPort()
-    if (port) apply(fitPdfZoom(port.clientWidth))
+    if (port) apply(fitPdfZoom(port.clientWidth, fitPdfGutter(isPhone), minZoom))
   }
 
   function apply(value: number): void {
@@ -47,8 +47,8 @@ export function PdfZoomControl() {
         <span className="inline-flex">
           <button
             type="button"
-            onClick={() => setZoom(stepPdfZoom(zoom, -1))}
-            disabled={zoom <= PDF_ZOOM_MIN}
+            onClick={() => setZoom(stepPdfZoom(zoom, -1, minZoom))}
+            disabled={zoom <= minZoom}
             aria-label="Alejar"
             className={CANVAS_TOOLBAR_ICON_ACTION_CLASSES}
           >

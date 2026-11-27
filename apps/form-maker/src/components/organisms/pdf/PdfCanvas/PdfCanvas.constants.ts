@@ -12,6 +12,7 @@ export const CANVAS_CSS: string = `
 @keyframes pdf-select-in { from { box-shadow: inset 0 0 0 4px var(--color-brand, #f97316); } }
 :host { display: block; min-width: max-content; }
 .${C.doc} { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 32px 32px 96px; min-width: max-content; box-sizing: border-box; }
+.${C.doc}[data-phone] { padding: 12px 12px 96px; }
 .${C.sheet} { display: flex; flex-direction: column; align-items: center; gap: 8px; animation: pdf-sheet-in 260ms cubic-bezier(.32,.72,0,1); }
 .${C.paper} { position: relative; flex-shrink: 0; background: #fff; color: #000; box-shadow: 0 1px 3px rgba(0,0,0,.2), 0 4px 12px rgba(0,0,0,.08); }
 .${C.paper}.${C.active} { box-shadow: 0 0 0 2px var(--color-brand, #f97316), 0 4px 12px rgba(0,0,0,.08); }

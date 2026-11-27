@@ -10,7 +10,14 @@ import {
 import { createPortal } from 'react-dom'
 import { PDF_CANVAS_CLASS } from '../../../../constants'
 import { useLayoutMode, usePinchZoom } from '../../../../hooks'
-import { clampPdfZoom, fitPdfZoom, pdfStyleSheet, wheelPdfZoom } from '../../../../lib/pdfDesign'
+import {
+  clampPdfZoom,
+  fitPdfGutter,
+  fitPdfZoom,
+  minPdfZoom,
+  pdfStyleSheet,
+  wheelPdfZoom,
+} from '../../../../lib/pdfDesign'
 import { selectedCellIds } from '../../../../lib/pdfDesignEdit'
 import { revealScrollBehavior } from '../../../../lib/performanceMode'
 import { useFormStore } from '../../../../store'
@@ -57,8 +64,10 @@ export function PdfCanvas() {
     const port: HTMLElement | null = scrollerOf(shadowRoot)
     if (!port || didFitRef.current) return
     didFitRef.current = true
-    usePdfDesignStore.getState().setZoom(fitPdfZoom(port.clientWidth))
-  }, [shadowRoot])
+    usePdfDesignStore
+      .getState()
+      .setZoom(fitPdfZoom(port.clientWidth, fitPdfGutter(isPhone), minPdfZoom(isPhone)))
+  }, [shadowRoot, isPhone])
 
   // Ctrl+rueda acerca sobre el cursor; sin esto el navegador haria zoom de pagina.
   useEffect(() => {
@@ -86,7 +95,10 @@ export function PdfCanvas() {
     onPinch: (frame: PinchFrame) => {
       const port: HTMLElement | null = scrollerOf(shadowRoot)
       const state = usePdfDesignStore.getState()
-      const next: number = clampPdfZoom(pinchStartZoomRef.current * frame.scale)
+      const next: number = clampPdfZoom(
+        pinchStartZoomRef.current * frame.scale,
+        minPdfZoom(isPhone),
+      )
       if (!port || next === state.zoom) return
       const rect: DOMRect = port.getBoundingClientRect()
       anchorRef.current = { x: frame.midpoint.x - rect.left, y: frame.midpoint.y - rect.top }
@@ -223,6 +235,7 @@ export function PdfCanvas() {
               className={PDF_CANVAS_CLASS.doc}
               data-tool={tool}
               data-paper={paperTone}
+              data-phone={isPhone ? '' : undefined}
               data-low-performance={isLowPerformance ? '' : undefined}
               onPointerDown={handleDocPointerDown}
               // Shift+clic: sin esto el navegador extiende tambien la seleccion de texto. El click

@@ -405,7 +405,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - En `compact`, un cajón.
   - En `phone`, una hoja con Hojas | Selección | Documento. Al seleccionar una celda o un bloque se
     abre a media altura, y el lienzo se desplaza para que la selección quede visible encima.
-- [ ] **D3 Zoom que entre:**
+- [x] ~~**D3 Zoom que entre:**~~ (2026-11-27)
   - La hoja Carta mide unos 816 px. Con `PDF_ZOOM_MIN` = 0,5 y `FIT_GUTTER_PX` = 64, ocupa
     472 px y **no entra en 390**.
   - Se baja el piso del ajuste en el celular. El relleno de `.fm-doc` (32 px, en

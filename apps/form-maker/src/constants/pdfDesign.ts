@@ -72,6 +72,10 @@ export const PDF_EDGE_GUARD_PX: number = 1
 
 // Llega mas lejos que el formulario (150%): una hoja va en letra de 8 px. Solo cambia la vista.
 export const PDF_ZOOM_MIN: number = 0.5
+// En el celular la hoja Carta (~816 px) necesita bajar de 0.5 para entrar en 360/390 px.
+export const PDF_ZOOM_MIN_PHONE: number = 0.25
+export const PDF_DOC_PADDING_PHONE_PX: number = 12
+export const FIT_GUTTER_PHONE_PX: number = 2 * PDF_DOC_PADDING_PHONE_PX
 
 export const PDF_ZOOM_MAX: number = 3
 

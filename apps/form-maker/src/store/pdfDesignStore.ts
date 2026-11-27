@@ -3,7 +3,8 @@ import { create, type Mutate, type StateCreator, type StoreApi, type UseBoundSto
 import { HISTORY_BURST_MS, HISTORY_LIMIT } from '../constants'
 import { createBurstGate } from '../lib/history'
 import { pdfComponentHtml } from '../lib/pdfComponents'
-import { clampPdfZoom, createBlankDesign, normalizeMargins } from '../lib/pdfDesign'
+import { layoutModeFor } from '../lib/layoutMode/layoutMode'
+import { clampPdfZoom, createBlankDesign, minPdfZoom, normalizeMargins } from '../lib/pdfDesign'
 import { loadPdfDesign } from '../lib/pdfDesignBank'
 import { factoryPdfDesign } from '../lib/pdfTemplates'
 import * as edit from '../lib/pdfDesignEdit'
@@ -87,7 +88,9 @@ const createPdfDesignState: StateCreator<PdfDesignState> = (set, get) => ({
 
   setZoom: (zoom) =>
     set((state) => {
-      const next: number = clampPdfZoom(zoom)
+      const isPhone: boolean =
+        typeof window !== 'undefined' && layoutModeFor(window.innerWidth) === 'phone'
+      const next: number = clampPdfZoom(zoom, minPdfZoom(isPhone))
       return next === state.zoom ? state : { zoom: next }
     }),
 
