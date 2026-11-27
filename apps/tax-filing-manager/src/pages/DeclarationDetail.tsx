@@ -7,6 +7,7 @@ import {
   UnremittedNotice,
   DeclarationTaxpayer,
   DeclarationData,
+  DeclarationChain,
   DeclarationSummonses,
   DeclarationSignatures,
   Calculation,
@@ -221,6 +222,7 @@ export default function DeclarationDetail() {
       }
       side={
         <>
+          <DeclarationChain d={d} declarations={declarations} />
           {application && (
             <CorrectionApplication
               d={d}
