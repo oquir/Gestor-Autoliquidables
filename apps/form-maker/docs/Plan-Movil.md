@@ -131,7 +131,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
 - **Menús que se abren encima** (`RowColumnsMenu`, `RowStylesMenu`, `MoveToStepMenu`,
   `CanvasZoomControl`, `PdfZoomControl`, el selector de color): en el celular salen como hoja.
 
-### [ ] B8 El botón Atrás de Android
+### [x] ~~B8 El botón Atrás de Android~~ (2026-11-26, c05ea4cd)
 
 - **Qué pasa:** simulador, diseñador de PDF, hojas y modales son banderas del store, no rutas.
   Atrás desde el simulador **se sale de FormMaker**.
