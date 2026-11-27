@@ -1,9 +1,14 @@
-import { ENTER_POP_CLASSES } from '../../../constants'
+import {
+  ACTION_TIER_CLASSES,
+  ENTER_POP_CLASSES,
+  WITHOUT_STEP_TABS_CLASSES,
+} from '../../../constants'
 import { Trash6, Xmark } from 'reicon-react'
 import { useFieldContextMenu } from '../../../hooks/useFieldContextMenu/useFieldContextMenu'
 import type { FieldContextMenuState } from '../../../types/fieldContextMenu'
 import { IconButton } from '../../atoms/IconButton/IconButton'
 import { TabButtonGroup } from '../../molecules/TabButtonGroup/TabButtonGroup'
+import { MoveToStepMenu } from '../MoveToStepMenu/MoveToStepMenu'
 import { ApiMappingPanel } from '../panels/ApiMappingPanel/ApiMappingPanel'
 import { AttributesPanel } from '../panels/AttributesPanel/AttributesPanel'
 import { LogicPanel } from '../panels/LogicPanel/LogicPanel'
@@ -18,10 +23,8 @@ export function FieldContextMenu({
   menu: FieldContextMenuState
   onClose: () => void
 }) {
-  const { field, activeTab, handleSelectTab, handleDelete, position } = useFieldContextMenu({
-    menu,
-    onClose,
-  })
+  const { field, activeTab, handleSelectTab, handleDelete, handleMoveToStep, position } =
+    useFieldContextMenu({ menu, onClose })
 
   if (!field) return null
 
@@ -42,6 +45,14 @@ export function FieldContextMenu({
           {field.label}
         </p>
         <div className="flex shrink-0 items-center gap-1">
+          <div className={WITHOUT_STEP_TABS_CLASSES}>
+            <MoveToStepMenu
+              onSelect={handleMoveToStep}
+              tooltip="Mover el campo a otro paso"
+              triggerClassName={ACTION_TIER_CLASSES.tertiary.compact}
+              placement="down"
+            />
+          </div>
           <IconButton
             onClick={handleDelete}
             className="text-slate-300 hover:text-red-500 dark:text-neutral-600 dark:hover:text-red-400 hover:cursor-pointer"

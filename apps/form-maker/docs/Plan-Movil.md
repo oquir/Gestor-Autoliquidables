@@ -295,7 +295,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     hoy solo muestra "desde col N"). Usa `moveField(fieldId, rowId, { colStart, colSpan })` con
     `getFreeRuns` y `getMaxSpanAt`. Verificar que `moveField` acepte la misma fila.
   - Se comparte con el celular.
-- [ ] **T5 Sin clic derecho ni doble clic:**
+- [x] ~~**T5 Sin clic derecho ni doble clic:**~~ (2026-11-27, 88015e7c; ⋯ de 24 px arriba a la
+      izquierda del campo fijado, solo `pointer-coarse:`; en el celular la hoja queda para P3)
   - Tocar selecciona y fija el cromo. El campo seleccionado muestra un botón ⋯ que abre
     `FieldContextMenu`, que es todo un editor de pestañas: como menú en la tablet y como hoja en el
     celular.

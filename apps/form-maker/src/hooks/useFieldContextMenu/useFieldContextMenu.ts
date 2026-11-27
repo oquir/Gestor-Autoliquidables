@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { findFieldById, getActiveRows, useFormStore } from '../../store/formStore'
 import type { ContextMenuTab } from '../../types/fieldContextMenu'
+import type { CanvasTarget } from '../../types/placement'
 import type {
   UseFieldContextMenuParams,
   UseFieldContextMenuResult,
@@ -16,6 +17,7 @@ export function useFieldContextMenu({
   const [activeTab, setActiveTab] = useState<ContextMenuTab>('attributes')
   const activeRows = useFormStore(getActiveRows)
   const removeFields = useFormStore((state) => state.removeFields)
+  const moveFieldsToStep = useFormStore((state) => state.moveFieldsToStep)
   const field = findFieldById(activeRows, menu.fieldId)
 
   function handleSelectTab(tab: ContextMenuTab): void {
@@ -24,6 +26,12 @@ export function useFieldContextMenu({
 
   function handleDelete(): void {
     removeFields([menu.fieldId])
+    onClose()
+  }
+
+  // Se cierra: abierto, volveria a aparecer al entrar al paso de destino, donde el campo existe.
+  function handleMoveToStep(target: CanvasTarget): void {
+    moveFieldsToStep([menu.fieldId], target)
     onClose()
   }
 
@@ -47,6 +55,7 @@ export function useFieldContextMenu({
     activeTab,
     handleSelectTab,
     handleDelete,
+    handleMoveToStep,
     position: getMenuPosition(menu.x, menu.y, window.innerWidth, window.innerHeight),
   }
 }

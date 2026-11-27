@@ -58,6 +58,11 @@ export const MOUSE_ONLY_CLASSES: string = 'pointer-coarse:hidden'
 
 export const TOUCH_ONLY_CLASSES: string = 'hidden pointer-coarse:inline'
 
+// Donde soltar en una pestana de paso no esta a mano (T6 de docs/Plan-Movil.md): debajo de 1280 px
+// el panel derecho es un cajon cerrado mientras se arrastra, y con el dedo llegar hasta ahi cuesta.
+// En el escritorio con mouse no se ve: ahi se suelta en la pestana como siempre.
+export const WITHOUT_STEP_TABS_CLASSES: string = 'hidden max-xl:block pointer-coarse:block'
+
 // Container query sobre el ancho real del chip: esconde el icono del control de muestra cuando no
 // entra ni el texto.
 export const NARROW_FIELD_HIDDEN_CLASSES: string = '@max-[5rem]:hidden'

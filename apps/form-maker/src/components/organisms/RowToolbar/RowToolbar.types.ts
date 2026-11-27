@@ -3,7 +3,7 @@ import type { CanvasRow } from '../../../types'
 
 type DraggableHandle = ReturnType<typeof useDraggable>
 
-export type RowToolbarMenu = 'columns' | 'styles'
+export type RowToolbarMenu = 'columns' | 'styles' | 'move'
 
 export interface RowToolbarProps {
   row: CanvasRow

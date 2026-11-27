@@ -1,5 +1,6 @@
 import type { CanvasField } from '../../types/field'
 import type { ContextMenuTab, FieldContextMenuState } from '../../types/fieldContextMenu'
+import type { CanvasTarget } from '../../types/placement'
 
 export interface UseFieldContextMenuParams {
   menu: FieldContextMenuState
@@ -20,5 +21,6 @@ export interface UseFieldContextMenuResult {
   activeTab: ContextMenuTab
   handleSelectTab: (tab: ContextMenuTab) => void
   handleDelete: () => void
+  handleMoveToStep: (target: CanvasTarget) => void
   position: FieldContextMenuPosition
 }
