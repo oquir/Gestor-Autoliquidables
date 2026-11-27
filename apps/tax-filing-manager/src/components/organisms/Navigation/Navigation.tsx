@@ -10,10 +10,11 @@ export default function Navigation({ onPick, collapsed, onExpand }: NavigationPr
   const { user, municipalityId } = useSession()
   const municipalities = useData((s) => s.municipalities)
   const RIT_ROUTES = ['/rit', '/declarantes']
+  const canSeeAll = can(user?.role, 'canSeeAllMunicipalities')
   const links = NAVIGATION.filter(
     (n) =>
       (!n.permission || can(user?.role, n.permission)) &&
-      (!RIT_ROUTES.includes(n.a) || ritVisible(municipalities, municipalityId)),
+      (!RIT_ROUTES.includes(n.a) || canSeeAll || ritVisible(municipalities, municipalityId)),
   )
 
   return (
