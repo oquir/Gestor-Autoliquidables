@@ -262,7 +262,14 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 
 ## 3. Fase 2 — Maquetador en tablet y táctil (grilla)
 
-- [ ] **T1 Paneles como cajones:**
+- [x] ~~**T1 Paneles como cajones:**~~ (2026-11-27, ea26755f y 8f7f28e8)
+  - Hecho en `AppLayout` para todo lo que no es `desktop` (el celular también, hasta la fase 3). Con
+    el cajón izquierdo abierto el riel de abajo queda vacío: un solo `Sidebar` montado (dos
+    paletas serían draggables con el mismo id). Arrancan cerrados (`getInitialPanelsOpen`) y se
+    cierran al pasar de escritorio a tablet. Escape con un modal abierto desde el cajón ya no
+    cierra el cajón (`useModalKeyGuard`).
+  - Queda para T2/T3/T6: con el cajón abierto el lienzo está tapado, así que de la paleta se
+    agrega tocando, no arrastrando.
   - En `compact`, el riel queda. El panel izquierdo (320 px) y el derecho (`RightSidebar`, con
     `CanvasTabs` y Proyecto) se abren **encima** del lienzo, con fondo oscuro detrás y uno a la vez.
   - El lienzo conserva su ancho, y el `ResizeObserver` del puerto no se dispara al abrirlos.

@@ -21,7 +21,7 @@ export function FieldDragHandle({
       {...listeners}
       {...attributes}
       title="Arrastrar para mover"
-      className={`absolute -left-1 top-1/2 z-9 flex -translate-y-1/2 cursor-grab items-center justify-center border border-slate-200 bg-white shadow-sm ring-1 ring-transparent transition-all hover:border-brand/50 hover:ring-brand/20 active:cursor-grabbing active:scale-95 active:border-brand active:ring-brand/40 dark:border-neutral-700 dark:bg-neutral-800 ${
+      className={`absolute -left-1 top-1/2 z-9 flex -translate-y-1/2 cursor-grab touch-none items-center justify-center border border-slate-200 bg-white shadow-sm ring-1 ring-transparent transition-all hover:border-brand/50 hover:ring-brand/20 active:cursor-grabbing active:scale-95 active:border-brand active:ring-brand/40 dark:border-neutral-700 dark:bg-neutral-800 ${
         isCompact ? 'h-6 w-6 rounded-lg' : 'h-9 w-9 rounded-xl'
       } ${pinned ? `${CHROME_PINNED_CLASSES} ${TOUCH_TARGET_CLASSES}` : CHROME_ON_FIELD_CLASSES}`}
     >

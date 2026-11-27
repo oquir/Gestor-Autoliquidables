@@ -16,7 +16,7 @@ export function FieldResizeHandleKnob({
     <div
       onPointerDown={onPointerDown}
       title={title}
-      className={`absolute -right-1 top-1/2 z-9 flex h-9 w-9 -translate-y-1/2 cursor-col-resize items-center justify-center rounded-xl border shadow-sm ring-1 transition-all ${
+      className={`absolute -right-1 top-1/2 z-9 flex h-9 w-9 -translate-y-1/2 cursor-col-resize touch-none items-center justify-center rounded-xl border shadow-sm ring-1 transition-all ${
         isResizing
           ? `scale-95 border-brand bg-brand-surface ring-brand/40 ${TOUCH_TARGET_CLASSES}`
           : `border-brand/50 bg-white ring-transparent hover:border-brand hover:ring-brand/20 dark:bg-neutral-800 ${
