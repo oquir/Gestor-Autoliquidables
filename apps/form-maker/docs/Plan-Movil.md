@@ -236,7 +236,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     (frágil, el consumidor copia la deducción) o una opción "Teclado numérico" en el campo (palabra
     nueva en el JSON: migración, `projectMeta.requires`, consumidor). No bloquea: el teclado de
     letras deja pasar a números, y la validación no deja avanzar sin un documento válido.
-- [ ] **S4 Resultados en una hoja:** en `phone`, `PreviewResults` (payload, valores, errores) sale
+- [x] ~~**S4 Resultados en una hoja:**~~ (2026-11-27, 1f630608; "Volver al lienzo" queda "Volver"
+      en el celular para que la cabecera entre en 360) en `phone`, `PreviewResults` (payload, valores, errores) sale
       de un botón "Resultados" en la cabecera, en lugar de quedar debajo del formulario largo. Desde
       `lg:` queda igual que hoy.
 - [ ] **S5 Modal de entrada:** el que va dentro de `PreviewForm` (`max-w-2xl`, `max-h-full`) en el
