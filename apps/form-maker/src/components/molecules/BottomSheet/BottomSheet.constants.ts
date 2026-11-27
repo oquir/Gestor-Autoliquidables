@@ -1,5 +1,5 @@
 import { ENTER_FADE_CLASSES, ENTER_SHEET_CLASSES } from '../../../constants'
-import type { BottomSheetSize } from './BottomSheet.types'
+import type { BottomSheetSize } from '../../../types'
 
 export const LAYER_CLASSES: string = 'fixed inset-0 z-50 flex flex-col justify-end'
 

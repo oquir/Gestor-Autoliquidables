@@ -1,12 +1,12 @@
 import { useRef } from 'react'
 import { Palette } from 'reicon-react'
 import { ROW_TOOLBAR_ICON_ITEM_CLASSES, ROW_TOOLBAR_POPOVER_CLASSES } from '../../../constants'
-import { useClickOutside } from '../../../hooks'
+import { useClickOutside, useLayoutMode } from '../../../hooks'
 import { useFormStore } from '../../../store'
 import { Label, Tooltip } from '../../atoms'
 import { Textarea } from '../../atoms'
 import { TwoColumnFieldGroup } from '../../atoms'
-import { CssValidationHint } from '../../molecules'
+import { CssValidationHint, MenuSurface } from '../../molecules'
 import { PxInput } from '../../molecules'
 import type { RowStylesMenuProps } from './RowStylesMenu.types'
 
@@ -15,8 +15,10 @@ import type { RowStylesMenuProps } from './RowStylesMenu.types'
 export function RowStylesMenu({ rowId, styles, isOpen, onToggle, onClose }: RowStylesMenuProps) {
   const updateRowStyles = useFormStore((state) => state.updateRowStyles)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  // En el celular el menu es una hoja en un portal: un toque adentro contaria como afuera.
+  const isPhone: boolean = useLayoutMode() === 'phone'
 
-  useClickOutside(containerRef, onClose, isOpen)
+  useClickOutside(containerRef, onClose, isOpen && !isPhone)
 
   return (
     <div ref={containerRef} className="relative">
@@ -31,7 +33,12 @@ export function RowStylesMenu({ rowId, styles, isOpen, onToggle, onClose }: RowS
         </button>
       </Tooltip>
       {isOpen && (
-        <div className={`${ROW_TOOLBAR_POPOVER_CLASSES} gap-3`}>
+        <MenuSurface
+          title="Estilos de la fila"
+          onClose={onClose}
+          popoverClassName={`${ROW_TOOLBAR_POPOVER_CLASSES} gap-3`}
+          sheetContentClassName="flex flex-col gap-3"
+        >
           <div className="flex flex-col gap-1">
             <Label htmlFor={`row-css-${rowId}`}>CSS personalizado</Label>
             <Textarea
@@ -61,7 +68,7 @@ export function RowStylesMenu({ rowId, styles, isOpen, onToggle, onClose }: RowS
               onChange={(value) => updateRowStyles(rowId, { marginBottom: value })}
             />
           </TwoColumnFieldGroup>
-        </div>
+        </MenuSurface>
       )}
     </div>
   )

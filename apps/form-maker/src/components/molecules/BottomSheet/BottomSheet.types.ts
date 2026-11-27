@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react'
-
-// Asoma (un vistazo), media (lo comun) o completa (editores largos).
-export type BottomSheetSize = 'peek' | 'half' | 'full'
+import type { BottomSheetSize } from '../../../types'
 
 export interface BottomSheetProps {
   title: ReactNode

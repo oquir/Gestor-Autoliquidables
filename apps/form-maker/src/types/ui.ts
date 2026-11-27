@@ -21,3 +21,11 @@ export interface CanvasToolItem {
   // Sin modificadores.
   shortcut: string
 }
+
+// Por el ancho de la ventana (docs/Plan-Movil.md, seccion 0): lista y hojas en phone, cajones en
+// compact, lo de siempre en desktop. Estado de vista: nunca va al borrador ni al export.
+export type LayoutMode = 'phone' | 'compact' | 'desktop'
+
+// Alto de la hoja de abajo (BottomSheet): asoma (un vistazo), media (lo comun) o completa (editores
+// largos).
+export type BottomSheetSize = 'peek' | 'half' | 'full'
