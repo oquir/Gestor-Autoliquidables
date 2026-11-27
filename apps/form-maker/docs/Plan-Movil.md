@@ -250,7 +250,9 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - La lista de `PreviewSearchSelect` dentro de la pantalla y por encima del teclado.
   - El selector de fecha (`showPicker`, que tiene respaldo).
   - Los ℹ de `field.tooltip` ya se abren al tocar.
-- [ ] **S7 Atrás cierra el simulador** (B8).
+- [x] ~~**S7 Atrás cierra el simulador** (B8).~~ (2026-11-27, 748554a7 y c58ed36a: ya lo hacía en
+      producción; se corrigió el cierre al abrir con `StrictMode` y la lista de `search_select` entró
+      en la pila)
 - [ ] **S8 El consumidor:** lo que el simulador hace en el celular y no va en el JSON (inputs de
       16 px, navegación fija, filas apiladas) va a Known gaps para que `FrontAutoliquidable` lo copie.
 - **Meta:**
