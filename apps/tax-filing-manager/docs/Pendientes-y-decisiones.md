@@ -78,7 +78,7 @@ Lista revisada con el usuario el 2026-11-15. Ya no trae lo implementado ni lo de
 2. **Estado de cuenta como sección propia**: que tenga su entrada en el menú, con un buscador del contribuyente por documento. Hoy es una página sin entrada en el menú, a la que solo se llega desde la declaración, la ficha del RIT o la cartera de Pagos (§1) (Hecho).
 3. **Calendario tributario más sencillo**: simplificar la parte de la página Calendario donde se cargan los vencimientos de cada año (Hecho).
 4. **Login con mejor apariencia** (Hecho).
-5. **Sobretasa de seguridad y pago voluntario** en Configuración (renglones 24, 39 y 40 del FUN)  (Hecho).
+5. **Sobretasa de seguridad y pago voluntario** en Configuración (renglones 24, 39 y 40 del FUN) (Hecho).
 6. **Cruce del renglón 28**: comparar las autorretenciones que el contribuyente resta en su ICA anual con las AutoReteICA que declaró y pagó en ese año gravable (§6.2 de `Dominio-ICA.md`). Será una funcionalidad que cada municipio enciende o apaga (Hecho).
 7. **Saldos a favor, acuerdos de pago, certificados de retención y exógena** (explicación pendiente de revisar con el usuario):
    - _saldo a favor_: cuando lo retenido y lo autorretenido superan el impuesto, el contribuyente queda con plata a su favor y la pide en devolución o la compensa con otra deuda;
@@ -89,7 +89,7 @@ Lista revisada con el usuario el 2026-11-15. Ya no trae lo implementado ni lo de
    - _inscripción de oficio_: que el municipio inscriba a alguien sin que lo haya pedido, por ejemplo a un negocio que encontró fiscalización;
    - _resolución de autorretenedores_: en Medellín, la administración nombra cada año a los autorretenedores en una resolución con la lista de NIT; se cargaría esa lista, como la plantilla de actividades, en lugar de que cada uno lo pida;
    - _naturaleza jurídica_: distinguir entidades públicas y privadas, porque hay quienes son agentes retenedores por ley según lo que son.
-9. **Cadena de correcciones de cada periodo**: hoy cada declaración solo enlaza a la que corrige y a la que la reemplazó. Faltaría ver juntas, en orden, la inicial y todas sus correcciones del mismo periodo, con cuál es la vigente.
+9. **Cadena de correcciones de cada periodo**: hoy cada declaración solo enlaza a la que corrige y a la que la reemplazó. Faltaría ver juntas, en orden, la inicial y todas sus correcciones del mismo periodo, con cuál es la vigente (Hecho).
 10. **Tour o guion para presentar la demo**.
 
 ### 2.2 Para el final

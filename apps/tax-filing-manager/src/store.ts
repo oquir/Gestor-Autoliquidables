@@ -540,7 +540,7 @@ export const useData = create<StoreState>()(
               suggestedPercentage: 0,
               requestDestination: false,
             },
-            crossCheckSelfWithholdings: c.crossCheckSelfWithholdings ?? false
+            crossCheckSelfWithholdings: c.crossCheckSelfWithholdings ?? false,
           })),
         }
       },

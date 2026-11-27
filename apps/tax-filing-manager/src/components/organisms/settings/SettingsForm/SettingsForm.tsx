@@ -35,7 +35,7 @@ export default function SettingsForm({ config, editable }: SettingsFormProps) {
       suggestedPercentage: 0,
       requestDestination: false,
     },
-    crossCheckSelfWithholdings: config.crossCheckSelfWithholdings ?? false
+    crossCheckSelfWithholdings: config.crossCheckSelfWithholdings ?? false,
   })
   const change = (partial: Partial<MunicipalityConfig>) => {
     setB((current) => ({ ...current, ...partial }))

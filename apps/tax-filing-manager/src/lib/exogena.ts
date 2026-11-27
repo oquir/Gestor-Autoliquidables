@@ -45,24 +45,24 @@ function parseLineDetail(rawConcept: string) {
 }
 
 /** Descarga la información exógena del contribuyente: una fila por renglón de detalle de cada ReteICA vigente. */
-export function downloadExogenous(reteica: StatementRow[] ) {
+export function downloadExogenous(reteica: StatementRow[]) {
   const payer = reteica[0]?.d.taxpayer
   if (!payer) return
   const rows = reteica.flatMap(({ d, status }) =>
     detailLines(d).map((line) => {
-        const { base, rate } = parseLineDetail(line.concept)
+      const { base, rate } = parseLineDetail(line.concept)
       return [
-      d.fiscalYear,
-      d.taxpayer.documentType, 
-      documentNumber(d.taxpayer),
-      d.taxpayer.name,
-      d.number,
-      periodLabel(d),
-      d.filingDate,
-      base,
-      rate,
-      line.value,
-      paymentStatusLabel[status],
+        d.fiscalYear,
+        d.taxpayer.documentType,
+        documentNumber(d.taxpayer),
+        d.taxpayer.name,
+        d.number,
+        periodLabel(d),
+        d.filingDate,
+        base,
+        rate,
+        line.value,
+        paymentStatusLabel[status],
       ]
     }),
   )
