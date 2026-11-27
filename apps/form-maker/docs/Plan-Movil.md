@@ -140,11 +140,13 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
     cambiar la URL, porque el PDF lee `?impuesto=`. Atrás cierra lo de más arriba.
   - La pila es pura: `lib/backStack`, con prueba. El hook va en `hooks/`.
 - **Meta:** Atrás nunca saca de la app con algo abierto.
-- **Hallazgo (2026-11-27, sin corregir, espera al usuario):** en `pnpm dev` con puntero táctil,
+- **Hallazgo (2026-11-27, corregido en el S7):** en `pnpm dev` con puntero táctil,
   toda capa con `useBackClose` se cierra al abrirse. `StrictMode` monta, limpia y vuelve a montar el
   efecto: la limpieza hace `history.back()` y el segundo `pushState` llega antes; Chrome vuelve a la
   entrada de carga (piso 0) y `popstate` cierra la capa. Sin verificar: podría pasar en producción si una
   capa se cierra y otra se abre en el mismo instante (la misma carrera). B8 se verificó con `vite preview` (sin `StrictMode`).
+  Arreglo: el cierre espera un microtask y se cancela si la misma capa se vuelve a montar
+  (`pendingCloses` en `useBackClose`). Verificado con táctil emulado en `pnpm dev`.
 
 ### [x] ~~B9 Que el guardado no se pierda~~ (2026-11-26, dd14b9e4)
 
@@ -243,7 +245,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 - [x] ~~**S5 Modal de entrada:**~~ (2026-11-27, 73addac1; en `max-sm:` deja de flotar, esconde el
       paso de atrás y pega su pie abajo) el que va dentro de `PreviewForm` (`max-w-2xl`, `max-h-full`) en el
       celular ocupa la tarjeta, con sus botones visibles con el teclado abierto.
-- [ ] **S6 Lo que se abre encima:**
+- [x] ~~**S6 Lo que se abre encima:**~~ (2026-11-27, c123b5e8; la lista va a pantalla completa en
+      `max-sm:` y en `dvh`; fecha e ℹ ya estaban)
   - La lista de `PreviewSearchSelect` dentro de la pantalla y por encima del teclado.
   - El selector de fecha (`showPicker`, que tiene respaldo).
   - Los ℹ de `field.tooltip` ya se abren al tocar.
