@@ -1,4 +1,5 @@
 import { ZOOM_MAX, ZOOM_MIN, ZOOM_STEP, ZOOM_WHEEL_FACTOR } from '../../constants'
+import type { PinchFrame, PinchPoint } from '../../types'
 
 // Aritmetica del zoom. Pura salvo getCanvasScale, que lee el DOM a proposito: el zoom vive en CSS.
 
@@ -43,4 +44,25 @@ export function getCanvasScale(element: HTMLElement | null): number {
   if (layoutWidth === 0) return 1
 
   return element.getBoundingClientRect().width / layoutWidth
+}
+
+// Pellizco con dos dedos (B10 de docs/Plan-Movil.md). La escala es contra la distancia del
+// comienzo, no contra el cuadro anterior: sumar razones cuadro a cuadro acumularia redondeos.
+export function pinchDistance(a: PinchPoint, b: PinchPoint): number {
+  return Math.hypot(b.x - a.x, b.y - a.y)
+}
+
+// Dedos que empezaron encima uno del otro (o datos rotos) no escalan: dividir por casi cero
+// dispararia el zoom al tope.
+export function pinchFrame(startDistance: number, a: PinchPoint, b: PinchPoint): PinchFrame {
+  const midpoint: PinchPoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }
+  const distance: number = pinchDistance(a, b)
+  const isUsable: boolean =
+    Number.isFinite(startDistance) && startDistance > 1 && Number.isFinite(distance)
+
+  return { scale: isUsable ? distance / startDistance : 1, midpoint }
+}
+
+export function pinchZoom(startZoom: number, scale: number): number {
+  return clampZoom(startZoom * scale)
 }

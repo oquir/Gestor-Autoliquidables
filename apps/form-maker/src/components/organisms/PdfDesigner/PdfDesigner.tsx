@@ -176,7 +176,7 @@ export function PdfDesigner() {
           <div className="relative flex min-w-0 flex-1 flex-col">
             <main
               data-canvas-scroll
-              className={`min-h-0 flex-1 overflow-auto ${tool === 'hand' ? HAND_CURSOR_CLASSES : ''}`}
+              className={`min-h-0 flex-1 overflow-auto touch-pan-x touch-pan-y ${tool === 'hand' ? HAND_CURSOR_CLASSES : ''}`}
             >
               <PdfCanvas />
             </main>

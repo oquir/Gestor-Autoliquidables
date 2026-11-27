@@ -141,7 +141,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
   - La pila es pura: `lib/backStack`, con prueba. El hook va en `hooks/`.
 - **Meta:** Atrás nunca saca de la app con algo abierto.
 
-### [ ] B9 Que el guardado no se pierda
+### [x] ~~B9 Que el guardado no se pierda~~ (2026-11-26, dd14b9e4)
 
 - **Qué pasa:**
   - El borrador se guarda cada **3 minutos** (`useAutosave.constants.ts`), y el PDF 800 ms después
