@@ -413,7 +413,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     cambiarlos juntos, así que el margen pasa a ser un parámetro de `fitPdfZoom`.
   - Actualizar `tests/lib/pdfDesign.test.ts`.
   - Pellizcar (B10) y el botón "Ajustar al ancho".
-- [ ] **D4 Tocar celdas:**
+- [x] ~~**D4 Tocar celdas:**~~ (2026-11-27)
   - Tocar selecciona (ya funciona). Con Selección múltiple, tocar otra celda arma el rectángulo
     (ya existe, `handleSelectCell`).
   - **Arrastrar entre celdas con el dedo no funciona hoy.** `PdfCanvas` usa `pointerover`, y un

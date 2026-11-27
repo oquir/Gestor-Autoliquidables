@@ -35,7 +35,7 @@ export const CANVAS_CSS: string = `
 .${C.doc}[data-paper="dark"] .${C.paper} { background: #121212; }
 .${C.doc}[data-paper="dark"] .${C.content} { filter: invert(1) hue-rotate(180deg); }
 .${C.doc}[data-tool="hand"] { pointer-events: none; }
-.${C.doc}[data-tool="select"] { user-select: none; -webkit-user-select: none; }
+.${C.doc}[data-tool="select"] { user-select: none; -webkit-user-select: none; touch-action: none; }
 .${C.doc}[data-tool="select"] .${C.cell}, .${C.doc}[data-tool="select"] .${C.html} { cursor: cell; }
 .${C.doc}[data-low-performance], .${C.doc}[data-low-performance] *, .${C.doc}[data-low-performance] *::before, .${C.doc}[data-low-performance] *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition-duration: 0s !important; transition-delay: 0s !important; }
 `

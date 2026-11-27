@@ -21,7 +21,7 @@ import {
 import { selectedCellIds } from '../../../../lib/pdfDesignEdit'
 import { revealScrollBehavior } from '../../../../lib/performanceMode'
 import { useFormStore } from '../../../../store'
-import type { PinchFrame } from '../../../../types'
+import type { PinchFrame, PinchPoint } from '../../../../types'
 import { usePdfDesignStore } from '../../../../store/pdfDesignStore'
 import { PdfSheetView } from '../PdfSheetView'
 import { CANVAS_CSS } from './PdfCanvas.constants'
@@ -51,6 +51,7 @@ export function PdfCanvas() {
   const anchorRef = useRef<ZoomAnchor | null>(null)
   const pendingRef = useRef<PendingZoom | null>(null)
   const pinchStartZoomRef = useRef<number>(1)
+  const prevPinchMidpointRef = useRef<PinchPoint | null>(null)
 
   // attachShadow solo se puede llamar una vez por elemento: si ya tiene, se reusa.
   const hostRef = useCallback((node: HTMLDivElement | null) => {
@@ -91,10 +92,17 @@ export function PdfCanvas() {
   usePinchZoom(scrollerOf(shadowRoot), {
     onStart: () => {
       pinchStartZoomRef.current = usePdfDesignStore.getState().zoom
+      prevPinchMidpointRef.current = null
+      dragRef.current = null
     },
     onPinch: (frame: PinchFrame) => {
       const port: HTMLElement | null = scrollerOf(shadowRoot)
       const state = usePdfDesignStore.getState()
+      if (port && state.tool === 'select' && prevPinchMidpointRef.current) {
+        port.scrollLeft -= frame.midpoint.x - prevPinchMidpointRef.current.x
+        port.scrollTop -= frame.midpoint.y - prevPinchMidpointRef.current.y
+      }
+      prevPinchMidpointRef.current = frame.midpoint
       const next: number = clampPdfZoom(
         pinchStartZoomRef.current * frame.scale,
         minPdfZoom(isPhone),
@@ -164,11 +172,11 @@ export function PdfCanvas() {
     dragRef.current = hit ? { ...hit, started: false, last: hit.cellId } : null
   }
 
-  function handleDocPointerOver(event: ReactPointerEvent<HTMLDivElement>): void {
+  function extendCellDrag(target: EventTarget | null): void {
     const drag: CellDrag | null = dragRef.current
     if (!drag) return
 
-    const hit: CellHit | null = cellOf(event.target)
+    const hit: CellHit | null = cellOf(target)
     if (!hit || hit.tableId !== drag.tableId || hit.cellId === drag.last) return
 
     if (!drag.started) {
@@ -177,6 +185,18 @@ export function PdfCanvas() {
     }
     selectCell(hit.tableId, hit.cellId, true)
     drag.last = hit.cellId
+  }
+
+  function handleDocPointerOver(event: ReactPointerEvent<HTMLDivElement>): void {
+    if (event.pointerType === 'touch') return
+    extendCellDrag(event.target)
+  }
+
+  // En tactil el puntero queda capturado en la celda inicial: elementFromPoint busca la celda
+  // debajo del dedo mientras se arrastra (D4 de docs/Plan-Movil.md).
+  function handleDocPointerMove(event: ReactPointerEvent<HTMLDivElement>): void {
+    if (event.pointerType !== 'touch' || !dragRef.current || !shadowRoot) return
+    extendCellDrag(shadowRoot.elementFromPoint(event.clientX, event.clientY))
   }
 
   // Estables por contenido: las filas de las tablas se memoizan, y un Set o una funcion nuevos en
@@ -244,6 +264,7 @@ export function PdfCanvas() {
                 if (event.shiftKey) event.preventDefault()
               }}
               onPointerOver={handleDocPointerOver}
+              onPointerMove={handleDocPointerMove}
             >
               {design.sheets.map((sheet, index) => (
                 <PdfSheetView
