@@ -313,7 +313,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - En táctil, con la herramienta Selección, tocar suma o quita (ya existe).
   - El marco queda solo para mouse y lápiz: con el dedo gana el desplazamiento.
   - La barra de acciones de la selección ya existe.
-- [ ] **T8 Pellizcar en el lienzo** (B10 en `useCanvasViewport`). La Mano y Espacio sobran en
+- [x] ~~**T8 Pellizcar en el lienzo**~~ (2026-11-27, de46b488; el pellizco ya era de B10; la Mano se
+      oculta en `CanvasToolPicker`, también en la barra del PDF) (B10 en `useCanvasViewport`). La Mano y Espacio sobran en
       táctil, porque el dedo ya desplaza: la Mano se oculta con `pointer-coarse`.
 - [ ] **T9 Barra flotante y chip plegado:**
   - `CanvasToolbar` ya se compacta con `@container/toolbar`. Se revisa en 640 a 1279, con la zona
