@@ -308,7 +308,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     arrastra.
   - `MoveToStepMenu` también para la selección de un solo campo (menú ⋯) y en la barra de la fila
     (`moveRowToStep`).
-- [ ] **T7 Selección múltiple:**
+- [x] ~~**T7 Selección múltiple:**~~ (2026-11-27, 51e37258; con el dedo `useCanvasMarquee` no arma
+      marco ni captura el puntero; antes deslizar sumaba campos)
   - En táctil, con la herramienta Selección, tocar suma o quita (ya existe).
   - El marco queda solo para mouse y lápiz: con el dedo gana el desplazamiento.
   - La barra de acciones de la selección ya existe.
