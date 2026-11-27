@@ -14,7 +14,7 @@ export function FormSimulator() {
   const toggleDarkMode = useFormStore((state) => state.toggleDarkMode)
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-surface-sunken text-fg">
+    <div className="flex h-dvh w-full flex-col overflow-hidden bg-surface-sunken text-fg">
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-4 py-3 sm:px-6">
         <div>
           <h1 className="text-base font-semibold text-fg-strong">Simulador</h1>

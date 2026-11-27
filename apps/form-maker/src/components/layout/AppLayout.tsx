@@ -6,7 +6,7 @@ export function AppLayout({ sidebar, canvas, canvasOverlay, rightSidebar }: AppL
   const isRightSidebarOpen: boolean = useFormStore((state) => state.isRightSidebarOpen)
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 text-slate-900 dark:bg-neutral-950 dark:text-neutral-100">
+    <div className="flex h-dvh w-full overflow-hidden bg-slate-50 text-slate-900 dark:bg-neutral-950 dark:text-neutral-100">
       <aside
         className={`relative flex shrink-0 flex-col h-full overflow-hidden bg-white transition-all ease-in-out border-r border-slate-200 dark:bg-neutral-900 dark:border-neutral-800 ${
           isSidebarOpen ? 'w-80 shadow-sm' : 'w-14'

@@ -2,7 +2,7 @@ import type { CrashPanelProps } from './CrashPanel.types'
 
 export function CrashPanel({ title, description, message, children }: CrashPanelProps) {
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-surface-sunken p-6">
+    <div className="flex min-h-dvh w-full items-center justify-center bg-surface-sunken p-6">
       <section
         role="alert"
         className="w-full max-w-lg rounded-lg border border-border bg-surface p-6 shadow-sm"

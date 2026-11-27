@@ -62,7 +62,7 @@ export function PdfDesigner() {
   useCanvasPan(isReady && tool === 'hand')
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-surface-sunken text-fg">
+    <div className="flex h-dvh w-full flex-col overflow-hidden bg-surface-sunken text-fg">
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-6 py-2">
         <div className="flex min-w-0 items-center gap-5">
           <Tooltip content="Volver al formulario">
