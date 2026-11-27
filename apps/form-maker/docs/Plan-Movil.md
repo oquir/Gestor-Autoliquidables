@@ -316,7 +316,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 - [x] ~~**T8 Pellizcar en el lienzo**~~ (2026-11-27, de46b488; el pellizco ya era de B10; la Mano se
       oculta en `CanvasToolPicker`, también en la barra del PDF) (B10 en `useCanvasViewport`). La Mano y Espacio sobran en
       táctil, porque el dedo ya desplaza: la Mano se oculta con `pointer-coarse`.
-- [ ] **T9 Barra flotante y chip plegado:**
+- [x] ~~**T9 Barra flotante y chip plegado:**~~ (2026-11-27, 2fdf73c1; revisada a 768, 820, 1024 y
+      1180 px sin desbordes; chip, aviso y etiqueta del paso pasan a `top-safe`/`right-safe`)
   - `CanvasToolbar` ya se compacta con `@container/toolbar`. Se revisa en 640 a 1279, con la zona
     segura y sin quedar debajo de los cajones.
   - `CollapsedRightSidebar` igual.
@@ -335,6 +336,11 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     - Modo oscuro y Bajo rendimiento.
   - **Abajo:** + (agregar), Deshacer, Rehacer, Vista y Seleccionar.
   - Sin riel ni paneles: todo va en hojas. Los botones usan `ACTION_TIER_CLASSES`.
+  - **Partido en tres (decisión del usuario, 2026-11-27):** P1a barra de abajo y fuera el riel y la
+    barra flotante; P1b barra de arriba con los pasos; P1c el menú ⋯. El ⋯ lleva una **versión
+    propia del celular** (acciones grandes y debajo `FormSummary` + vista previa del PDF), no
+    `RightSidebar` metido en una hoja.
+  - [ ] P1a · [ ] P1b · [ ] P1c
 - [ ] **P2 `organisms/CanvasList` (nuevo):**
   - Su modelo es puro, en `lib/canvasList`, con prueba:
     - Pasos → filas → campos, en orden de `colStart`, como `PreviewRowsGrid`.
