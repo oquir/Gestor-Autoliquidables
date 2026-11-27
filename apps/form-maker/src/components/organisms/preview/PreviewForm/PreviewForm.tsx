@@ -11,6 +11,7 @@ import {
   SUBMITTED_CLASSES,
 } from './PreviewForm.constants'
 import type { PreviewFormProps } from './PreviewForm.types'
+import { handleEnterKey, labelEnterKeys } from './PreviewForm.utils'
 import {
   ENTER_FADE_CLASSES,
   ENTER_MODAL_CLASSES,
@@ -25,6 +26,8 @@ export function PreviewForm({ preview }: PreviewFormProps) {
   const navigation = usePreviewNavigation(preview)
   const isPhone: boolean = useLayoutMode() === 'phone'
   const cardRef = useRef<HTMLDivElement | null>(null)
+  const stepScopeRef = useRef<HTMLDivElement | null>(null)
+  const introScopeRef = useRef<HTMLDivElement | null>(null)
   const shownStepId = useRef<string | undefined>(navigation.step?.stepId)
   const stepId: string | undefined = navigation.step?.stepId
 
@@ -35,6 +38,12 @@ export function PreviewForm({ preview }: PreviewFormProps) {
     if (isPhone) cardRef.current?.scrollIntoView({ block: 'start' })
   }, [stepId, isPhone])
 
+  // Sin dependencias a proposito: un campo que aparece o se esconde cambia cual es el ultimo.
+  useEffect(() => {
+    labelEnterKeys(stepScopeRef.current)
+    labelEnterKeys(introScopeRef.current)
+  })
+
   return (
     <div
       ref={cardRef}
@@ -43,6 +52,8 @@ export function PreviewForm({ preview }: PreviewFormProps) {
       {navigation.step ? (
         <div
           key={navigation.step.stepId}
+          ref={stepScopeRef}
+          onKeyDown={handleEnterKey}
           className={
             navigation.direction === 'back' ? ENTER_STEP_BACK_CLASSES : ENTER_STEP_FORWARD_CLASSES
           }
@@ -96,6 +107,8 @@ export function PreviewForm({ preview }: PreviewFormProps) {
           className={`absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-slate-900/30 p-4 dark:bg-black/50 ${ENTER_FADE_CLASSES}`}
         >
           <div
+            ref={introScopeRef}
+            onKeyDown={handleEnterKey}
             className={`flex max-h-full w-full max-w-2xl flex-col overflow-auto rounded-xl border border-border bg-surface p-5 shadow-2xl ${ENTER_MODAL_CLASSES}`}
           >
             {navigation.introStep && (

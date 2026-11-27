@@ -216,14 +216,26 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - Reiniciar pasa a ícono para que todo entre en una línea a 360 px; al cambiar de paso la tarjeta
     vuelve arriba; `scroll-pb-20` deja el campo enfocado por encima del pie.
   - Verificado en Edge headless a 390×844 y a 1280×720 (escritorio igual).
-- [ ] **S2 Toques e inputs:**
-  - B3 en todos los controles.
+- [x] ~~**S2 Toques e inputs:**~~ (2026-11-27, 174caf07)
+  - B3 en todos los controles (ya estaba: todos los inputs del simulador tenían `pointer-coarse:text-base`).
   - El `toggle_group` (`py-1 text-xs`), las casillas y las opciones se pueden tocar en toda su fila.
+  - En `pointer-coarse:` (`PreviewFieldControl.constants.ts`): chips y filas con `min-h-11` (44 px),
+    casilla de 20 px, letra de las filas a 16 px. Tamaño real y no `touch-target`: el `::after` de
+    un chip pisaría al vecino. Medido en Edge headless; el escritorio no cambia.
 - [ ] **S3 El teclado correcto en cada campo:**
   - Revisar `inputMode`, `enterKeyHint` y `autoComplete` por tipo. Número ya usa `decimal`, y la
     máscara de fecha ya usa `numeric`.
   - `tel` y `email` (`PreviewFieldControl.tsx:114`) y el NIT.
   - `enterKeyHint="next"` en los campos que no son el último.
+  - Hecho en `PreviewForm` (`PreviewForm.utils.ts`): "siguiente" en cada campo de texto y "listo" en
+    el último, por paso y en el modal de entrada; en táctil Enter pasa al siguiente o cierra el
+    teclado (fuera de un `<form>` Android no salta solo). Con mouse Enter sigue sin hacer nada.
+    `tel`/`email` ya traían su teclado y número ya usaba `decimal`: sin cambios.
+  - **NIT y documentos: en veremos (decisión del usuario, 2026-11-27).** Se exportan como `text` y
+    que sean solo dígitos vive en el regex dentro del string de Zod. Caminos: deducirlo del regex
+    (frágil, el consumidor copia la deducción) o una opción "Teclado numérico" en el campo (palabra
+    nueva en el JSON: migración, `projectMeta.requires`, consumidor). No bloquea: el teclado de
+    letras deja pasar a números, y la validación no deja avanzar sin un documento válido.
 - [ ] **S4 Resultados en una hoja:** en `phone`, `PreviewResults` (payload, valores, errores) sale
       de un botón "Resultados" en la cabecera, en lugar de quedar debajo del formulario largo. Desde
       `lg:` queda igual que hoy.

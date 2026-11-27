@@ -13,3 +13,7 @@ export const NAV_FOOTER_CLASSES: string =
 export const RESTART_BUTTON_CLASSES: string = `${NAV_BUTTON_CLASSES} max-sm:flex max-sm:items-center max-sm:px-2`
 
 export const SUBMITTED_CLASSES: string = 'text-[11px] font-medium text-success'
+
+// Fecha nativa, casillas y archivo no abren teclado; el tabindex -1 es el selector de fecha oculto.
+export const TEXT_ENTRY_SELECTOR: string =
+  'input:not([type="checkbox"], [type="radio"], [type="file"], [type="hidden"], [type="date"], [type="datetime-local"], [tabindex="-1"]):not(:disabled), textarea:not(:disabled)'
