@@ -341,7 +341,10 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     propia del celular** (acciones grandes y debajo `FormSummary` + vista previa del PDF), no
     `RightSidebar` metido en una hoja.
   - [x] ~~P1a~~ (2026-11-27, 0a42c2e9: `PhoneBottomBar`; sin riel ni `CanvasToolbar` en `phone`)
-    · [ ] P1b · [ ] P1c
+    · [x] ~~P1b~~ (2026-11-27, c58ece47: `PhoneTopBar`; `describeActiveStep` en `lib/stepNavigation`)
+    · [x] ~~P1c~~ (2026-11-27: `PhoneMoreMenu` con la hoja "Proyecto"; sin chip flotante en `phone`)
+  - **Pendiente (el usuario, 2026-11-27): revisar el diseño visual de las barras y hojas del
+    celular** una vez esté la fase 3; funcionan, pero el acabado no se ha pulido.
 - [ ] **P2 `organisms/CanvasList` (nuevo):**
   - Su modelo es puro, en `lib/canvasList`, con prueba:
     - Pasos → filas → campos, en orden de `colStart`, como `PreviewRowsGrid`.

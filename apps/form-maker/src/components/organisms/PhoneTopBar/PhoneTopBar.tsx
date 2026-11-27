@@ -6,6 +6,7 @@ import type { ActiveStepDescription, CanvasTarget } from '../../../types'
 import { BottomSheet } from '../../molecules/BottomSheet/BottomSheet'
 import { SaveStatus } from '../../molecules/SaveStatus/SaveStatus'
 import { CanvasTabs } from '../CanvasTabs/CanvasTabs'
+import { PhoneMoreMenu } from '../PhoneMoreMenu/PhoneMoreMenu'
 import { StepTitleEditor } from '../StepTitleEditor/StepTitleEditor'
 import { UploadButton } from '../UploadButton/UploadButton'
 import {
@@ -69,6 +70,7 @@ export function PhoneTopBar() {
 
         <SaveStatus compact />
         <UploadButton />
+        <PhoneMoreMenu />
       </header>
 
       {isStepsOpen && (
