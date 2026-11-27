@@ -45,6 +45,9 @@ export function useModalKeyGuard(
       const ownerDialog: Element | null = event.target.closest('[role="dialog"]')
       if (ownerDialog !== null && ownerDialog !== event.currentTarget) return
     }
+    // Con ese modal abierto el foco puede seguir en el boton que lo abrio, aca en la capa: el Escape
+    // igual es del modal (el panel derecho en el cajon de tablet abre "Abrir formulario").
+    if (event.currentTarget.querySelector('[role="dialog"]') !== null) return
     onClose()
   }
 
