@@ -9,9 +9,10 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { PDF_CANVAS_CLASS } from '../../../../constants'
-import { usePinchZoom } from '../../../../hooks'
+import { useLayoutMode, usePinchZoom } from '../../../../hooks'
 import { clampPdfZoom, fitPdfZoom, pdfStyleSheet, wheelPdfZoom } from '../../../../lib/pdfDesign'
 import { selectedCellIds } from '../../../../lib/pdfDesignEdit'
+import { revealScrollBehavior } from '../../../../lib/performanceMode'
 import { useFormStore } from '../../../../store'
 import type { PinchFrame } from '../../../../types'
 import { usePdfDesignStore } from '../../../../store/pdfDesignStore'
@@ -35,6 +36,7 @@ export function PdfCanvas() {
   const tool = usePdfDesignStore((state) => state.tool)
   const paperTone = usePdfDesignStore((state) => state.paperTone)
   const isLowPerformance = useFormStore((state) => state.isLowPerformance)
+  const isPhone: boolean = useLayoutMode() === 'phone'
   const dragRef = useRef<CellDrag | null>(null)
   // Tras un arrastre entre celdas el navegador manda un clic a la fila, que limpiaria la seleccion:
   // este flag lo salta una vez.
@@ -167,6 +169,31 @@ export function PdfCanvas() {
 
   // Estables por contenido: las filas de las tablas se memoizan, y un Set o una funcion nuevos en
   // cada tecla las repintarian todas. La clave solo cambia si cambian los ids seleccionados.
+  // En el celular, al seleccionar una celda o bloque se abre la hoja a media altura: desplaza el
+  // lienzo para que la seleccion quede visible en la mitad de arriba (D2 de docs/Plan-Movil.md).
+  useEffect(() => {
+    if (!isPhone || !selection || !shadowRoot) return
+
+    const frame: number = requestAnimationFrame(() => {
+      const port: HTMLElement | null = scrollerOf(shadowRoot)
+      const selectedEl: HTMLElement | null = shadowRoot.querySelector<HTMLElement>(
+        `.${PDF_CANVAS_CLASS.selected}`,
+      )
+      if (!port || !selectedEl) return
+
+      const portRect: DOMRect = port.getBoundingClientRect()
+      const elRect: DOMRect = selectedEl.getBoundingClientRect()
+      if (elRect.bottom > window.innerHeight * 0.42 || elRect.top < portRect.top) {
+        port.scrollBy({
+          top: elRect.top - portRect.top - 24,
+          behavior: revealScrollBehavior(isLowPerformance),
+        })
+      }
+    })
+
+    return () => cancelAnimationFrame(frame)
+  }, [isPhone, selection, shadowRoot, isLowPerformance])
+
   const selectedKey: string = useMemo(
     () => (design ? selectedCellIds(design, selection).join('|') : ''),
     [design, selection],

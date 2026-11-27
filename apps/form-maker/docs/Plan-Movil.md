@@ -401,7 +401,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - En `compact` y `phone` quedan ←, el título recortado, el punto de estado y **Subir**. El menú ⋯
     lleva Abrir…, Descargar HTML, **Imprimir** (lo que hoy solo hace Ctrl+P con `printPdfHtml`),
     papel y tema.
-- [ ] **D2 La barra lateral** (`aside w-80` + `PdfSidebar`):
+- [x] ~~**D2 La barra lateral**~~ (2026-11-27) (`aside w-80` + `PdfSidebar`):
   - En `compact`, un cajón.
   - En `phone`, una hoja con Hojas | Selección | Documento. Al seleccionar una celda o un bloque se
     abre a media altura, y el lienzo se desplaza para que la selección quede visible encima.

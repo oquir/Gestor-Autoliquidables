@@ -8,6 +8,7 @@ import {
   Moon,
   MoreH,
   Printer,
+  Sliders,
   Sun,
 } from 'reicon-react'
 import { useBackClose, useCanvasPan, useClickOutside, useLayoutMode } from '../../../hooks'
@@ -19,7 +20,7 @@ import { useFormStore } from '../../../store'
 import { usePdfDesignStore } from '../../../store/pdfDesignStore'
 import type { LayoutMode, PdfTaxType } from '../../../types'
 import { Spinner, Tooltip } from '../../atoms'
-import { MenuSurface } from '../../molecules'
+import { BottomSheet, MenuSurface, SideDrawer } from '../../molecules'
 import { PdfCanvas } from '../pdf/PdfCanvas'
 import { PdfImportModal } from '../pdf/PdfImportModal'
 import { PdfPaperPicker } from '../pdf/PdfPaperPicker'
@@ -60,6 +61,7 @@ export function PdfDesigner() {
   const openDesign = usePdfDesignStore((state) => state.openDesign)
   const [isImportOpen, setImportOpen] = useState<boolean>(false)
   const [isMoreOpen, setMoreOpen] = useState<boolean>(false)
+  const [isSidebarOpen, setSidebarOpen] = useState<boolean>(false)
   const moreRef = useRef<HTMLDivElement | null>(null)
   const { isUploading, upload, download, print } = usePdfFile()
   const tool = usePdfDesignStore((state) => state.tool)
@@ -67,6 +69,14 @@ export function PdfDesigner() {
   const isCompactOrPhone: boolean = layoutMode !== 'desktop'
 
   useClickOutside(moreRef, () => setMoreOpen(false), isMoreOpen && layoutMode === 'compact')
+
+  // En el celular, seleccionar una celda o un bloque abre la hoja de edicion a media altura.
+  useEffect(() => {
+    if (layoutMode !== 'phone') return
+    return usePdfDesignStore.subscribe((state, prev) => {
+      if (state.selection !== null && state.selection !== prev.selection) setSidebarOpen(true)
+    })
+  }, [layoutMode])
 
   // La URL se lee una vez al montar.
   const taxType: PdfTaxType | null = useMemo(
@@ -127,16 +137,27 @@ export function PdfDesigner() {
 
           <div className="flex shrink-0 items-center gap-1">
             {isReady && (
-              <button
-                type="button"
-                onClick={upload}
-                disabled={isUploading}
-                aria-busy={isUploading}
-                className={UPLOAD_BUTTON_CLASSES}
-              >
-                {isUploading ? <Spinner className="size-[13px]" /> : <CloudUpload size={13} />}
-                Subir v{(publishedVersion ?? 0) + 1}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen((open) => !open)}
+                  aria-label="Panel del PDF"
+                  aria-expanded={isSidebarOpen}
+                  className={COMPACT_MORE_CLASSES}
+                >
+                  <Sliders size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={upload}
+                  disabled={isUploading}
+                  aria-busy={isUploading}
+                  className={UPLOAD_BUTTON_CLASSES}
+                >
+                  {isUploading ? <Spinner className="size-[13px]" /> : <CloudUpload size={13} />}
+                  Subir v{(publishedVersion ?? 0) + 1}
+                </button>
+              </>
             )}
             <div ref={moreRef} className="relative">
               <button
@@ -331,9 +352,11 @@ export function PdfDesigner() {
 
       {isReady && (
         <div className="flex min-h-0 flex-1">
-          <aside className="w-80 shrink-0 overflow-y-auto border-r border-border bg-surface">
-            <PdfSidebar />
-          </aside>
+          {layoutMode === 'desktop' && (
+            <aside className="w-80 shrink-0 overflow-y-auto border-r border-border bg-surface">
+              <PdfSidebar />
+            </aside>
+          )}
           {/* La barra cuelga de este contenedor y no del <main> que hace scroll: queda quieta
               sobre las hojas. */}
           <div className="relative flex min-w-0 flex-1 flex-col">
@@ -346,6 +369,20 @@ export function PdfDesigner() {
             <PdfToolbar />
           </div>
         </div>
+      )}
+
+      {isReady && layoutMode === 'compact' && isSidebarOpen && (
+        <SideDrawer label="Panel del PDF" side="left" onClose={() => setSidebarOpen(false)}>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <PdfSidebar />
+          </div>
+        </SideDrawer>
+      )}
+
+      {isReady && layoutMode === 'phone' && isSidebarOpen && (
+        <BottomSheet title="Panel del PDF" size="half" onClose={() => setSidebarOpen(false)}>
+          <PdfSidebar />
+        </BottomSheet>
       )}
     </div>
   )
