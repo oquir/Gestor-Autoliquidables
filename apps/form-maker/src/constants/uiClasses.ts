@@ -46,6 +46,14 @@ export const CHROME_ON_ROW_CLASSES: string =
 
 export const CHROME_PINNED_CLASSES: string = 'opacity-100'
 
+// Area de toque de 44px en tactil (utilidad touch-target de index.css). Solo en lo que se ve: lo
+// oculto con opacidad sigue recibiendo toques y robaria los de al lado.
+export const TOUCH_TARGET_CLASSES: string = 'touch-target'
+
+// La barra de la fila esta oculta hasta el hover: sus botones crecen solo con la barra a la vista
+// (RowToolbar pone data-chrome="pinned").
+export const ROW_TOUCH_TARGET_CLASSES: string = 'in-data-[chrome=pinned]:touch-target'
+
 // Container query sobre el ancho real del chip: esconde el icono del control de muestra cuando no
 // entra ni el texto.
 export const NARROW_FIELD_HIDDEN_CLASSES: string = '@max-[5rem]:hidden'
@@ -60,21 +68,17 @@ export const PREVIEW_FIELD_STACK_CLASSES: string =
   '@max-[40rem]/form:col-span-full! @max-[40rem]/form:row-auto!'
 
 // Compartidas con RowColumnsMenu y RowStylesMenu.
-export const ROW_TOOLBAR_ITEM_CLASSES: string =
-  'flex h-5 items-center justify-center rounded-md px-1.5 text-[10px] font-medium text-fg-muted transition-colors hover:bg-surface-raised hover:text-fg-strong hover:cursor-pointer dark:hover:bg-surface-inset'
+export const ROW_TOOLBAR_ITEM_CLASSES: string = `flex h-5 items-center justify-center rounded-md px-1.5 text-[10px] font-medium text-fg-muted transition-colors hover:bg-surface-raised hover:text-fg-strong hover:cursor-pointer dark:hover:bg-surface-inset ${ROW_TOUCH_TARGET_CLASSES}`
 
-export const ROW_TOOLBAR_ICON_ITEM_CLASSES: string =
-  'flex h-5 w-5 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-surface-raised hover:text-fg-strong hover:cursor-pointer dark:hover:bg-surface-inset'
+export const ROW_TOOLBAR_ICON_ITEM_CLASSES: string = `flex h-5 w-5 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-surface-raised hover:text-fg-strong hover:cursor-pointer dark:hover:bg-surface-inset ${ROW_TOUCH_TARGET_CLASSES}`
 
 // Abre hacia la izquierda: la barra esta pegada al borde derecho de la fila.
 export const ROW_TOOLBAR_POPOVER_CLASSES: string = `absolute right-0 top-6 z-20 flex w-72 origin-top-right flex-col gap-2 rounded-md border border-border bg-surface p-3 shadow-lg dark:bg-surface-raised ${ENTER_POP_CLASSES}`
 
 // Compartidas con MoveToStepMenu y CollapsedRightSidebar.
-export const CANVAS_TOOLBAR_ACTION_CLASSES: string =
-  'flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 text-xs font-medium text-fg-soft transition-colors hover:cursor-pointer hover:bg-surface-raised hover:text-fg-strong disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-fg-soft dark:hover:bg-surface-inset'
+export const CANVAS_TOOLBAR_ACTION_CLASSES: string = `flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 text-xs font-medium text-fg-soft transition-colors hover:cursor-pointer hover:bg-surface-raised hover:text-fg-strong disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-fg-soft dark:hover:bg-surface-inset ${TOUCH_TARGET_CLASSES}`
 
-export const CANVAS_TOOLBAR_ICON_ACTION_CLASSES: string =
-  'flex h-8 w-8 items-center justify-center rounded-lg text-fg-muted transition-colors hover:cursor-pointer hover:bg-surface-raised hover:text-fg-strong dark:hover:bg-surface-inset disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-fg-muted dark:disabled:hover:bg-transparent'
+export const CANVAS_TOOLBAR_ICON_ACTION_CLASSES: string = `flex h-8 w-8 items-center justify-center rounded-lg text-fg-muted transition-colors hover:cursor-pointer hover:bg-surface-raised hover:text-fg-strong dark:hover:bg-surface-inset disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-fg-muted dark:disabled:hover:bg-transparent ${TOUCH_TARGET_CLASSES}`
 
 export const CANVAS_TOOLBAR_DIVIDER_CLASSES: string = 'mx-0.5 h-5 w-px bg-border'
 
@@ -87,8 +91,7 @@ export const CANVAS_TOOLBAR_CLASSES: string = `absolute bottom-safe-4 left-1/2 z
 
 export const CANVAS_TOOLBAR_GROUP_CLASSES: string = 'flex items-center gap-0.5'
 
-export const CANVAS_TOOL_BUTTON_BASE_CLASSES: string =
-  'flex h-8 w-8 items-center justify-center rounded-lg press hover:cursor-pointer'
+export const CANVAS_TOOL_BUTTON_BASE_CLASSES: string = `flex h-8 w-8 items-center justify-center rounded-lg press hover:cursor-pointer ${TOUCH_TARGET_CLASSES}`
 
 // La herramienta activa en naranja: cambia lo que hace un clic y tiene que verse de reojo.
 export const CANVAS_TOOL_BUTTON_ACTIVE_CLASSES: string = 'bg-brand text-on-brand'

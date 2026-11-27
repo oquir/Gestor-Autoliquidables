@@ -23,6 +23,7 @@ function RowToolbarBase({ row, listeners, attributes, pinned }: RowToolbarProps)
 
   return (
     <div
+      data-chrome={isVisible ? 'pinned' : undefined}
       className={`${ROW_TOOLBAR_CLASSES} ${isVisible ? CHROME_PINNED_CLASSES : CHROME_ON_ROW_CLASSES}`}
     >
       <RowDragHandle listeners={listeners} attributes={attributes} />
@@ -47,6 +48,7 @@ function RowToolbarBase({ row, listeners, attributes, pinned }: RowToolbarProps)
         onClick={() => removeRow(row.id)}
         title="Eliminar fila"
         aria-label="Eliminar fila"
+        touchTarget={false}
         className={ROW_TOOLBAR_DANGER_ITEM_CLASSES}
       >
         <Trash6 size={13} />

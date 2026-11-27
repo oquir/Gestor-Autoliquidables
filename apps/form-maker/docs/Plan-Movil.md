@@ -63,7 +63,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
 - Aplican a la barra flotante (`TOOLBAR_LAYER_CLASSES`, `bottom-4`), `PdfToolbar`, `Toaster`, las
   barras de abajo del celular y las hojas.
 
-### [ ] B3 Inputs de 16 px en táctil
+### [x] ~~B3 Inputs de 16 px en táctil~~ (2026-11-26, 1aebfe43)
 
 - **Qué pasa:** los inputs son `text-sm` (14 px): `INPUT_CLASSES` en `constants/uiClasses.ts:22`,
   los átomos `Input` y `TextArea`, `PreviewFieldControl.constants.ts:2`, `SEARCH_INPUT_CLASSES` y

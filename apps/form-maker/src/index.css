@@ -391,6 +391,31 @@
   padding-right: calc(var(--spacing) * --value(integer) + env(safe-area-inset-right, 0px));
 }
 
+/* Area de toque de 44x44 en tactil sin cambiar el dibujo: un ::after centrado que solo crece
+   (nunca achica un boton mas grande). Los que ya son absolute/fixed/sticky no se tocan; al resto se
+   le pone relative para que el ::after se mida contra el boton.
+   z-index -1: el area extra queda debajo de los botones e inputs vecinos y nunca les roba el toque
+   (con z auto, el ::after del boton de la derecha tapaba el borde del de la izquierda y el de un
+   borrar tapaba el input de al lado). El precio: solo gana espacio donde el contexto de
+   apilamiento del boton no pinta un fondo encima (barras con z-index o isolate). TRAMPA: en un
+   elemento con z-index propio el ::after si tapa a sus vecinos; no usarla en lo que esta oculto con
+   opacidad, porque sigue recibiendo toques. */
+@utility touch-target {
+  @media (pointer: coarse) {
+    &:where(:not(.absolute, .fixed, .sticky)) {
+      position: relative;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      inset-block: min(0px, calc(50% - 22px));
+      inset-inline: min(0px, calc(50% - 22px));
+    }
+  }
+}
+
 /* Loader origami: una hoja que se dobla por cuartos (la idea del "Folding Cube" de SpinKit,
    escrita aparte). Aqui si va `transform`: es un elemento aislado, sin modales ni dnd-kit dentro.
    Cada cuarto es un casillero de una cuadricula 2x2 girada 45 grados; su ::before es el pliegue. */

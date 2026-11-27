@@ -1,4 +1,8 @@
-import { CHROME_ON_FIELD_CLASSES, CHROME_PINNED_CLASSES } from '../../../constants/uiClasses'
+import {
+  CHROME_ON_FIELD_CLASSES,
+  CHROME_PINNED_CLASSES,
+  TOUCH_TARGET_CLASSES,
+} from '../../../constants/uiClasses'
 import type { FieldResizeHandleVariantProps } from '../../../types/fieldResize'
 
 export function FieldResizeHandleBar({
@@ -12,7 +16,9 @@ export function FieldResizeHandleBar({
       onPointerDown={onPointerDown}
       title={title}
       className={`absolute -right-1 top-1/2 z-9 flex h-9 w-3 -translate-y-1/2 cursor-col-resize items-center justify-center transition-opacity ${
-        isResizing || pinned ? CHROME_PINNED_CLASSES : CHROME_ON_FIELD_CLASSES
+        isResizing || pinned
+          ? `${CHROME_PINNED_CLASSES} ${TOUCH_TARGET_CLASSES}`
+          : CHROME_ON_FIELD_CLASSES
       }`}
     >
       <span
