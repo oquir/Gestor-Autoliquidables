@@ -38,7 +38,14 @@ export function useModalKeyGuard(
 
     event.stopPropagation()
     // Un Escape que CodeMirror ya uso (cerrar el autocompletado, colapsar una seleccion) no cierra.
-    if (event.key === 'Escape' && !event.defaultPrevented) onClose()
+    // Tampoco uno que nace en otro dialogo de adentro (un ModalShell sin guardia propia abierto desde
+    // un panel del cajon): es de ese modal, y cerrar esta capa lo desmontaria con su trabajo.
+    if (event.key !== 'Escape' || event.defaultPrevented) return
+    if (event.target instanceof Element) {
+      const ownerDialog: Element | null = event.target.closest('[role="dialog"]')
+      if (ownerDialog !== null && ownerDialog !== event.currentTarget) return
+    }
+    onClose()
   }
 
   return { dialogRef, handleDialogKeyDown }

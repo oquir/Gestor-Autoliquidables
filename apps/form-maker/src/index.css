@@ -386,6 +386,14 @@
   padding-bottom: calc(var(--spacing) * --value(integer) + env(safe-area-inset-bottom, 0px));
 }
 
+@utility pl-safe-* {
+  padding-left: calc(var(--spacing) * --value(integer) + env(safe-area-inset-left, 0px));
+}
+
+@utility pr-safe-* {
+  padding-right: calc(var(--spacing) * --value(integer) + env(safe-area-inset-right, 0px));
+}
+
 @utility px-safe-* {
   padding-left: calc(var(--spacing) * --value(integer) + env(safe-area-inset-left, 0px));
   padding-right: calc(var(--spacing) * --value(integer) + env(safe-area-inset-right, 0px));
