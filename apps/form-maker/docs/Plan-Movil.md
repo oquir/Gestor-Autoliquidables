@@ -354,9 +354,9 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     (`updateRowColumns`), estilos, mover a paso, "Agregar campo aquí" y eliminar.
   - **Cada campo:** etiqueta (o la vinculada), `FieldTypeBadge`, íconos de estado y "4/16 · col 1".
   - Los selectores devuelven referencias estables (los centinelas `NO_ROWS` y compañía).
-- [ ] **P3 Editar un campo:**
-  - Tocar abre una hoja con las mismas pestañas de `FieldContextMenu` (Atributos, Validaciones,
-    Estilos, Lógica, Mapeo).
+- [x] ~~**P3 Editar un campo:**~~ (2026-11-27)
+  - Dejar presionado (450 ms, con vibración) abre una hoja con las mismas pestañas de
+    `FieldContextMenu` (Atributos, Validaciones, Estilos, Lógica, Mapeo).
   - Se extrae un `FieldEditorTabs` compartido entre el menú y la hoja, para no duplicarlo.
   - Arriba van el nombre, borrar y mover.
 - [ ] **P4 Agregar:**

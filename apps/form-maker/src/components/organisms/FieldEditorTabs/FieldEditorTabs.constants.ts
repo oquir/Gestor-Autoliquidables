@@ -1,7 +1,6 @@
-import type { ContextMenuTab } from '../../../types'
-import type { TabButtonGroupItem } from '../../../types'
+import type { ContextMenuTab, TabButtonGroupItem } from '../../../types'
 
-export const CONTEXT_MENU_TABS: TabButtonGroupItem<ContextMenuTab>[] = [
+export const FIELD_EDITOR_TABS: TabButtonGroupItem<ContextMenuTab>[] = [
   { tab: 'attributes', label: 'Atributos' },
   { tab: 'styles', label: 'Estilos' },
   { tab: 'validations', label: 'Validaciones' },

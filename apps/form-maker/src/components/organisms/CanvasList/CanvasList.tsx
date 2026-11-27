@@ -1,4 +1,4 @@
-import { type ComponentType, useMemo, useState } from 'react'
+import { type ComponentType, type PointerEvent, useMemo, useRef, useState } from 'react'
 import {
   BranchDown,
   Eye,
@@ -11,13 +11,26 @@ import {
   Plus,
   Trash6,
 } from 'reicon-react'
-import { FIELD_TYPE_ICONS, FIELD_TYPES, MAX_ROW_COLUMNS, MIN_ROW_COLUMNS } from '../../../constants'
+import {
+  ACTION_TIER_CLASSES,
+  FIELD_TYPE_ICONS,
+  FIELD_TYPES,
+  MAX_ROW_COLUMNS,
+  MIN_ROW_COLUMNS,
+} from '../../../constants'
 import { buildCanvasList, buildLinkedLabelIndex, hasTooltip } from '../../../lib'
-import { getActiveGroups, getActiveRows, getAllFields, useFormStore } from '../../../store'
+import {
+  findFieldById,
+  getActiveGroups,
+  getActiveRows,
+  getAllFields,
+  useFormStore,
+} from '../../../store'
 import type {
   CanvasField,
   CanvasListItem,
   CanvasRow,
+  ContextMenuTab,
   FieldTypeDef,
   IconProps,
 } from '../../../types'
@@ -30,6 +43,8 @@ import {
   TwoColumnFieldGroup,
 } from '../../atoms'
 import { BottomSheet, CssValidationHint, PxInput } from '../../molecules'
+import { FieldEditorTabs } from '../FieldEditorTabs'
+import { MoveToStepMenu } from '../MoveToStepMenu'
 import {
   ADD_FIELD_BUTTON_CLASSES,
   CATEGORY_HEADINGS,
@@ -46,6 +61,9 @@ import {
   GROUP_SECTION_CLASSES,
   INTRO_BANNER_CLASSES,
   LIST_CONTAINER_CLASSES,
+  LONG_PRESS_DELAY_MS,
+  LONG_PRESS_MOVE_TOLERANCE_PX,
+  LONG_PRESS_VIBRATE_MS,
   MOVE_CAPTION_CLASSES,
   MOVE_ITEM_CLASSES,
   MOVE_NUMBER_CLASSES,
@@ -76,9 +94,45 @@ function CanvasListRowCard({
   linkedLabels,
   selectedSet,
   onFieldClick,
+  onFieldLongPress,
   onOpenRowMenu,
 }: CanvasListRowCardProps) {
   const columnsLabel: string = row.columns === 1 ? '1 columna' : `${row.columns} columnas`
+  const pressTimerRef = useRef<number | null>(null)
+  const pressStartRef = useRef<{ x: number; y: number } | null>(null)
+  const longPressedRef = useRef<boolean>(false)
+
+  function clearPressTimer(): void {
+    if (pressTimerRef.current !== null) {
+      window.clearTimeout(pressTimerRef.current)
+      pressTimerRef.current = null
+    }
+    pressStartRef.current = null
+  }
+
+  function handleFieldPointerDown(event: PointerEvent<HTMLButtonElement>, fieldId: string): void {
+    if (event.button !== 0 && event.pointerType === 'mouse') return
+    clearPressTimer()
+    longPressedRef.current = false
+    pressStartRef.current = { x: event.clientX, y: event.clientY }
+    pressTimerRef.current = window.setTimeout(() => {
+      longPressedRef.current = true
+      pressTimerRef.current = null
+      pressStartRef.current = null
+      if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+        navigator.vibrate(LONG_PRESS_VIBRATE_MS)
+      }
+      onFieldLongPress(fieldId)
+    }, LONG_PRESS_DELAY_MS)
+  }
+
+  function handleFieldPointerMove(event: PointerEvent<HTMLButtonElement>): void {
+    const start = pressStartRef.current
+    if (!start) return
+    const dx: number = event.clientX - start.x
+    const dy: number = event.clientY - start.y
+    if (Math.hypot(dx, dy) > LONG_PRESS_MOVE_TOLERANCE_PX) clearPressTimer()
+  }
 
   return (
     <article data-canvas-row={row.id} className={ROW_CARD_CLASSES}>
@@ -117,7 +171,19 @@ function CanvasListRowCard({
               <li key={field.id} data-field-id={field.id}>
                 <button
                   type="button"
-                  onClick={() => onFieldClick(field.id)}
+                  onPointerDown={(event) => handleFieldPointerDown(event, field.id)}
+                  onPointerMove={handleFieldPointerMove}
+                  onPointerUp={clearPressTimer}
+                  onPointerCancel={clearPressTimer}
+                  onPointerLeave={clearPressTimer}
+                  onContextMenu={(event) => event.preventDefault()}
+                  onClick={() => {
+                    if (longPressedRef.current) {
+                      longPressedRef.current = false
+                      return
+                    }
+                    onFieldClick(field.id)
+                  }}
                   className={`${FIELD_BUTTON_CLASSES} ${borderClasses}`}
                 >
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -197,6 +263,8 @@ export function CanvasList() {
   const canvasTool = useFormStore((state) => state.canvasTool)
   const selectField = useFormStore((state) => state.selectField)
   const toggleFieldSelection = useFormStore((state) => state.toggleFieldSelection)
+  const removeFields = useFormStore((state) => state.removeFields)
+  const moveFieldsToStep = useFormStore((state) => state.moveFieldsToStep)
   const updateRowColumns = useFormStore((state) => state.updateRowColumns)
   const updateRowStyles = useFormStore((state) => state.updateRowStyles)
   const moveRowToStep = useFormStore((state) => state.moveRowToStep)
@@ -204,6 +272,8 @@ export function CanvasList() {
   const addFieldToRow = useFormStore((state) => state.addFieldToRow)
 
   const [rowSheet, setRowSheet] = useState<RowSheetState | null>(null)
+  const [editingFieldId, setEditingFieldId] = useState<string | null>(null)
+  const [editingTab, setEditingTab] = useState<ContextMenuTab>('attributes')
 
   const items: CanvasListItem[] = useMemo(
     () => buildCanvasList(activeRows, activeGroups),
@@ -223,6 +293,9 @@ export function CanvasList() {
     ? activeRows.find((row) => row.id === rowSheet.rowId)
     : undefined
   const activeSheetRowNumber: number = activeSheetRow ? activeRows.indexOf(activeSheetRow) + 1 : 0
+  const editingField: CanvasField | null = editingFieldId
+    ? findFieldById(activeRows, editingFieldId)
+    : null
 
   function handleFieldClick(fieldId: string): void {
     if (canvasTool === 'select') {
@@ -230,6 +303,13 @@ export function CanvasList() {
       return
     }
     selectField(fieldId)
+  }
+
+  function handleFieldLongPress(fieldId: string): void {
+    if (canvasTool === 'select') return
+    selectField(fieldId)
+    setEditingTab('attributes')
+    setEditingFieldId(fieldId)
   }
 
   function closeSheet(): void {
@@ -261,6 +341,7 @@ export function CanvasList() {
                 linkedLabels={linkedLabels}
                 selectedSet={selectedSet}
                 onFieldClick={handleFieldClick}
+                onFieldLongPress={handleFieldLongPress}
                 onOpenRowMenu={(rowId) => setRowSheet({ rowId, mode: 'actions' })}
               />
             )
@@ -291,6 +372,7 @@ export function CanvasList() {
                     linkedLabels={linkedLabels}
                     selectedSet={selectedSet}
                     onFieldClick={handleFieldClick}
+                    onFieldLongPress={handleFieldLongPress}
                     onOpenRowMenu={(rowId) => setRowSheet({ rowId, mode: 'actions' })}
                   />
                 ))}
@@ -504,6 +586,47 @@ export function CanvasList() {
               )
             })}
           </div>
+        </BottomSheet>
+      )}
+
+      {editingField && (
+        <BottomSheet
+          title={editingField.label || 'Editar campo'}
+          size="full"
+          onClose={() => setEditingFieldId(null)}
+        >
+          <div className="mb-3 flex items-center justify-between gap-2 border-b border-border pb-3">
+            <span className="truncate font-mono text-xs text-fg-muted">{editingField.name}</span>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <MoveToStepMenu
+                onSelect={(target) => {
+                  moveFieldsToStep([editingField.id], target)
+                  setEditingFieldId(null)
+                }}
+                tooltip="Mover el campo a otro paso"
+                triggerClassName={ACTION_TIER_CLASSES.tertiary.compact}
+                placement="down"
+              />
+              <IconButton
+                onClick={() => {
+                  removeFields([editingField.id])
+                  setEditingFieldId(null)
+                }}
+                className="text-fg-subtle transition-colors hover:text-danger"
+                aria-label="Borrar campo"
+                title="Borrar campo"
+              >
+                <Trash6 size={16} />
+              </IconButton>
+            </div>
+          </div>
+
+          <FieldEditorTabs
+            field={editingField}
+            activeTab={editingTab}
+            onSelectTab={setEditingTab}
+            bodyClassName="pt-3"
+          />
         </BottomSheet>
       )}
     </div>

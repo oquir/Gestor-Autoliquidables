@@ -30,5 +30,6 @@ export interface CanvasListRowCardProps {
   linkedLabels: Map<string, CanvasField>
   selectedSet: Set<string>
   onFieldClick: (fieldId: string) => void
+  onFieldLongPress: (fieldId: string) => void
   onOpenRowMenu: (rowId: string) => void
 }

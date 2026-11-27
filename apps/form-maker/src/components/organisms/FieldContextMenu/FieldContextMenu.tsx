@@ -1,20 +1,14 @@
+import { Trash6, Xmark } from 'reicon-react'
 import {
   ACTION_TIER_CLASSES,
   ENTER_POP_CLASSES,
   WITHOUT_STEP_TABS_CLASSES,
 } from '../../../constants'
-import { Trash6, Xmark } from 'reicon-react'
 import { useFieldContextMenu } from '../../../hooks/useFieldContextMenu/useFieldContextMenu'
 import type { FieldContextMenuState } from '../../../types/fieldContextMenu'
 import { IconButton } from '../../atoms/IconButton/IconButton'
-import { TabButtonGroup } from '../../molecules/TabButtonGroup/TabButtonGroup'
+import { FieldEditorTabs } from '../FieldEditorTabs/FieldEditorTabs'
 import { MoveToStepMenu } from '../MoveToStepMenu/MoveToStepMenu'
-import { ApiMappingPanel } from '../panels/ApiMappingPanel/ApiMappingPanel'
-import { AttributesPanel } from '../panels/AttributesPanel/AttributesPanel'
-import { LogicPanel } from '../panels/LogicPanel/LogicPanel'
-import { StylesPanel } from '../panels/StylesPanel/StylesPanel'
-import { ValidationsPanel } from '../panels/ValidationsPanel/ValidationsPanel'
-import { CONTEXT_MENU_TABS } from './FieldContextMenu.constants'
 
 export function FieldContextMenu({
   menu,
@@ -71,15 +65,12 @@ export function FieldContextMenu({
         </div>
       </div>
 
-      <TabButtonGroup tabs={CONTEXT_MENU_TABS} activeTab={activeTab} onSelect={handleSelectTab} />
-
-      <div className="overflow-y-auto p-3 scrollbar-gutter-stable">
-        {activeTab === 'attributes' && <AttributesPanel field={field} />}
-        {activeTab === 'validations' && <ValidationsPanel field={field} />}
-        {activeTab === 'styles' && <StylesPanel field={field} />}
-        {activeTab === 'logic' && <LogicPanel field={field} />}
-        {activeTab === 'apiMapping' && <ApiMappingPanel field={field} />}
-      </div>
+      <FieldEditorTabs
+        field={field}
+        activeTab={activeTab}
+        onSelectTab={handleSelectTab}
+        bodyClassName="overflow-y-auto p-3 scrollbar-gutter-stable"
+      />
     </div>
   )
 }

@@ -29,7 +29,11 @@ export const ROW_MORE_BUTTON_CLASSES: string =
   'flex h-8 w-8 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg-strong'
 
 export const FIELD_BUTTON_CLASSES: string =
-  'flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 text-left transition-colors'
+  'flex min-h-11 w-full select-none items-center justify-between gap-3 rounded-lg border px-3 py-2 text-left transition-colors active:scale-[0.99]'
+
+export const LONG_PRESS_DELAY_MS: number = 450
+export const LONG_PRESS_MOVE_TOLERANCE_PX: number = 8
+export const LONG_PRESS_VIBRATE_MS: number = 15
 
 export const FIELD_DEFAULT_CLASSES: string = 'border-border bg-surface hover:bg-surface-hover'
 
