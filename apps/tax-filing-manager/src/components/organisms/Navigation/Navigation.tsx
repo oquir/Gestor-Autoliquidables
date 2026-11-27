@@ -9,10 +9,11 @@ import type { NavigationProps } from './Navigation.types'
 export default function Navigation({ onPick, collapsed, onExpand }: NavigationProps) {
   const { user, municipalityId } = useSession()
   const municipalities = useData((s) => s.municipalities)
+  const RIT_ROUTES = ['/rit', '/declarantes']
   const links = NAVIGATION.filter(
     (n) =>
       (!n.permission || can(user?.role, n.permission)) &&
-      (n.a !== '/rit' || ritVisible(municipalities, municipalityId)),
+      (!RIT_ROUTES.includes(n.a) || ritVisible(municipalities, municipalityId)),
   )
 
   return (
