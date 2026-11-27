@@ -4,7 +4,7 @@
 // reglas estan en lib/pdfFile.
 import { toast } from 'sonner'
 import { describeApiError } from '../../lib/fakeApi/fakeApi'
-import { buildPdfHtml, downloadPdfHtml, pdfFileName } from '../../lib/pdfFile'
+import { buildPdfHtml, downloadPdfHtml, pdfFileName, printPdfHtml } from '../../lib/pdfFile'
 import { uploadPdfHtml } from '../../lib/pdfUpload'
 import { renderVerticalTextPng } from '../../lib/pdfVerticalText'
 import { usePdfDesignStore } from '../../store/pdfDesignStore'
@@ -55,5 +55,12 @@ export function usePdfFile(): UsePdfFileResult {
     toast.success(`Se descargó ${fileName}`, { description: PDF_FILE_COPY.downloadedDescription })
   }
 
-  return { isUploading, upload, download }
+  function print(): void {
+    const { design, publishedVersion } = usePdfDesignStore.getState()
+    if (!design) return
+
+    printPdfHtml(buildPdfHtml(design, publishedVersion, renderVerticalTextPng))
+  }
+
+  return { isUploading, upload, download, print }
 }

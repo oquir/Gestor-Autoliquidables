@@ -395,7 +395,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 
 ## 5. Fase 4 — Diseñador de PDF en tablet y celular
 
-- [ ] **D1 Cabecera:**
+- [x] ~~**D1 Cabecera:**~~ (2026-11-27)
   - Hoy lleva Volver, título, estado, papel, tema, Abrir…, Descargar HTML y Subir en una sola
     línea (`PdfDesigner.tsx`).
   - En `compact` y `phone` quedan ←, el título recortado, el punto de estado y **Subir**. El menú ⋯

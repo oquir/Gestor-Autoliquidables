@@ -1,22 +1,40 @@
-import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, CloudUpload, DocumentDownload2, FolderOpen, Moon, Sun } from 'reicon-react'
-import { useBackClose, useCanvasPan } from '../../../hooks'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  ArrowLeft,
+  Check,
+  CloudUpload,
+  DocumentDownload2,
+  FolderOpen,
+  Moon,
+  MoreH,
+  Printer,
+  Sun,
+} from 'reicon-react'
+import { useBackClose, useCanvasPan, useClickOutside, useLayoutMode } from '../../../hooks'
 import { usePdfDesignAutosave } from '../../../hooks/usePdfDesignAutosave'
 import { usePdfDesignerShortcuts } from '../../../hooks/usePdfDesignerShortcuts'
 import { usePdfFile } from '../../../hooks/usePdfFile'
 import { readPdfEntryParams, resolvePdfTaxType, taxTypeLabel } from '../../../lib/pdfDesign'
 import { useFormStore } from '../../../store'
 import { usePdfDesignStore } from '../../../store/pdfDesignStore'
-import type { PdfTaxType } from '../../../types'
+import type { LayoutMode, PdfTaxType } from '../../../types'
 import { Spinner, Tooltip } from '../../atoms'
+import { MenuSurface } from '../../molecules'
 import { PdfCanvas } from '../pdf/PdfCanvas'
 import { PdfImportModal } from '../pdf/PdfImportModal'
 import { PdfPaperPicker } from '../pdf/PdfPaperPicker'
+import { PdfPaperSheetIcon } from '../pdf/PdfPaperSheetIcon'
 import { PdfSidebar } from '../pdf/PdfSidebar'
 import { PdfToolbar } from '../pdf/PdfToolbar'
 import {
   BACK_BUTTON_CLASSES,
   BACK_DIVIDER_CLASSES,
+  COMPACT_BACK_CLASSES,
+  COMPACT_MENU_CLASSES,
+  COMPACT_MENU_ITEM_CLASSES,
+  COMPACT_MENU_SECTION_CLASSES,
+  COMPACT_MORE_CLASSES,
+  COMPACT_PAPER_OPTIONS,
   DOWNLOAD_BUTTON_CLASSES,
   HAND_CURSOR_CLASSES,
   OPEN_BUTTON_CLASSES,
@@ -37,10 +55,18 @@ export function PdfDesigner() {
   const lastSavedAt = usePdfDesignStore((state) => state.lastSavedAt)
   const saveError = usePdfDesignStore((state) => state.saveError)
   const publishedVersion = usePdfDesignStore((state) => state.publishedVersion)
+  const paperTone = usePdfDesignStore((state) => state.paperTone)
+  const setPaperTone = usePdfDesignStore((state) => state.setPaperTone)
   const openDesign = usePdfDesignStore((state) => state.openDesign)
   const [isImportOpen, setImportOpen] = useState<boolean>(false)
-  const { isUploading, upload, download } = usePdfFile()
+  const [isMoreOpen, setMoreOpen] = useState<boolean>(false)
+  const moreRef = useRef<HTMLDivElement | null>(null)
+  const { isUploading, upload, download, print } = usePdfFile()
   const tool = usePdfDesignStore((state) => state.tool)
+  const layoutMode: LayoutMode = useLayoutMode()
+  const isCompactOrPhone: boolean = layoutMode !== 'desktop'
+
+  useClickOutside(moreRef, () => setMoreOpen(false), isMoreOpen && layoutMode === 'compact')
 
   // La URL se lee una vez al montar.
   const taxType: PdfTaxType | null = useMemo(
@@ -72,90 +98,227 @@ export function PdfDesigner() {
 
   return (
     <div className="flex h-dvh w-full flex-col overflow-hidden bg-surface-sunken text-fg">
-      <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-6 py-2">
-        <div className="flex min-w-0 items-center gap-5">
-          <Tooltip content="Volver al formulario">
-            <button type="button" onClick={closeDesigner} className={BACK_BUTTON_CLASSES}>
-              <ArrowLeft size={14} />
-              Volver
-            </button>
-          </Tooltip>
-          <span aria-hidden className={BACK_DIVIDER_CLASSES} />
-          <div className="min-w-0">
-            <h1 className="text-base font-semibold text-fg-strong">Diseñar PDF</h1>
-            <p className="truncate text-xs text-fg-muted">
-              {taxType ? `${taxTypeLabel(taxType)} · ` : ''}Carta · 5 mm de margen del back ·{' '}
-              {publishedVersion ? `Última versión subida: ${publishedVersion}` : 'Sin subir'}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Tooltip content={saveError ?? status.label}>
-            <span
-              className={`flex items-center gap-1.5 text-[11px] ${
-                status.tone === 'error' ? 'text-danger' : 'text-fg-muted'
-              }`}
-            >
-              <span
-                className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT_CLASSES[status.tone]}`}
-              />
-              {status.label}
-            </span>
-          </Tooltip>
-          {/* Los dos controles de como se ve, juntos: el papel de las hojas y el tema de la app. */}
-          {isReady && <PdfPaperPicker />}
-          <Tooltip content={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}>
+      {isCompactOrPhone ? (
+        <header className="flex shrink-0 items-center justify-between gap-2 border-b border-border bg-surface px-2 py-1.5">
+          <div className="flex min-w-0 items-center gap-1.5">
             <button
               type="button"
-              onClick={toggleDarkMode}
-              aria-label={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}
-              className={THEME_BUTTON_CLASSES}
+              onClick={closeDesigner}
+              aria-label="Volver al formulario"
+              className={COMPACT_BACK_CLASSES}
             >
-              {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+              <ArrowLeft size={16} />
             </button>
-          </Tooltip>
-          {isReady && (
-            <div className="flex items-center gap-1.5">
-              <Tooltip content="Abre un .html de FormMaker o una plantilla hecha a mano. Con varios, vale el de versión más alta.">
-                <button
-                  type="button"
-                  onClick={() => setImportOpen(true)}
-                  disabled={isUploading}
-                  className={OPEN_BUTTON_CLASSES}
-                >
-                  <FolderOpen size={14} />
-                  Abrir…
-                </button>
-              </Tooltip>
-              <Tooltip content="Descarga una copia del .html del diseño actual. No gasta versión.">
-                <button type="button" onClick={download} className={DOWNLOAD_BUTTON_CLASSES}>
-                  <DocumentDownload2 size={14} />
-                  Descargar HTML
-                </button>
-              </Tooltip>
-              <Tooltip
-                content={
-                  isUploading
-                    ? 'Subiendo la plantilla…'
-                    : `Sube el .html a la API como versión ${(publishedVersion ?? 0) + 1}`
-                }
-              >
-                <button
-                  type="button"
-                  onClick={upload}
-                  disabled={isUploading}
-                  aria-busy={isUploading}
-                  className={UPLOAD_BUTTON_CLASSES}
-                >
-                  {isUploading ? <Spinner className="size-[13px]" /> : <CloudUpload size={13} />}
-                  Subir v{(publishedVersion ?? 0) + 1}
-                </button>
-              </Tooltip>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h1 className="truncate text-sm font-semibold text-fg-strong">Diseñar PDF</h1>
+                <Tooltip content={saveError ?? status.label}>
+                  <span
+                    aria-label={saveError ?? status.label}
+                    className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT_CLASSES[status.tone]}`}
+                  />
+                </Tooltip>
+              </div>
+              {taxType && (
+                <p className="truncate text-[11px] text-fg-muted">{taxTypeLabel(taxType)}</p>
+              )}
             </div>
-          )}
-        </div>
-      </header>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1">
+            {isReady && (
+              <button
+                type="button"
+                onClick={upload}
+                disabled={isUploading}
+                aria-busy={isUploading}
+                className={UPLOAD_BUTTON_CLASSES}
+              >
+                {isUploading ? <Spinner className="size-[13px]" /> : <CloudUpload size={13} />}
+                Subir v{(publishedVersion ?? 0) + 1}
+              </button>
+            )}
+            <div ref={moreRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreOpen((open) => !open)}
+                aria-label="Más opciones del diseño"
+                aria-haspopup="menu"
+                aria-expanded={isMoreOpen}
+                className={COMPACT_MORE_CLASSES}
+              >
+                <MoreH size={18} />
+              </button>
+
+              {isMoreOpen && (
+                <MenuSurface
+                  title="Opciones del diseño"
+                  onClose={() => setMoreOpen(false)}
+                  popoverClassName={COMPACT_MENU_CLASSES}
+                  sheetContentClassName="flex flex-col gap-1"
+                  sheetSize="half"
+                >
+                  {isReady && (
+                    <>
+                      <button
+                        type="button"
+                        disabled={isUploading}
+                        onClick={() => {
+                          setMoreOpen(false)
+                          setImportOpen(true)
+                        }}
+                        className={COMPACT_MENU_ITEM_CLASSES}
+                      >
+                        <FolderOpen size={16} />
+                        Abrir…
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMoreOpen(false)
+                          download()
+                        }}
+                        className={COMPACT_MENU_ITEM_CLASSES}
+                      >
+                        <DocumentDownload2 size={16} />
+                        Descargar HTML
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMoreOpen(false)
+                          print()
+                        }}
+                        className={COMPACT_MENU_ITEM_CLASSES}
+                      >
+                        <Printer size={16} />
+                        Imprimir
+                      </button>
+
+                      <span className={COMPACT_MENU_SECTION_CLASSES}>Papel en pantalla</span>
+                      {COMPACT_PAPER_OPTIONS.map((option) => (
+                        <button
+                          key={option.tone}
+                          type="button"
+                          onClick={() => {
+                            setPaperTone(option.tone)
+                            setMoreOpen(false)
+                          }}
+                          className={COMPACT_MENU_ITEM_CLASSES}
+                        >
+                          <PdfPaperSheetIcon paper={option.paper} ink={option.ink} size="sm" />
+                          <span className="flex-1">{option.label}</span>
+                          {option.tone === paperTone && (
+                            <Check size={14} weight="Filled" className="shrink-0 text-brand-fg" />
+                          )}
+                        </button>
+                      ))}
+                    </>
+                  )}
+
+                  <span className={COMPACT_MENU_SECTION_CLASSES}>Apariencia</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      toggleDarkMode()
+                      setMoreOpen(false)
+                    }}
+                    className={COMPACT_MENU_ITEM_CLASSES}
+                  >
+                    {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+                    {isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}
+                  </button>
+                </MenuSurface>
+              )}
+            </div>
+          </div>
+        </header>
+      ) : (
+        <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-6 py-2">
+          <div className="flex min-w-0 items-center gap-5">
+            <Tooltip content="Volver al formulario">
+              <button type="button" onClick={closeDesigner} className={BACK_BUTTON_CLASSES}>
+                <ArrowLeft size={14} />
+                Volver
+              </button>
+            </Tooltip>
+            <span aria-hidden className={BACK_DIVIDER_CLASSES} />
+            <div className="min-w-0">
+              <h1 className="text-base font-semibold text-fg-strong">Diseñar PDF</h1>
+              <p className="truncate text-xs text-fg-muted">
+                {taxType ? `${taxTypeLabel(taxType)} · ` : ''}Carta · 5 mm de margen del back ·{' '}
+                {publishedVersion ? `Última versión subida: ${publishedVersion}` : 'Sin subir'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Tooltip content={saveError ?? status.label}>
+              <span
+                className={`flex items-center gap-1.5 text-[11px] ${
+                  status.tone === 'error' ? 'text-danger' : 'text-fg-muted'
+                }`}
+              >
+                <span
+                  className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT_CLASSES[status.tone]}`}
+                />
+                {status.label}
+              </span>
+            </Tooltip>
+            {/* Los dos controles de como se ve, juntos: el papel de las hojas y el tema de la app. */}
+            {isReady && <PdfPaperPicker />}
+            <Tooltip content={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}>
+              <button
+                type="button"
+                onClick={toggleDarkMode}
+                aria-label={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}
+                className={THEME_BUTTON_CLASSES}
+              >
+                {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+              </button>
+            </Tooltip>
+            {isReady && (
+              <div className="flex items-center gap-1.5">
+                <Tooltip content="Abre un .html de FormMaker o una plantilla hecha a mano. Con varios, vale el de versión más alta.">
+                  <button
+                    type="button"
+                    onClick={() => setImportOpen(true)}
+                    disabled={isUploading}
+                    className={OPEN_BUTTON_CLASSES}
+                  >
+                    <FolderOpen size={14} />
+                    Abrir…
+                  </button>
+                </Tooltip>
+                <Tooltip content="Descarga una copia del .html del diseño actual. No gasta versión.">
+                  <button type="button" onClick={download} className={DOWNLOAD_BUTTON_CLASSES}>
+                    <DocumentDownload2 size={14} />
+                    Descargar HTML
+                  </button>
+                </Tooltip>
+                <Tooltip
+                  content={
+                    isUploading
+                      ? 'Subiendo la plantilla…'
+                      : `Sube el .html a la API como versión ${(publishedVersion ?? 0) + 1}`
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={upload}
+                    disabled={isUploading}
+                    aria-busy={isUploading}
+                    className={UPLOAD_BUTTON_CLASSES}
+                  >
+                    {isUploading ? <Spinner className="size-[13px]" /> : <CloudUpload size={13} />}
+                    Subir v{(publishedVersion ?? 0) + 1}
+                  </button>
+                </Tooltip>
+              </div>
+            )}
+          </div>
+        </header>
+      )}
 
       {isImportOpen && <PdfImportModal onClose={() => setImportOpen(false)} />}
 
