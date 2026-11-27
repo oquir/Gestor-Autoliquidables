@@ -370,7 +370,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - Pasos con `moveRowToStep` y `moveFieldsToStep`.
   - Arrastrar dentro de la lista (dnd-kit sortable, pulsación larga) queda **para después**,
     opcional.
-- [ ] **P6 Ancho y columna:** en la hoja, el control de ancho y la "Columna de inicio" de T4.
+- [x] ~~**P6 Ancho y columna:**~~ (2026-11-27, cubierto por `AttributesPanel` en la hoja de P3 + T4) en la hoja, el control de ancho y la "Columna de inicio" de T4.
 - [ ] **P7 Seleccionar varios:** modo con casillas (`toggleFieldSelection`) y la barra de abajo con
       mover a paso y eliminar, con la misma lógica de `CanvasToolbar`.
 - [ ] **P8 Grupos repetibles:**
