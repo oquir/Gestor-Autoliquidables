@@ -3,6 +3,7 @@
 export * from './ActiveStepLabel'
 export * from './AppCrashScreen'
 export * from './Canvas'
+export * from './CanvasList'
 export * from './CanvasRow'
 export * from './CanvasRowsGrid'
 export * from './CanvasTabs'

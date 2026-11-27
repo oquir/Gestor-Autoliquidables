@@ -1,7 +1,8 @@
 import { type PointerEvent, useCallback, useState } from 'react'
-import { useCanvasViewport, useViewModeScroll } from '../../../hooks'
+import { useCanvasViewport, useLayoutMode, useViewModeScroll } from '../../../hooks'
 import { getActiveGroups, getActiveRows, useFormStore } from '../../../store'
 import type { FieldContextMenuState } from '../../../types'
+import { CanvasList } from '../CanvasList'
 import { CanvasRowsGrid } from '../CanvasRowsGrid'
 import { CanvasToolLayer } from '../CanvasToolLayer'
 import { FieldContextMenu } from '../FieldContextMenu'
@@ -19,6 +20,7 @@ export function Canvas() {
   const selectField = useFormStore((state) => state.selectField)
   const [contextMenu, setContextMenu] = useState<FieldContextMenuState | null>(null)
   const { contentRef, rootStyle, contentStyle } = useCanvasViewport()
+  const isPhone: boolean = useLayoutMode() === 'phone'
   useViewModeScroll(viewMode)
 
   const isIntro = activeCanvas.type === 'introStep'
@@ -50,6 +52,8 @@ export function Canvas() {
       </div>
     )
   }
+
+  if (isPhone) return <CanvasList />
 
   return (
     <div
