@@ -12,10 +12,12 @@ import type { CanvasToolPickerProps } from './CanvasToolPicker.types'
 
 // Lo comparten las barras del formulario y del PDF; quien lo monta guarda la herramienta. La Mano
 // no se muestra en tactil: el dedo ya desplaza (T8 y D5 de docs/Plan-Movil.md).
-export function CanvasToolPicker({ tool, onSelect }: CanvasToolPickerProps) {
+export function CanvasToolPicker({ tool, onSelect, allowSelect = true }: CanvasToolPickerProps) {
+  const tools = allowSelect ? CANVAS_TOOLS : CANVAS_TOOLS.filter((item) => item.tool !== 'select')
+
   return (
     <div className={CANVAS_TOOLBAR_GROUP_CLASSES}>
-      {CANVAS_TOOLS.map((item) => {
+      {tools.map((item) => {
         const Icon = TOOL_ICONS[item.tool]
         const isActive: boolean = tool === item.tool
 

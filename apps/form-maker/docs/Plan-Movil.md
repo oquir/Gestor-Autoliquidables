@@ -421,7 +421,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - Con el dedo se usa `pointermove` + `shadowRoot.elementFromPoint`, y `touch-action: none` en
     `.fm-doc[data-tool="select"]` (`CANVAS_CSS`). En esa herramienta, dos dedos desplazan y acercan
     con un gesto propio.
-- [ ] **D5 La barra del PDF (`PdfToolbar`):**
+- [x] ~~**D5 La barra del PDF (`PdfToolbar`):**~~ (2026-11-27; selección múltiple desactivada en `phone` por decisión del usuario)
   - Íconos y zoom (−, ajustar, +), y la selección "N celdas · Combinar · Deseleccionar" entra en 360.
   - La Mano se oculta en táctil. Va con la zona segura.
 - [ ] **D6 Paneles en la hoja:**

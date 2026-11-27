@@ -166,7 +166,7 @@ export function PdfCanvas() {
   // clic.
   function handleDocPointerDown(event: ReactPointerEvent<HTMLDivElement>): void {
     swallowClickRef.current = false
-    if (tool !== 'select' || event.button !== 0) return
+    if (isPhone || tool !== 'select' || event.button !== 0) return
 
     const hit: CellHit | null = cellOf(event.target)
     dragRef.current = hit ? { ...hit, started: false, last: hit.cellId } : null
@@ -236,8 +236,8 @@ export function PdfCanvas() {
   )
   const handleSelectCell: (tableId: string, cellId: string, extend: boolean) => void = useCallback(
     (tableId: string, cellId: string, extend: boolean): void =>
-      selectCell(tableId, cellId, extend || tool === 'select'),
-    [selectCell, tool],
+      selectCell(tableId, cellId, !isPhone && (extend || tool === 'select')),
+    [selectCell, tool, isPhone],
   )
   const selectedBlockId: string | null = selection?.kind === 'block' ? selection.blockId : null
   const designCss: string = useMemo(() => (design ? pdfStyleSheet(design) : ''), [design])

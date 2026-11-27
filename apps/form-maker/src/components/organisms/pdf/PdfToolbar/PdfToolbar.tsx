@@ -2,17 +2,21 @@ import { useMemo } from 'react'
 import { Xmark } from 'reicon-react'
 import { useStore } from 'zustand'
 import {
-  CANVAS_TOOLBAR_CLASSES,
   CANVAS_TOOLBAR_DIVIDER_CLASSES,
   CANVAS_TOOLBAR_GROUP_CLASSES,
   CANVAS_TOOLBAR_ICON_ACTION_CLASSES,
 } from '../../../../constants'
+import { useLayoutMode } from '../../../../hooks'
 import { selectedCellIds } from '../../../../lib/pdfDesignEdit'
 import { usePdfDesignStore } from '../../../../store/pdfDesignStore'
 import { Tooltip } from '../../../atoms'
 import { CanvasToolPicker, HistoryButtons, PerformanceModeToggle } from '../../../molecules'
 import { PdfZoomControl } from '../PdfZoomControl'
-import { MERGE_BUTTON_CLASSES, SELECTION_COUNT_CLASSES } from './PdfToolbar.constants'
+import {
+  MERGE_BUTTON_CLASSES,
+  PDF_TOOLBAR_CLASSES,
+  SELECTION_COUNT_CLASSES,
+} from './PdfToolbar.constants'
 
 // La misma barra que la del formulario, sin + Fila ni + Grupo repetible y con zoom. Va fuera del
 // area que hace scroll; herramienta e historial son los de usePdfDesignStore.
@@ -25,6 +29,7 @@ export function PdfToolbar() {
   const redo = usePdfDesignStore((state) => state.redo)
   const mergeSelection = usePdfDesignStore((state) => state.mergeSelection)
   const clearSelection = usePdfDesignStore((state) => state.clearSelection)
+  const isPhone: boolean = useLayoutMode() === 'phone'
   const canUndo: boolean = useStore(
     usePdfDesignStore.temporal,
     (temporal) => temporal.pastStates.length > 0,
@@ -40,10 +45,14 @@ export function PdfToolbar() {
   )
 
   return (
-    <div role="toolbar" aria-label="Herramientas del PDF" className={CANVAS_TOOLBAR_CLASSES}>
-      <CanvasToolPicker tool={tool} onSelect={setTool} />
+    <div role="toolbar" aria-label="Herramientas del PDF" className={PDF_TOOLBAR_CLASSES}>
+      {!isPhone && (
+        <>
+          <CanvasToolPicker tool={tool} onSelect={setTool} />
 
-      <span aria-hidden className={CANVAS_TOOLBAR_DIVIDER_CLASSES} />
+          <span aria-hidden className={CANVAS_TOOLBAR_DIVIDER_CLASSES} />
+        </>
+      )}
 
       <HistoryButtons canUndo={canUndo} canRedo={canRedo} onUndo={undo} onRedo={redo} />
 

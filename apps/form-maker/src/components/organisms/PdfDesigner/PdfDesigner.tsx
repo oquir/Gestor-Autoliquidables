@@ -70,9 +70,11 @@ export function PdfDesigner() {
 
   useClickOutside(moreRef, () => setMoreOpen(false), isMoreOpen && layoutMode === 'compact')
 
-  // En el celular, seleccionar una celda o un bloque abre la hoja de edicion a media altura.
+  // En el celular, seleccionar una celda o un bloque abre la hoja de edicion a media altura, y se
+  // desactiva la herramienta de seleccion multiple.
   useEffect(() => {
     if (layoutMode !== 'phone') return
+    if (usePdfDesignStore.getState().tool === 'select') usePdfDesignStore.getState().setTool('move')
     return usePdfDesignStore.subscribe((state, prev) => {
       if (state.selection !== null && state.selection !== prev.selection) setSidebarOpen(true)
     })
