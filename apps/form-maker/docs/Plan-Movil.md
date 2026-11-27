@@ -253,7 +253,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 - [x] ~~**S7 Atrás cierra el simulador** (B8).~~ (2026-11-27, 748554a7 y c58ed36a: ya lo hacía en
       producción; se corrigió el cierre al abrir con `StrictMode` y la lista de `search_select` entró
       en la pila)
-- [ ] **S8 El consumidor:** lo que el simulador hace en el celular y no va en el JSON (inputs de
+- [x] ~~**S8 El consumidor:**~~ (2026-11-27, 500b023a; lista completa en Known gaps de `CLAUDE.md`) lo que el simulador hace en el celular y no va en el JSON (inputs de
       16 px, navegación fija, filas apiladas) va a Known gaps para que `FrontAutoliquidable` lo copie.
 - **Meta:**
   - A 360, 390 y 412 px no hay scroll horizontal.
