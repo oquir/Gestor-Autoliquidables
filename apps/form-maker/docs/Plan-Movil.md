@@ -373,7 +373,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 - [x] ~~**P6 Ancho y columna:**~~ (2026-11-27, cubierto por `AttributesPanel` en la hoja de P3 + T4) en la hoja, el control de ancho y la "Columna de inicio" de T4.
 - [x] ~~**P7 Seleccionar varios:**~~ (2026-11-27) modo con casillas (`toggleFieldSelection`) y la barra de abajo con
       mover a paso y eliminar, con la misma lógica de `CanvasToolbar`.
-- [ ] **P8 Grupos repetibles:**
+- [x] ~~**P8 Grupos repetibles:**~~ (2026-11-27)
   - Sección con sus filas. Su ⋯ abre lo que hoy edita `RepeatableGroupBand`.
   - Las reglas del grupo no cambian: una fila no entra ni sale de un grupo.
 - [ ] **P9 La vista "Revisar":**

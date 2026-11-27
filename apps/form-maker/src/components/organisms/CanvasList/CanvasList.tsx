@@ -26,9 +26,11 @@ import {
   FIELD_TYPES,
   MAX_ROW_COLUMNS,
   MIN_ROW_COLUMNS,
+  PAYLOAD_SCHEMA,
+  SELECT_CLASSES,
 } from '../../../constants'
 import { useCanvasReveal } from '../../../hooks'
-import { buildCanvasList, buildLinkedLabelIndex, hasTooltip } from '../../../lib'
+import { arrayPaths, buildCanvasList, buildLinkedLabelIndex, hasTooltip } from '../../../lib'
 import {
   findFieldById,
   getActiveGroups,
@@ -43,11 +45,13 @@ import type {
   ContextMenuTab,
   FieldTypeDef,
   IconProps,
+  RepeatableGroup,
   RowDropTarget,
 } from '../../../types'
 import {
   FieldTypeBadge,
   IconButton,
+  Input,
   Label,
   Textarea,
   Tooltip,
@@ -56,6 +60,7 @@ import {
 import { BottomSheet, CssValidationHint, PxInput } from '../../molecules'
 import { FieldEditorTabs } from '../FieldEditorTabs'
 import { MoveToStepMenu } from '../MoveToStepMenu'
+import { GroupChecksEditor } from '../panels/GroupChecksEditor'
 import {
   ADD_FIELD_BUTTON_CLASSES,
   CATEGORY_HEADINGS,
@@ -320,6 +325,9 @@ export function CanvasList() {
   const moveRowToStep = useFormStore((state) => state.moveRowToStep)
   const removeRow = useFormStore((state) => state.removeRow)
   const addFieldToRow = useFormStore((state) => state.addFieldToRow)
+  const updateGroup = useFormStore((state) => state.updateGroup)
+  const addRowToGroup = useFormStore((state) => state.addRowToGroup)
+  const removeGroup = useFormStore((state) => state.removeGroup)
   const isLowPerformance = useFormStore((state) => state.isLowPerformance)
   const reveal = useCanvasReveal()
 
@@ -329,6 +337,7 @@ export function CanvasList() {
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null)
   const [editingTab, setEditingTab] = useState<ContextMenuTab>('attributes')
   const [isMoveFieldRowOpen, setMoveFieldRowOpen] = useState<boolean>(false)
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null)
 
   const items: CanvasListItem[] = useMemo(
     () => buildCanvasList(activeRows, activeGroups),
@@ -351,6 +360,10 @@ export function CanvasList() {
   const editingField: CanvasField | null = editingFieldId
     ? findFieldById(activeRows, editingFieldId)
     : null
+  const editingGroup: RepeatableGroup | undefined = editingGroupId
+    ? activeGroups.find((group) => group.id === editingGroupId)
+    : undefined
+  const groupArrayPaths: string[] = useMemo(() => arrayPaths(PAYLOAD_SCHEMA), [])
 
   function handleFieldClick(fieldId: string): void {
     if (canvasTool === 'select') {
@@ -470,9 +483,19 @@ export function CanvasList() {
                   <Layers size={14} weight="Filled" className="shrink-0 text-fg-muted" />
                   <span className="truncate">{item.group.title.trim() || 'Grupo repetible'}</span>
                 </span>
-                <span className="shrink-0 text-[11px] tabular-nums">
-                  {item.group.min}–{item.group.max}
-                </span>
+                <div className="flex shrink-0 items-center gap-1">
+                  <span className="text-[11px] tabular-nums">
+                    {item.group.min}–{item.group.max}
+                  </span>
+                  <IconButton
+                    onClick={() => setEditingGroupId(item.group.id)}
+                    title="Configurar grupo repetible"
+                    aria-label={`Acciones del grupo ${item.group.title.trim() || 'repetible'}`}
+                    className={ROW_MORE_BUTTON_CLASSES}
+                  >
+                    <MoreH size={16} />
+                  </IconButton>
+                </div>
               </header>
               <div className="flex flex-col gap-2">
                 {item.rows.map((listRow) => (
@@ -798,6 +821,110 @@ export function CanvasList() {
                 </button>
               )
             })}
+          </div>
+        </BottomSheet>
+      )}
+
+      {editingGroup && (
+        <BottomSheet
+          title={editingGroup.title.trim() || 'Grupo repetible'}
+          size="full"
+          onClose={() => setEditingGroupId(null)}
+        >
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor={`list-group-title-${editingGroup.id}`}>Título del grupo</Label>
+              <Input
+                id={`list-group-title-${editingGroup.id}`}
+                value={editingGroup.title}
+                onChange={(event) => updateGroup(editingGroup.id, { title: event.target.value })}
+                placeholder="Título del grupo"
+              />
+            </div>
+
+            <TwoColumnFieldGroup legend="Repeticiones">
+              <div className="flex flex-col gap-1">
+                <Label htmlFor={`list-group-min-${editingGroup.id}`}>Mínimo</Label>
+                <Input
+                  id={`list-group-min-${editingGroup.id}`}
+                  type="number"
+                  min={0}
+                  value={editingGroup.min}
+                  onChange={(event) =>
+                    updateGroup(editingGroup.id, { min: Number(event.target.value) })
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label htmlFor={`list-group-max-${editingGroup.id}`}>Máximo</Label>
+                <Input
+                  id={`list-group-max-${editingGroup.id}`}
+                  type="number"
+                  min={1}
+                  value={editingGroup.max}
+                  onChange={(event) =>
+                    updateGroup(editingGroup.id, { max: Number(event.target.value) })
+                  }
+                />
+              </div>
+            </TwoColumnFieldGroup>
+
+            <div className="flex flex-col gap-1">
+              <Label htmlFor={`list-group-path-${editingGroup.id}`}>Arreglo del payload</Label>
+              <select
+                id={`list-group-path-${editingGroup.id}`}
+                value={editingGroup.arrayPath ?? ''}
+                onChange={(event) =>
+                  updateGroup(editingGroup.id, { arrayPath: event.target.value || undefined })
+                }
+                className={SELECT_CLASSES}
+              >
+                <option value="">— Sin mapear —</option>
+                {groupArrayPaths.map((path) => (
+                  <option key={path} value={path}>
+                    {path}[]
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-fg-muted">
+                {editingGroup.arrayPath
+                  ? `Cada repetición es un ítem de ${editingGroup.arrayPath}[].`
+                  : 'Elige el arreglo para poder mapear los campos de adentro.'}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                addRowToGroup(editingGroup.id)
+                setEditingGroupId(null)
+                const groupRows: CanvasRow[] = getActiveRows(useFormStore.getState()).filter(
+                  (row) => row.groupId === editingGroup.id,
+                )
+                const lastRow: CanvasRow | undefined = groupRows[groupRows.length - 1]
+                if (lastRow) reveal({ kind: 'row', id: lastRow.id })
+              }}
+              className={ADD_FIELD_BUTTON_CLASSES}
+            >
+              <Plus size={16} />
+              Agregar fila al grupo
+            </button>
+
+            <GroupChecksEditor group={editingGroup} />
+
+            <div className="border-t border-border pt-3">
+              <button
+                type="button"
+                onClick={() => {
+                  removeGroup(editingGroup.id)
+                  setEditingGroupId(null)
+                }}
+                className={SHEET_DANGER_ACTION_CLASSES}
+              >
+                <Trash6 size={16} />
+                Disolver el grupo (las filas se quedan)
+              </button>
+            </div>
           </div>
         </BottomSheet>
       )}
