@@ -386,7 +386,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 - [x] ~~**P10 Lo demás en hojas a altura completa:**~~ (2026-11-27)
   - Lógica (CodeMirror a 16 px), Mapeo API, Catálogos y Fechas.
   - JSON y Payload ya se virtualizan, y `JsonSearchBar` ya se adapta con `@xs`.
-- [ ] **P11 Asistente y recuperación del borrador** a pantalla completa (B7).
+- [x] ~~**P11 Asistente y recuperación del borrador**~~ (2026-11-27, cubierto por `ModalShell` de B7) a pantalla completa (B7).
 - **Meta:**
   - A 390×844 y 360×800, solo con el dedo: armar un formulario corto desde cero y editar el ICA
     (etiquetas, validaciones, un script).
