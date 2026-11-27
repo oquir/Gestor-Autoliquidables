@@ -5,6 +5,11 @@ import type { FieldDestination } from './CanvasFieldChip.types'
 
 export const STATE_ICON_CLASSES: string = 'flex shrink-0 items-center text-fg-subtle'
 
+// El clic derecho del dedo (T5 de docs/Plan-Movil.md): solo en tactil y solo en el campo fijado.
+// Safari no dispara contextmenu con la pulsacion larga, asi que es el camino seguro. Espejo de la X.
+export const MENU_BUTTON_CLASSES: string =
+  'absolute -left-2 -top-2 z-10 hidden h-6 w-6 items-center justify-center rounded-full border border-border bg-surface text-fg-muted shadow-sm transition-colors hover:cursor-pointer hover:border-brand-border hover:text-fg-strong pointer-coarse:flex'
+
 export const DELETE_BUTTON_CLASSES: string =
   'absolute -right-1.5 -top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border border-border bg-surface text-fg-subtle shadow-sm transition-colors hover:cursor-pointer hover:border-danger-soft hover:text-danger'
 

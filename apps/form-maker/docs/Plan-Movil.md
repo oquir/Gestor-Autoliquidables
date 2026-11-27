@@ -288,7 +288,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     centra debajo, y el dedo la tapa.
   - El autoscroll de dnd-kit en los bordes ya existe.
   - `onDragCancel` sigue siendo clave, porque en táctil `pointercancel` es frecuente.
-- [ ] **T4 Sin Shift ni Shift+Ctrl:**
+- [x] ~~**T4 Sin Shift ni Shift+Ctrl:**~~ (2026-11-27, 9b055938; selector "Columna de inicio" con
+      `getValidStarts`, solo inicios donde el ancho entra entero; `moveField` acepta la misma fila)
   - Hoy la columna exacta se elige arrastrando con modificadores.
   - En Atributos se agrega un control "Columna de inicio" junto al ancho (`AttributesPanel.tsx:143`
     hoy solo muestra "desde col N"). Usa `moveField(fieldId, rowId, { colStart, colSpan })` con
