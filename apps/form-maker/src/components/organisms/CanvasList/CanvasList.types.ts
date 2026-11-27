@@ -31,6 +31,7 @@ export interface CanvasListRowCardProps {
   moveDown: RowDropTarget | null
   linkedLabels: Map<string, CanvasField>
   selectedSet: Set<string>
+  isSelecting: boolean
   onFieldClick: (fieldId: string) => void
   onFieldLongPress: (fieldId: string) => void
   onMoveRow: (rowId: string, target: RowDropTarget) => void

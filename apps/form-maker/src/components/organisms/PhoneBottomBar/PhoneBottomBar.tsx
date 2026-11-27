@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Grid, Layers, Plus, Redo, Undo, VectorSquare } from 'reicon-react'
+import { Grid, Layers, Plus, Redo, Trash6, Undo, VectorSquare, Xmark } from 'reicon-react'
 import {
   CANVAS_TOOL_BUTTON_ACTIVE_CLASSES,
   CANVAS_TOOL_BUTTON_INACTIVE_CLASSES,
@@ -11,9 +11,16 @@ import type { CanvasRow, RepeatableGroup } from '../../../types/formStructure'
 import { BottomSheet } from '../../molecules/BottomSheet/BottomSheet'
 import { ViewModeSwitch } from '../../molecules/ViewModeSwitch/ViewModeSwitch'
 import { FieldPalette } from '../FieldPalette/FieldPalette'
+import { MoveToStepMenu } from '../MoveToStepMenu/MoveToStepMenu'
 import {
   BAR_CLASSES,
   ITEM_CLASSES,
+  SELECTION_ACTIONS_CLASSES,
+  SELECTION_ACTION_CLASSES,
+  SELECTION_BAR_CLASSES,
+  SELECTION_CLOSE_CLASSES,
+  SELECTION_COUNT_CLASSES,
+  SELECTION_DANGER_CLASSES,
   STRUCTURE_BUTTON_CLASSES,
   STRUCTURE_GRID_CLASSES,
 } from './PhoneBottomBar.constants'
@@ -25,12 +32,19 @@ export function PhoneBottomBar() {
   const viewMode = useFormStore((state) => state.canvasViewMode)
   const setViewMode = useFormStore((state) => state.setCanvasViewMode)
   const isIntro = useFormStore((state) => state.activeCanvas.type === 'introStep')
+  const selectedFieldIds = useFormStore((state) => state.selectedFieldIds)
+  const selectField = useFormStore((state) => state.selectField)
+  const removeFields = useFormStore((state) => state.removeFields)
+  const moveFieldsToStep = useFormStore((state) => state.moveFieldsToStep)
   const addRowToActiveCanvas = useFormStore((state) => state.addRowToActiveCanvas)
   const addGroupToActiveStep = useFormStore((state) => state.addGroupToActiveStep)
   const { canUndo, canRedo, undo, redo } = useFormHistory()
   const reveal = useCanvasReveal()
   const [sheet, setSheet] = useState<PhoneBottomSheet | null>(null)
   const isSelecting: boolean = canvasTool === 'select'
+  const showSelectionBar: boolean =
+    viewMode === 'canvas' &&
+    (selectedFieldIds.length > 1 || (isSelecting && selectedFieldIds.length > 0))
 
   function revealLastRow(): void {
     const rows: CanvasRow[] = getActiveRows(useFormStore.getState())
@@ -56,6 +70,38 @@ export function PhoneBottomBar() {
 
   return (
     <>
+      {showSelectionBar && (
+        <div role="region" aria-label="Acciones de selección" className={SELECTION_BAR_CLASSES}>
+          <span className={SELECTION_COUNT_CLASSES}>
+            {selectedFieldIds.length === 1
+              ? '1 seleccionado'
+              : `${selectedFieldIds.length} seleccionados`}
+          </span>
+          <div className={SELECTION_ACTIONS_CLASSES}>
+            <MoveToStepMenu
+              onSelect={(target) => moveFieldsToStep(selectedFieldIds, target)}
+              triggerClassName={SELECTION_ACTION_CLASSES}
+            />
+            <button
+              type="button"
+              onClick={() => removeFields(selectedFieldIds)}
+              aria-label="Eliminar los campos seleccionados"
+              className={SELECTION_DANGER_CLASSES}
+            >
+              <Trash6 size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => selectField(null)}
+              aria-label="Deseleccionar"
+              className={SELECTION_CLOSE_CLASSES}
+            >
+              <Xmark size={14} weight="Filled" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <nav aria-label="Acciones del lienzo" className={BAR_CLASSES}>
         <button
           type="button"

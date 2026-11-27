@@ -108,6 +108,7 @@ function CanvasListRowCard({
   moveDown,
   linkedLabels,
   selectedSet,
+  isSelecting,
   onFieldClick,
   onFieldLongPress,
   onMoveRow,
@@ -220,8 +221,19 @@ function CanvasListRowCard({
                     }
                     onFieldClick(field.id)
                   }}
+                  aria-pressed={selected}
                   className={`${FIELD_BUTTON_CLASSES} ${borderClasses}`}
                 >
+                  {isSelecting && (
+                    <input
+                      type="checkbox"
+                      readOnly
+                      checked={selected}
+                      tabIndex={-1}
+                      aria-hidden
+                      className="pointer-events-none h-5 w-5 shrink-0 accent-brand"
+                    />
+                  )}
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <div className="flex min-w-0 items-center gap-1.5">
                       {linkedLabel ? (
@@ -438,6 +450,7 @@ export function CanvasList() {
                 moveDown={item.row.moveDown}
                 linkedLabels={linkedLabels}
                 selectedSet={selectedSet}
+                isSelecting={canvasTool === 'select'}
                 onFieldClick={handleFieldClick}
                 onFieldLongPress={handleFieldLongPress}
                 onMoveRow={handleMoveRow}
@@ -472,6 +485,7 @@ export function CanvasList() {
                     moveDown={listRow.moveDown}
                     linkedLabels={linkedLabels}
                     selectedSet={selectedSet}
+                    isSelecting={canvasTool === 'select'}
                     onFieldClick={handleFieldClick}
                     onFieldLongPress={handleFieldLongPress}
                     onMoveRow={handleMoveRow}
