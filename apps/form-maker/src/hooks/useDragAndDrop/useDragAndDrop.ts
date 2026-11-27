@@ -2,6 +2,7 @@ import type { DragEndEvent, DragMoveEvent, DragStartEvent, Modifier } from '@dnd
 import { TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { GRID_BASE_COLUMNS } from '../../constants'
+import { useLayoutMode } from '../useLayoutMode'
 import { getBandElement, getRowElement } from '../../lib'
 import { findNearestFit, getFreeRuns } from '../../lib'
 import { resolveBandDrop, resolveRowDrop } from '../../lib'
@@ -59,10 +60,10 @@ export function useDragAndDrop(): DragAndDropReturn {
   const modifiersRef = useRef({ shift: false, ctrl: false })
   const anchorRef = useRef<number | null>(null)
 
-  const sensors = useSensors(
-    useSensor(MousePenSensor, POINTER_SENSOR_OPTIONS),
-    useSensor(TouchSensor, TOUCH_SENSOR_OPTIONS),
-  )
+  const isPhone: boolean = useLayoutMode() === 'phone'
+  const mouseSensor = useSensor(MousePenSensor, POINTER_SENSOR_OPTIONS)
+  const touchSensor = useSensor(TouchSensor, TOUCH_SENSOR_OPTIONS)
+  const sensors = useSensors(...(isPhone ? [] : [mouseSensor, touchSensor]))
 
   const getDraggedSpan = useCallback((drag: ActiveDrag | null): number => {
     if (!drag) return GRID_BASE_COLUMNS

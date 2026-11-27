@@ -1,12 +1,16 @@
-import { ZOOM_MAX, ZOOM_MIN, ZOOM_STEP, ZOOM_WHEEL_FACTOR } from '../../constants'
+import { ZOOM_MAX, ZOOM_MIN, ZOOM_MIN_PHONE, ZOOM_STEP, ZOOM_WHEEL_FACTOR } from '../../constants'
 import type { PinchFrame, PinchPoint } from '../../types'
 
 // Aritmetica del zoom. Pura salvo getCanvasScale, que lee el DOM a proposito: el zoom vive en CSS.
 
-export function clampZoom(zoom: number): number {
-  if (!Number.isFinite(zoom)) return ZOOM_MIN
+export function minCanvasZoom(isPhone: boolean): number {
+  return isPhone ? ZOOM_MIN_PHONE : ZOOM_MIN
+}
 
-  return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom))
+export function clampZoom(zoom: number, minZoom: number = ZOOM_MIN): number {
+  if (!Number.isFinite(zoom)) return minZoom
+
+  return Math.min(ZOOM_MAX, Math.max(minZoom, zoom))
 }
 
 // Dos decimales: 0.1 + 0.6 da 0.7000000000000001 y nunca seria igual al tope.
@@ -63,6 +67,6 @@ export function pinchFrame(startDistance: number, a: PinchPoint, b: PinchPoint):
   return { scale: isUsable ? distance / startDistance : 1, midpoint }
 }
 
-export function pinchZoom(startZoom: number, scale: number): number {
-  return clampZoom(startZoom * scale)
+export function pinchZoom(startZoom: number, scale: number, minZoom: number = ZOOM_MIN): number {
+  return clampZoom(startZoom * scale, minZoom)
 }

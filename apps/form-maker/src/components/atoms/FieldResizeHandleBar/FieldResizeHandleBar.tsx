@@ -13,6 +13,7 @@ export function FieldResizeHandleBar({
 }: FieldResizeHandleVariantProps) {
   return (
     <div
+      data-field-chrome
       onPointerDown={onPointerDown}
       title={title}
       className={`absolute -right-1 top-1/2 z-9 flex h-9 w-3 -translate-y-1/2 cursor-col-resize touch-none items-center justify-center transition-opacity ${

@@ -3,6 +3,7 @@ export interface ViewportInput {
   portHeight: number
   zoom: number
   panelsCollapsed: boolean
+  minDocumentWidth?: number
 }
 
 // px del puerto. home*: scroll con el documento centrado y su borde superior a la vista.

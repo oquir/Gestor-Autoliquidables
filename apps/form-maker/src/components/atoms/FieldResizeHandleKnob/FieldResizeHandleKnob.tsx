@@ -14,6 +14,7 @@ export function FieldResizeHandleKnob({
 }: FieldResizeHandleVariantProps) {
   return (
     <div
+      data-field-chrome
       onPointerDown={onPointerDown}
       title={title}
       className={`absolute -right-1 top-1/2 z-9 flex h-9 w-9 -translate-y-1/2 cursor-col-resize touch-none items-center justify-center rounded-xl border shadow-sm ring-1 transition-all ${

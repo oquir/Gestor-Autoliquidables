@@ -1,11 +1,12 @@
-import { type PointerEvent, useCallback, useState } from 'react'
+import { type MouseEvent, type PointerEvent, useCallback, useRef, useState } from 'react'
 import { useCanvasViewport, useLayoutMode, useViewModeScroll } from '../../../hooks'
-import { getActiveGroups, getActiveRows, useFormStore } from '../../../store'
-import type { FieldContextMenuState } from '../../../types'
+import { findFieldById, getActiveGroups, getActiveRows, useFormStore } from '../../../store'
+import type { CanvasField, FieldContextMenuState } from '../../../types'
 import { CanvasList } from '../CanvasList'
 import { CanvasRowsGrid } from '../CanvasRowsGrid'
 import { CanvasToolLayer } from '../CanvasToolLayer'
 import { FieldContextMenu } from '../FieldContextMenu'
+import { FieldEditorSheet } from '../FieldEditorSheet'
 import { JsonPreviewCanvas } from '../JsonPreviewCanvas'
 import { PayloadPreviewCanvas } from '../PayloadPreviewCanvas'
 import { TOOL_ROOT_CLASSES } from './Canvas.constants'
@@ -19,11 +20,75 @@ export function Canvas() {
   const canvasTool = useFormStore((state) => state.canvasTool)
   const selectField = useFormStore((state) => state.selectField)
   const [contextMenu, setContextMenu] = useState<FieldContextMenuState | null>(null)
+  const [reviewFieldId, setReviewFieldId] = useState<string | null>(null)
+  const reviewPressTimerRef = useRef<number | null>(null)
+  const reviewPressStartRef = useRef<{ x: number; y: number } | null>(null)
+  const reviewLongPressedRef = useRef<boolean>(false)
   const { contentRef, rootStyle, contentStyle } = useCanvasViewport()
   const isPhone: boolean = useLayoutMode() === 'phone'
+  const isReview: boolean = isPhone && viewMode === 'review'
   useViewModeScroll(viewMode)
 
   const isIntro = activeCanvas.type === 'introStep'
+  const reviewField: CanvasField | null =
+    isReview && reviewFieldId ? findFieldById(activeRows, reviewFieldId) : null
+
+  function clearReviewPress(): void {
+    if (reviewPressTimerRef.current !== null) {
+      window.clearTimeout(reviewPressTimerRef.current)
+      reviewPressTimerRef.current = null
+    }
+    reviewPressStartRef.current = null
+  }
+
+  function handleReviewPointerDownCapture(event: PointerEvent<HTMLDivElement>): void {
+    event.stopPropagation()
+    clearReviewPress()
+    reviewLongPressedRef.current = false
+    if (event.button !== 0 && event.pointerType === 'mouse') return
+
+    const target = event.target
+    if (!(target instanceof Element)) return
+    const fieldElement: HTMLElement | null = target.closest<HTMLElement>('[data-field-id]')
+    const fieldId: string | undefined = fieldElement?.dataset.fieldId
+    if (!fieldId) return
+
+    reviewPressStartRef.current = { x: event.clientX, y: event.clientY }
+    reviewPressTimerRef.current = window.setTimeout(() => {
+      reviewLongPressedRef.current = true
+      reviewPressTimerRef.current = null
+      reviewPressStartRef.current = null
+      if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+        navigator.vibrate(15)
+      }
+      selectField(fieldId)
+      setReviewFieldId(fieldId)
+    }, 450)
+  }
+
+  function handleReviewPointerMoveCapture(event: PointerEvent<HTMLDivElement>): void {
+    const start = reviewPressStartRef.current
+    if (!start) return
+    if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) clearReviewPress()
+  }
+
+  function handleReviewClickCapture(event: MouseEvent<HTMLDivElement>): void {
+    event.stopPropagation()
+    event.preventDefault()
+
+    if (reviewLongPressedRef.current) {
+      reviewLongPressedRef.current = false
+      return
+    }
+
+    const target = event.target
+    if (!(target instanceof Element)) return
+    const fieldElement: HTMLElement | null = target.closest<HTMLElement>('[data-field-id]')
+    const fieldId: string | undefined = fieldElement?.dataset.fieldId
+    if (!fieldId) return
+
+    selectField(fieldId)
+  }
 
   // Clic en vacio suelta la seleccion. Busca hacia arriba un campo, fila o grupo: comparar contra
   // un contenedor fallaba con envoltorios decorativos. Solo en Mover.
@@ -44,7 +109,7 @@ export function Canvas() {
     [],
   )
 
-  if (viewMode !== 'canvas') {
+  if (viewMode === 'json' || viewMode === 'payload') {
     return (
       <div key={viewMode} className={`mx-auto max-w-5xl px-6 py-8 ${ENTER_FADE_CLASSES}`}>
         {viewMode === 'json' && <JsonPreviewCanvas />}
@@ -53,7 +118,7 @@ export function Canvas() {
     )
   }
 
-  if (isPhone) return <CanvasList />
+  if (isPhone && viewMode === 'canvas') return <CanvasList />
 
   return (
     <div
@@ -66,7 +131,14 @@ export function Canvas() {
       <div
         ref={contentRef}
         style={contentStyle}
-        className={`mx-auto ${ENTER_FADE_CLASSES} ${canvasTool === 'move' ? '' : 'pointer-events-none'}`}
+        data-review-preview={isReview ? '' : undefined}
+        onPointerDownCapture={isReview ? handleReviewPointerDownCapture : undefined}
+        onPointerMoveCapture={isReview ? handleReviewPointerMoveCapture : undefined}
+        onPointerUpCapture={isReview ? clearReviewPress : undefined}
+        onPointerCancelCapture={isReview ? clearReviewPress : undefined}
+        onContextMenuCapture={isReview ? (event) => event.preventDefault() : undefined}
+        onClickCapture={isReview ? handleReviewClickCapture : undefined}
+        className={`mx-auto ${ENTER_FADE_CLASSES} ${canvasTool === 'move' || isReview ? '' : 'pointer-events-none'} ${isReview ? 'select-none' : ''}`}
       >
         {isIntro ? (
           <div className="relative flex min-h-[70vh] items-center justify-center overflow-hidden rounded-lg bg-slate-100 p-6 dark:bg-neutral-950">
@@ -109,8 +181,13 @@ export function Canvas() {
         )}
       </div>
 
-      <CanvasToolLayer />
-      {contextMenu && <FieldContextMenu menu={contextMenu} onClose={() => setContextMenu(null)} />}
+      {!isReview && <CanvasToolLayer />}
+      {!isReview && contextMenu && (
+        <FieldContextMenu menu={contextMenu} onClose={() => setContextMenu(null)} />
+      )}
+      {reviewField && (
+        <FieldEditorSheet field={reviewField} onClose={() => setReviewFieldId(null)} />
+      )}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Grid, Layers, Plus, Redo, Trash6, Undo, VectorSquare, Xmark } from 'reicon-react'
+import { DOCUMENT_MAX_WIDTH_PX } from '../../../constants/canvasViewport'
 import {
   CANVAS_TOOL_BUTTON_ACTIVE_CLASSES,
   CANVAS_TOOL_BUTTON_INACTIVE_CLASSES,
@@ -31,6 +32,7 @@ export function PhoneBottomBar() {
   const setCanvasTool = useFormStore((state) => state.setCanvasTool)
   const viewMode = useFormStore((state) => state.canvasViewMode)
   const setViewMode = useFormStore((state) => state.setCanvasViewMode)
+  const setCanvasZoom = useFormStore((state) => state.setCanvasZoom)
   const isIntro = useFormStore((state) => state.activeCanvas.type === 'introStep')
   const selectedFieldIds = useFormStore((state) => state.selectedFieldIds)
   const selectField = useFormStore((state) => state.selectField)
@@ -195,6 +197,11 @@ export function PhoneBottomBar() {
           <ViewModeSwitch
             activeMode={viewMode}
             onSelect={(mode) => {
+              if (mode === 'review') {
+                const fitZoom: number =
+                  Math.floor(((window.innerWidth - 24) / DOCUMENT_MAX_WIDTH_PX) * 100) / 100
+                setCanvasZoom(fitZoom)
+              }
               setViewMode(mode)
               setSheet(null)
             }}

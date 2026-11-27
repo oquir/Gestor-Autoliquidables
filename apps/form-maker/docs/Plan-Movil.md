@@ -376,8 +376,9 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 - [x] ~~**P8 Grupos repetibles:**~~ (2026-11-27)
   - Sección con sus filas. Su ⋯ abre lo que hoy edita `RepeatableGroupBand`.
   - Las reglas del grupo no cambian: una fila no entra ni sale de un grupo.
-- [ ] **P9 La vista "Revisar":**
-  - La grilla real (`Canvas`) con zoom para que entre, y pellizcar. Tocar un campo abre su hoja.
+- [x] ~~**P9 La vista "Revisar":**~~ (2026-11-27)
+  - La grilla real (`Canvas`) con zoom para que entre, y pellizcar. Dejar presionado (450 ms, con
+    vibración) un campo abre su hoja, sin botones ni cromo de edición.
   - En el celular no se arrastra.
   - `ViewModeSwitch` en `phone`: Lista · Revisar · JSON · Payload. Si `CanvasViewMode`
     (`types/ui.ts:13`) gana un valor, sigue siendo estado de vista, fuera del borrador.

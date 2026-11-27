@@ -21,7 +21,6 @@ import {
   Trash6,
 } from 'reicon-react'
 import {
-  ACTION_TIER_CLASSES,
   FIELD_TYPE_ICONS,
   FIELD_TYPES,
   MAX_ROW_COLUMNS,
@@ -42,7 +41,6 @@ import type {
   CanvasField,
   CanvasListItem,
   CanvasRow,
-  ContextMenuTab,
   FieldTypeDef,
   IconProps,
   RepeatableGroup,
@@ -58,8 +56,7 @@ import {
   TwoColumnFieldGroup,
 } from '../../atoms'
 import { BottomSheet, CssValidationHint, PxInput } from '../../molecules'
-import { FieldEditorTabs } from '../FieldEditorTabs'
-import { MoveToStepMenu } from '../MoveToStepMenu'
+import { FieldEditorSheet } from '../FieldEditorSheet'
 import { GroupChecksEditor } from '../panels/GroupChecksEditor'
 import {
   ADD_FIELD_BUTTON_CLASSES,
@@ -316,8 +313,6 @@ export function CanvasList() {
   const canvasTool = useFormStore((state) => state.canvasTool)
   const selectField = useFormStore((state) => state.selectField)
   const toggleFieldSelection = useFormStore((state) => state.toggleFieldSelection)
-  const removeFields = useFormStore((state) => state.removeFields)
-  const moveFieldsToStep = useFormStore((state) => state.moveFieldsToStep)
   const moveRow = useFormStore((state) => state.moveRow)
   const moveField = useFormStore((state) => state.moveField)
   const updateRowColumns = useFormStore((state) => state.updateRowColumns)
@@ -335,7 +330,6 @@ export function CanvasList() {
   const pendingFlipRef = useRef<Map<string, number> | null>(null)
   const [rowSheet, setRowSheet] = useState<RowSheetState | null>(null)
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null)
-  const [editingTab, setEditingTab] = useState<ContextMenuTab>('attributes')
   const [isMoveFieldRowOpen, setMoveFieldRowOpen] = useState<boolean>(false)
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null)
 
@@ -376,7 +370,6 @@ export function CanvasList() {
   function handleFieldLongPress(fieldId: string): void {
     if (canvasTool === 'select') return
     selectField(fieldId)
-    setEditingTab('attributes')
     setMoveFieldRowOpen(false)
     setEditingFieldId(fieldId)
   }
@@ -729,55 +722,14 @@ export function CanvasList() {
       )}
 
       {editingField && (
-        <BottomSheet
-          title={editingField.label || 'Editar campo'}
-          size="full"
+        <FieldEditorSheet
+          field={editingField}
           onClose={() => {
             setMoveFieldRowOpen(false)
             setEditingFieldId(null)
           }}
-        >
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
-            <span className="truncate font-mono text-xs text-fg-muted">{editingField.name}</span>
-            <div className="flex shrink-0 items-center gap-1.5">
-              <button
-                type="button"
-                disabled={activeRows.length < 2}
-                onClick={() => setMoveFieldRowOpen(true)}
-                className={ACTION_TIER_CLASSES.tertiary.compact}
-              >
-                Mover a fila…
-              </button>
-              <MoveToStepMenu
-                onSelect={(target) => {
-                  moveFieldsToStep([editingField.id], target)
-                  setEditingFieldId(null)
-                }}
-                tooltip="Mover el campo a otro paso"
-                triggerClassName={ACTION_TIER_CLASSES.tertiary.compact}
-                placement="down"
-              />
-              <IconButton
-                onClick={() => {
-                  removeFields([editingField.id])
-                  setEditingFieldId(null)
-                }}
-                className="text-fg-subtle transition-colors hover:text-danger"
-                aria-label="Borrar campo"
-                title="Borrar campo"
-              >
-                <Trash6 size={16} />
-              </IconButton>
-            </div>
-          </div>
-
-          <FieldEditorTabs
-            field={editingField}
-            activeTab={editingTab}
-            onSelectTab={setEditingTab}
-            bodyClassName="pt-3"
-          />
-        </BottomSheet>
+          onMoveToRow={activeRows.length >= 2 ? () => setMoveFieldRowOpen(true) : undefined}
+        />
       )}
 
       {isMoveFieldRowOpen && editingField && (

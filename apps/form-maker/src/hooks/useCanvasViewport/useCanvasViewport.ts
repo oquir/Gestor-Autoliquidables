@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/refs -- el ancla se captura en render a proposito, ver captureAnchor */
 import { type CSSProperties, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { DOCUMENT_MAX_WIDTH_PX } from '../../constants/canvasViewport'
 import { getViewportLayout } from '../../lib/canvasViewport/canvasViewport'
-import { pinchZoom, wheelZoom } from '../../lib/canvasZoom/canvasZoom'
+import { minCanvasZoom, pinchZoom, wheelZoom } from '../../lib/canvasZoom/canvasZoom'
 import { useFormStore } from '../../store/formStore'
 import type { ViewportLayout } from '../../types/canvasViewport'
 import type { PinchFrame, PinchPoint } from '../../types/pinch'
+import { useLayoutMode } from '../useLayoutMode'
 import { usePinchZoom } from '../usePinchZoom'
 import type { CanvasViewportReturn } from '../../types/canvasViewportReturn'
 import type { HomedView, PortSize, ViewAnchor } from './useCanvasViewport.types'
@@ -17,6 +19,7 @@ import { captureAnchor, readPortSize, restoreAnchor, samePortSize } from './useC
 // del formulario queda inalcanzable.
 export function useCanvasViewport(): CanvasViewportReturn {
   const zoom: number = useFormStore((state) => state.canvasZoom)
+  const isPhone: boolean = useLayoutMode() === 'phone'
   const panelsCollapsed: boolean = useFormStore(
     (state) => !state.isSidebarOpen && !state.isRightSidebarOpen,
   )
@@ -130,7 +133,7 @@ export function useCanvasViewport(): CanvasViewportReturn {
     },
     onPinch: (frame: PinchFrame) => {
       const state = useFormStore.getState()
-      const next: number = pinchZoom(pinchStartZoom.current, frame.scale)
+      const next: number = pinchZoom(pinchStartZoom.current, frame.scale, minCanvasZoom(isPhone))
       if (next === state.canvasZoom) return
       pinchPoint.current = frame.midpoint
       state.setCanvasZoom(next)
@@ -151,6 +154,7 @@ export function useCanvasViewport(): CanvasViewportReturn {
         portHeight: portSize.height,
         zoom,
         panelsCollapsed,
+        minDocumentWidth: isPhone ? DOCUMENT_MAX_WIDTH_PX : 0,
       })
     : null
 

@@ -78,6 +78,7 @@ export function RepeatableGroupBand({
 
         <button
           type="button"
+          data-field-chrome
           onClick={() => addRowToGroup(group.id)}
           className={BAND_ACTION_CLASSES}
         >
@@ -88,6 +89,7 @@ export function RepeatableGroupBand({
 
         <button
           type="button"
+          data-field-chrome
           onClick={() => setIsConfigOpen((open) => !open)}
           aria-expanded={isConfigOpen}
           className={BAND_ACTION_CLASSES}

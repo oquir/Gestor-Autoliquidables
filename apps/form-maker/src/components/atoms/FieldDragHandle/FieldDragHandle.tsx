@@ -18,6 +18,7 @@ export function FieldDragHandle({
 
   return (
     <div
+      data-field-chrome
       {...listeners}
       {...attributes}
       title="Arrastrar para mover"

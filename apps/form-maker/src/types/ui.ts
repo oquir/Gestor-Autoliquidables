@@ -10,7 +10,7 @@ export type SidebarTab =
 
 export type RightSidebarTab = 'project' | 'steps'
 
-export type CanvasViewMode = 'canvas' | 'json' | 'payload'
+export type CanvasViewMode = 'canvas' | 'review' | 'json' | 'payload'
 
 // select y hand dejan el documento inerte: el puntero lo maneja el puerto.
 export type CanvasTool = 'move' | 'select' | 'hand'

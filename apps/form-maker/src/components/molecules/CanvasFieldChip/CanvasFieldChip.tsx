@@ -224,6 +224,7 @@ function CanvasFieldChipBodyBase({
       {showTooltip && field.tooltip && <TooltipBubble tooltip={field.tooltip} />}
       {pinned && (
         <IconButton
+          data-field-chrome
           onClick={(event) => onChipContextMenu(event, field.id)}
           title="Más opciones del campo"
           aria-label="Más opciones del campo"
@@ -234,6 +235,7 @@ function CanvasFieldChipBodyBase({
         </IconButton>
       )}
       <IconButton
+        data-field-chrome
         onClick={() => removeFields([field.id])}
         title="Eliminar campo"
         aria-label="Eliminar campo"

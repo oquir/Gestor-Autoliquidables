@@ -39,6 +39,7 @@ function RowToolbarBase({ row, listeners, attributes, pinned }: RowToolbarProps)
 
   return (
     <div
+      data-field-chrome
       className={`${ROW_TOOLBAR_CLASSES} ${isVisible ? CHROME_PINNED_CLASSES : CHROME_ON_ROW_CLASSES}`}
     >
       <RowDragHandle listeners={listeners} attributes={attributes} />

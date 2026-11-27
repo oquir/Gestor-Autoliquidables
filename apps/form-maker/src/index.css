@@ -553,3 +553,8 @@
   background-size: 22px 22px;
   background-attachment: local;
 }
+
+/* En la vista Revisar del celular se ocultan los controles de mover, redimensionar, borrar y ⋯. */
+[data-review-preview] [data-field-chrome] {
+  display: none;
+}

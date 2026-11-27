@@ -15,11 +15,15 @@ export function getViewportLayout({
   portHeight,
   zoom,
   panelsCollapsed,
+  minDocumentWidth = 0,
 }: ViewportInput): ViewportLayout | null {
   if (portWidth <= 0 || portHeight <= 0) return null
 
   const maxWidth: number = panelsCollapsed ? DOCUMENT_MAX_WIDTH_FOCUSED_PX : DOCUMENT_MAX_WIDTH_PX
-  const documentWidth: number = Math.max(0, Math.min(maxWidth, portWidth - 2 * DOCUMENT_GUTTER_PX))
+  const documentWidth: number = Math.max(
+    minDocumentWidth,
+    Math.min(maxWidth, portWidth - 2 * DOCUMENT_GUTTER_PX),
+  )
   const panX: number = Math.round(portWidth * CANVAS_PAN_ROOM_RATIO)
   const panY: number = Math.round(portHeight * CANVAS_PAN_ROOM_RATIO)
   // El puerto entero si el documento entra, o el documento escalado con su aire.

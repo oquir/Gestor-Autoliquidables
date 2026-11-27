@@ -5,7 +5,8 @@ import { ZOOM_DEFAULT } from '../constants/canvasZoom'
 import { GRID_BASE_COLUMNS, MAX_ROW_COLUMNS, MIN_ROW_COLUMNS } from '../constants/grid'
 import { HISTORY_BURST_MS, HISTORY_LIMIT } from '../constants/history'
 import { sameIdSet, toggleId, withoutIds } from '../lib/canvasSelection/canvasSelection'
-import { clampZoom } from '../lib/canvasZoom/canvasZoom'
+import { clampZoom, minCanvasZoom } from '../lib/canvasZoom/canvasZoom'
+import { layoutModeFor } from '../lib/layoutMode/layoutMode'
 import { slugifyFieldName, uniqueFieldName } from '../lib/fieldName/fieldName'
 import { allowsManualOptions, isOptionBasedField } from '../lib/fieldOptions/fieldOptions'
 import { createFieldRule, moveRule } from '../lib/fieldRule/fieldRule'
@@ -155,7 +156,11 @@ const createFormState: StateCreator<FormState, [['temporal', unknown]], []> = (s
   // vive en usePdfDesignStore.
   setPdfDesignerOpen: (open) => set({ isPdfDesignerOpen: open }),
   // Se recorta aca: la rueda manda valores continuos y los atajos no saben del rango.
-  setCanvasZoom: (zoom) => set({ canvasZoom: clampZoom(zoom) }),
+  setCanvasZoom: (zoom) => {
+    const isPhone: boolean =
+      typeof window !== 'undefined' && layoutModeFor(window.innerWidth) === 'phone'
+    set({ canvasZoom: clampZoom(zoom, minCanvasZoom(isPhone)) })
+  },
   // Estado de vista: no viaja en el borrador y al recargar vuelve a Mover.
   setCanvasTool: (tool) => set({ canvasTool: tool }),
   setSidebarTab: (tab) => set({ sidebarTab: tab }),
