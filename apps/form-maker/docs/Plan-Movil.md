@@ -81,7 +81,7 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
     un `::after` con `-inset-*` solo en `pointer-coarse:`.
   - La meta es 44×44 px. El mínimo de WCAG 2.5.8 es 24 px.
 
-### [ ] B5 Lo que hoy solo aparece con hover
+### [x] ~~B5 Lo que hoy solo aparece con hover~~ (2026-11-26, 0151e6b1)
 
 - **Qué pasa:**
   - `CHROME_ON_FIELD_CLASSES` y `CHROME_ON_ROW_CLASSES` (`uiClasses.ts:41-45`) muestran el cromo con
