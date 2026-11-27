@@ -240,7 +240,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
       en el celular para que la cabecera entre en 360) en `phone`, `PreviewResults` (payload, valores, errores) sale
       de un botón "Resultados" en la cabecera, en lugar de quedar debajo del formulario largo. Desde
       `lg:` queda igual que hoy.
-- [ ] **S5 Modal de entrada:** el que va dentro de `PreviewForm` (`max-w-2xl`, `max-h-full`) en el
+- [x] ~~**S5 Modal de entrada:**~~ (2026-11-27, 73addac1; en `max-sm:` deja de flotar, esconde el
+      paso de atrás y pega su pie abajo) el que va dentro de `PreviewForm` (`max-w-2xl`, `max-h-full`) en el
       celular ocupa la tarjeta, con sus botones visibles con el teclado abierto.
 - [ ] **S6 Lo que se abre encima:**
   - La lista de `PreviewSearchSelect` dentro de la pantalla y por encima del teclado.
