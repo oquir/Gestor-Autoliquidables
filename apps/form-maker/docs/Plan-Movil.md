@@ -302,7 +302,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     celular.
   - Android también dispara `contextmenu` con la pulsación larga. Safari no, así que el botón es el
     camino seguro.
-- [ ] **T6 Mover a otro paso sin soltar en la pestaña:**
+- [x] ~~**T6 Mover a otro paso sin soltar en la pestaña:**~~ (2026-11-27, 71f25de4; en la fila y en
+      el menú del campo, solo con `WITHOUT_STEP_TABS_CLASSES`: debajo de 1280 px o táctil)
   - Las zonas para soltar viven en el panel derecho, que en `compact` está cerrado mientras se
     arrastra.
   - `MoveToStepMenu` también para la selección de un solo campo (menú ⋯) y en la barra de la fila
