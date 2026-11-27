@@ -383,7 +383,7 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - `ViewModeSwitch` en `phone`: Lista · Revisar · JSON · Payload. Si `CanvasViewMode`
     (`types/ui.ts:13`) gana un valor, sigue siendo estado de vista, fuera del borrador.
   - `ZOOM_MIN` (0,5) baja en el celular.
-- [ ] **P10 Lo demás en hojas a altura completa:**
+- [x] ~~**P10 Lo demás en hojas a altura completa:**~~ (2026-11-27)
   - Lógica (CodeMirror a 16 px), Mapeo API, Catálogos y Fechas.
   - JSON y Payload ya se virtualizan, y `JsonSearchBar` ya se adapta con `@xs`.
 - [ ] **P11 Asistente y recuperación del borrador** a pantalla completa (B7).
