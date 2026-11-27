@@ -140,6 +140,11 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
     cambiar la URL, porque el PDF lee `?impuesto=`. Atrás cierra lo de más arriba.
   - La pila es pura: `lib/backStack`, con prueba. El hook va en `hooks/`.
 - **Meta:** Atrás nunca saca de la app con algo abierto.
+- **Hallazgo (2026-11-27, sin corregir, espera al usuario):** en `pnpm dev` con puntero táctil,
+  toda capa con `useBackClose` se cierra al abrirse. `StrictMode` monta, limpia y vuelve a montar el
+  efecto: la limpieza hace `history.back()` y el segundo `pushState` llega antes; Chrome vuelve a la
+  entrada de carga (piso 0) y `popstate` cierra la capa. Sin verificar: podría pasar en producción si una
+  capa se cierra y otra se abre en el mismo instante (la misma carrera). B8 se verificó con `vite preview` (sin `StrictMode`).
 
 ### [x] ~~B9 Que el guardado no se pierda~~ (2026-11-26, dd14b9e4)
 
@@ -203,8 +208,14 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
 Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px en
 `Decisiones.md`) y la cabecera ya se adapta (`sm:`).
 
-- [ ] **S1 Navegación al alcance del pulgar:** en `phone`, el pie de `PreviewForm` (Anterior · Paso
-      N de M · Siguiente/Enviar) queda fijo abajo, con la zona segura.
+- [x] ~~**S1 Navegación al alcance del pulgar:**~~ (2026-11-27, 569c6823) en `phone`, el pie de
+      `PreviewForm` (Anterior · Paso N de M · Siguiente/Enviar) queda fijo abajo, con la zona segura.
+  - `sticky` dentro de la tarjeta, no `fixed`: el modal de entrada lo sigue tapando y, pasada la
+    tarjeta, vuelve a su lugar. `-bottom-4` compensa el `py-4` del scroll (Chrome mide el sticky
+    dentro de ese padding).
+  - Reiniciar pasa a ícono para que todo entre en una línea a 360 px; al cambiar de paso la tarjeta
+    vuelve arriba; `scroll-pb-20` deja el campo enfocado por encima del pie.
+  - Verificado en Edge headless a 390×844 y a 1280×720 (escritorio igual).
 - [ ] **S2 Toques e inputs:**
   - B3 en todos los controles.
   - El `toggle_group` (`py-1 text-xs`), las casillas y las opciones se pueden tocar en toda su fila.

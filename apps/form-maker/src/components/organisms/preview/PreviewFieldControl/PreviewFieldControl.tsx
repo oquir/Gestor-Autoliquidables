@@ -26,8 +26,10 @@ import {
   CONTROL_IDLE_CLASSES,
   CONTROL_INVALID_CLASSES,
   INLINE_OPTIONS_CLASSES,
+  OPTION_INPUT_CLASSES,
   OPTION_ROW_CLASSES,
   STACKED_OPTIONS_CLASSES,
+  TOGGLE_GROUP_CLASSES,
 } from './PreviewFieldControl.constants'
 import type { PreviewFieldControlProps } from './PreviewFieldControl.types'
 import { toggleInList, toInputValue, toSelectedList } from './PreviewFieldControl.utils'
@@ -163,7 +165,7 @@ export function PreviewFieldControl({
             disabled={disabled}
             checked={Boolean(value)}
             onChange={(event) => onChange(event.target.checked)}
-            className="accent-brand"
+            className={OPTION_INPUT_CLASSES}
           />
           {field.title || 'Acepto'}
         </label>
@@ -218,7 +220,7 @@ export function PreviewFieldControl({
 
     case 'toggle_group':
       return (
-        <div className="flex flex-wrap gap-1.5">
+        <div className={TOGGLE_GROUP_CLASSES}>
           {options.map((option) => (
             <button
               key={option.id}
@@ -248,7 +250,7 @@ export function PreviewFieldControl({
                 disabled={disabled}
                 checked={toInputValue(value) === option.id}
                 onChange={() => onChange(option.id)}
-                className="accent-brand"
+                className={OPTION_INPUT_CLASSES}
               />
               {option.label}
             </label>
@@ -270,7 +272,7 @@ export function PreviewFieldControl({
                 disabled={disabled}
                 checked={selected.includes(option.id)}
                 onChange={() => onChange(toggleInList(selected, option.id))}
-                className="accent-brand"
+                className={OPTION_INPUT_CLASSES}
               />
               {option.label}
             </label>
