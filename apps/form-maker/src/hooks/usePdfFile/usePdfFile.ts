@@ -3,8 +3,15 @@
 // Descargar es una copia que no gasta N: lleva la ultima subida, o _borrador si nunca se subio. Las
 // reglas estan en lib/pdfFile.
 import { toast } from 'sonner'
+import { TOUCH_POINTER_QUERY } from '../../constants'
 import { describeApiError } from '../../lib/fakeApi/fakeApi'
-import { buildPdfHtml, downloadPdfHtml, pdfFileName, printPdfHtml } from '../../lib/pdfFile'
+import {
+  buildPdfHtml,
+  downloadPdfHtml,
+  pdfFileName,
+  printPdfHtml,
+  printPdfHtmlInTab,
+} from '../../lib/pdfFile'
 import { uploadPdfHtml } from '../../lib/pdfUpload'
 import { renderVerticalTextPng } from '../../lib/pdfVerticalText'
 import { usePdfDesignStore } from '../../store/pdfDesignStore'
@@ -59,7 +66,10 @@ export function usePdfFile(): UsePdfFileResult {
     const { design, publishedVersion } = usePdfDesignStore.getState()
     if (!design) return
 
-    printPdfHtml(buildPdfHtml(design, publishedVersion, renderVerticalTextPng))
+    const html: string = buildPdfHtml(design, publishedVersion, renderVerticalTextPng)
+    // Con el dedo, en pestaña (ver printPdfHtmlInTab); si el navegador la bloquea, el iframe.
+    if (window.matchMedia(TOUCH_POINTER_QUERY).matches && printPdfHtmlInTab(html)) return
+    printPdfHtml(html)
   }
 
   return { isUploading, upload, download, print }

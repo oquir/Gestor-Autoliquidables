@@ -35,6 +35,11 @@ export const PRINT_CSS: string =
   '@page { size: letter; margin: 5mm; }\n' +
   'html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }'
 
+// Solo en la copia que imprime la pestaña del celular (printPdfHtmlInTab); nunca en el .html que se
+// descarga o se sube. Espera a load para que las imagenes ya esten.
+export const PRINT_ON_LOAD_SCRIPT: string =
+  "<script>window.addEventListener('load', function () { window.print() })</script>"
+
 // Respaldo por si el navegador no manda afterprint y el iframe se quedaria para siempre.
 export const PRINT_FRAME_TIMEOUT_MS: number = 60_000
 

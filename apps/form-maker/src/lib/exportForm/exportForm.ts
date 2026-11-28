@@ -7,6 +7,7 @@ import type {
 } from '../../types/exportForm'
 import type { CanvasRow, FormStep, IntroModalStep } from '../../types/formStructure'
 import type { SetupConfig } from '../../types/setup'
+import { downloadBlob } from '../fileDownload/fileDownload'
 import { collectRequires } from '../formRequires/formRequires'
 import { buildDraftPayload } from '../persistence/persistence'
 import { buildNameIndex, mapFormStep, mapRows } from './exportForm.utils'
@@ -98,11 +99,8 @@ export function downloadFormExport(
     introModalSteps,
     formScript,
   )
-  const blob: Blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const anchor: HTMLAnchorElement = document.createElement('a')
-  anchor.href = url
-  anchor.download = `${data.projectMeta.formId}.json`
-  anchor.click()
-  URL.revokeObjectURL(url)
+  downloadBlob(
+    new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
+    `${data.projectMeta.formId}.json`,
+  )
 }

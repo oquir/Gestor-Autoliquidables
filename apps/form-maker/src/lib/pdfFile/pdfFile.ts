@@ -29,6 +29,7 @@ import type {
   PdfTaxType,
   PdfVerticalTextRenderer,
 } from '../../types'
+import { downloadBlob } from '../fileDownload'
 import { pdfComponentHtml } from '../pdfComponents'
 import {
   cellStyleMap,
@@ -65,6 +66,7 @@ import {
   PDF_FILE_FORMAT_VERSION,
   PRINT_CSS,
   PRINT_FRAME_TIMEOUT_MS,
+  PRINT_ON_LOAD_SCRIPT,
   UNSAFE_INPUT,
 } from './pdfFile.constants'
 import {
@@ -171,15 +173,26 @@ export function pickLatestPdfFile(reads: PdfFileRead[]): number {
   return best
 }
 
-// Toca el DOM, como downloadFormExport: el resto de este archivo es puro.
+// Toca el DOM, como downloadFormExport: el resto de este archivo es puro, salvo imprimir.
 export function downloadPdfHtml(html: string, fileName: string): void {
-  const blob: Blob = new Blob([html], { type: 'text/html;charset=utf-8' })
-  const url: string = URL.createObjectURL(blob)
-  const anchor: HTMLAnchorElement = document.createElement('a')
-  anchor.href = url
-  anchor.download = fileName
-  anchor.click()
-  URL.revokeObjectURL(url)
+  downloadBlob(new Blob([html], { type: 'text/html;charset=utf-8' }), fileName)
+}
+
+function withPrintCss(html: string): string {
+  return html.replace('</head>', `<style>\n${PRINT_CSS}\n</style>\n</head>`)
+}
+
+// Imprimir en el celular: el .html en una pestaña nueva que se imprime sola al cargar. Chrome de
+// Android imprime la pagina entera y no el iframe oculto de printPdfHtml, asi que saldria la app.
+// La pestaña queda abierta con el PDF: se vuelve con Atras o cerrandola. Tiene que llamarse dentro
+// del toque (si no, el navegador bloquea la ventana); devuelve false si la bloqueo igual.
+export function printPdfHtmlInTab(html: string): boolean {
+  const tab: Window | null = window.open('', '_blank')
+  if (!tab) return false
+  tab.document.open()
+  tab.document.write(withPrintCss(html).replace('</head>', `${PRINT_ON_LOAD_SCRIPT}\n</head>`))
+  tab.document.close()
+  return true
 }
 
 // Imprime el mismo .html en un iframe oculto: Ctrl+P saca el PDF y no la app.
@@ -212,7 +225,7 @@ export function printPdfHtml(html: string): void {
     win.focus()
     win.print()
   }
-  frame.srcdoc = html.replace('</head>', `<style>\n${PRINT_CSS}\n</style>\n</head>`)
+  frame.srcdoc = withPrintCss(html)
   document.body.appendChild(frame)
 }
 
