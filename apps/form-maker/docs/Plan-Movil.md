@@ -499,6 +499,19 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     - Bajo rendimiento: en D9 quitó trabajo de animaciones, pero no acortó el toque. Con estas
       medidas no hace falta que arranque activado en táctil (falta la decisión del usuario).
 - [ ] **C2 Pasada completa:** Android real, más la emulación de iPhone y iPad.
+  - Emulación (2026-11-27): iPhone 390×844, iPad 820×1180 y 1180×820, táctil. Maquetador (lista,
+    ⋯, hoja del campo, Agregar, Revisar; en tablet cajones y campo tocado), simulador y diseñador
+    de PDF (celda tocada y ⋯). Sin desbordes a lo ancho; dos fallas, corregidas:
+    - **Revisar en el celular quedaba corrido ~90 px y cortado a la derecha.** P9 deja el
+      documento en 976 px con `scale`; su caja era más ancha que la raíz, `mx-auto` ya no centraba
+      y el `scale` encogía hacia el centro de la caja. Ahora `getViewportLayout` da
+      `documentShift` (margen izquierdo negativo, solo cuando no entra; en el escritorio 0).
+    - **El modal de entrada del simulador en tablet con el dedo quedaba a media tarjeta**, con
+      Continuar fuera de la pantalla (1180×820 y 1024×768). Los controles de 44 px de S2 alargan el
+      paso 1 a 1450 px. Con `sm:pointer-coarse:` va arriba, `sticky` y con el alto de la pantalla.
+      Con mouse sigue centrado; en el celular sigue como en S5.
+  - Fuera del plan, visto de paso: un select obligatorio vacío muestra el mensaje de Zod en
+    inglés ("Invalid input: expected string, received undefined").
 - [ ] **C3 Documentación:**
   - `CLAUDE.md`: rehacer el Known gap de responsive y agregar las invariantes nuevas (los dos ejes,
     hojas y cajones sin transform, la pila de Atrás, `touch-action` por herramienta).
