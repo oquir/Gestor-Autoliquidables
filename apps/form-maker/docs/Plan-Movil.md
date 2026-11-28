@@ -519,8 +519,18 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
   - `Decisiones.md`: una sección por fase.
   - Los pendientes del consumidor (Known gaps de `CLAUDE.md`, con la regla nueva del modal de
     entrada en tablet).
-- [ ] **C4 En cada fase:** `pnpm test`, `pnpm lint`, `pnpm build` y `pnpm check:chunks` en verde.
-      Las hojas viven en el chunk inicial y no pueden importar nada del simulador ni del PDF.
+- [x] ~~**C4 En cada fase:**~~ (2026-11-27, sobre 48b5006d) `pnpm test`, `pnpm lint`, `pnpm build` y
+      `pnpm check:chunks` en verde. Las hojas viven en el chunk inicial y no pueden importar nada
+      del simulador ni del PDF.
+  - Verde: 841 pruebas (y las 12 `it.fails` de siempre), lint y Prettier, `tsc -b` + build, y las
+    fronteras perezosas.
+  - **Escritorio sin cambios**, comparado pixel a pixel contra 32c05947 (el commit de antes de
+    B1, armado en un `git worktree` aparte): Edge headless con mouse y `prefers-reduced-motion`,
+    a 1280×720, 1366×768 y 1600×1000; maquetador, campo seleccionado, simulador y diseñador de
+    PDF. 11 de 12 fotos idénticas. La del simulador difiere en 15 px: el suavizado de unas letras
+    de "Volver al lienzo", que 694aae87 envolvió en un `<span>` para quitar el espacio que había
+    dejado S4; mismo lugar, mismo tamaño. Cambio de escritorio buscado y no fotografiado: el
+    selector "Columna de inicio" de T4 en Atributos.
 
 ## 7. Pruebas
 
