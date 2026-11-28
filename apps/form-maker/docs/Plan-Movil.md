@@ -498,7 +498,8 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     - Simulador: entrar al paso 1 desde el modal, 48 ms; teclear, 8–11 ms de JS por tecla.
     - Bajo rendimiento: en D9 quitó trabajo de animaciones, pero no acortó el toque. Con estas
       medidas no hace falta que arranque activado en táctil (falta la decisión del usuario).
-- [ ] **C2 Pasada completa:** Android real, más la emulación de iPhone y iPad.
+- [x] ~~**C2 Pasada completa:**~~ (2026-11-27, 3a2bb182, 0f0e22e8 y a037881f; el usuario aprobó los
+      arreglos) Android real, más la emulación de iPhone y iPad.
   - Emulación (2026-11-27): iPhone 390×844, iPad 820×1180 y 1180×820, táctil. Maquetador (lista,
     ⋯, hoja del campo, Agregar, Revisar; en tablet cajones y campo tocado), simulador y diseñador
     de PDF (celda tocada y ⋯). Sin desbordes a lo ancho; dos fallas, corregidas:
@@ -512,11 +513,12 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
       Con mouse sigue centrado; en el celular sigue como en S5.
   - Fuera del plan, visto de paso: un select obligatorio vacío muestra el mensaje de Zod en
     inglés ("Invalid input: expected string, received undefined").
-- [ ] **C3 Documentación:**
+- [x] ~~**C3 Documentación:**~~ (2026-11-27; sección `Phones and tablets` en `Decisiones.md`)
   - `CLAUDE.md`: rehacer el Known gap de responsive y agregar las invariantes nuevas (los dos ejes,
     hojas y cajones sin transform, la pila de Atrás, `touch-action` por herramienta).
   - `Decisiones.md`: una sección por fase.
-  - Los pendientes del consumidor.
+  - Los pendientes del consumidor (Known gaps de `CLAUDE.md`, con la regla nueva del modal de
+    entrada en tablet).
 - [ ] **C4 En cada fase:** `pnpm test`, `pnpm lint`, `pnpm build` y `pnpm check:chunks` en verde.
       Las hojas viven en el chunk inicial y no pueden importar nada del simulador ni del PDF.
 
