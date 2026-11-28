@@ -193,6 +193,13 @@ las variantes `max-*:` y `pointer-coarse:`. Al cerrar cada fase se comparan capt
   - `vite preview --port 5199 --strictPort` aparte, para no tocar el dev server del usuario. Abre en
     `localhost`, no en `127.0.0.1` (ahí rechaza la conexión).
   - Ancho: `Emulation.setDeviceMetricsOverride` (`mobile: true` para celular y tablet).
+  - **Para medir rendimiento, Edge con `--disable-extensions --disable-sync`:** aun con un
+    `--user-data-dir` nuevo, Edge copia las extensiones de la cuenta (React DevTools, KeePassXC…).
+    El gancho de React DevTools sumaba ~17 ms a cada toque en el perfil (`installHook.js`).
+  - Tiempos: `Emulation.setCPUThrottlingRate` (×4), `Performance.getMetrics` antes y después
+    (`ScriptDuration`, `RecalcStyleDuration`, `LayoutDuration`) y un `PerformanceObserver` de tipo
+    `event` en la página, que da del toque a la pintura. `Input.insertText` teclea como el teclado
+    de Android; `dispatchKeyEvent` no llegaba al `textarea`.
   - Dedo: `Emulation.setTouchEmulationEnabled` hace que `pointer: coarse` sea verdad;
     `Input.dispatchTouchEvent` da toques y pellizcos (dos `touchPoints`) reales.
   - Atrás de Android: `history.back()` en la página dispara el mismo `popstate`.
@@ -442,10 +449,26 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     `data-fm-version`, así que un `ica_v3 (1).html` de Descargas abre bien).
 - [x] ~~**D8 Atrás cierra el diseñador**~~ (2026-11-27, cubierto por B8, c05ea4cd: `useBackClose`
       llama a `closeDesigner`, que guarda antes de cerrar) (B8), con el guardado de B9.
-- [ ] **D9 Rendimiento:**
+- [x] ~~**D9 Rendimiento:**~~ (2026-11-27: emulación medida, sin cambios de código; el usuario lo
+      probó en su Android y el rendimiento es bueno)
   - La plantilla del ICA tiene 226 celdas en una sola tabla.
   - Medir en un Android de gama media, con DevTools remoto: tocar para seleccionar, teclear en una
     celda y pellizcar. Probar también con bajo rendimiento.
+  - **Emulación** (Edge headless, 412×915 táctil, CPU ×4, build sin minificar, ICA de fábrica; del
+    toque a la pintura con Event Timing):
+    - Tocar una celda (abre la hoja a media altura): 72–96 ms, el primero tras abrir hasta 112–136.
+      JS ~30 ms y estilos ~20 ms. La espera está en el cuadro de después: los eventos de mouse que
+      Android sintetiza tras el toque tardan 0–1 ms en su manejador.
+    - Teclear en "Texto de la celda": 9–15 ms de JS por tecla, 24–48 ms a la pantalla.
+    - Pellizcar: ~3 ms de JS por paso.
+    - Bajo rendimiento: quita las animaciones (tareas de ~270 a ~90 ms por toque), pero el toque
+      tarda lo mismo.
+  - **Descartado:** cachear `useLayoutMode`. Su `getSnapshot` lee `window.innerWidth`, que obliga a
+    Chrome a recalcular el layout, y en el perfil salían 64 ms de 146 por toque. Pero en A/B (4
+    aperturas por lado) el tiempo a la pantalla no cambió: era el mismo layout que el cuadro hace
+    igual, solo que antes. No se toca sin una medida que lo justifique.
+  - Queda el `focus` de `useInertOutside` al abrir la hoja (~25 ms a ×4, también es layout
+    adelantado). No se toca: mueve el foco a la hoja (accesibilidad).
 - **Meta:**
   - En un Android, solo con el dedo: abrir el ICA, seleccionar una celda, cambiar texto y color,
     combinar dos celdas, agregar una fila, deshacer y descargar el HTML.
