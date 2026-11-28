@@ -429,11 +429,19 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
     `PdfClassesPanel`, `PdfComponentPanel`, `PdfHtmlBlockPanel` y `PdfImageSourceField`. "Elegir
     archivo…" abre la cámara o la galería.
   - Inputs de 16 px. Con el teclado abierto, el campo que se edita sigue a la vista.
-- [ ] **D7 Archivos:**
+- [x] ~~**D7 Archivos:**~~ (2026-11-27, d2d92a1d; probado por el usuario en Android)
   - Abrir (`input type=file`), Descargar (`a.download` va a Descargas en Chrome de Android), Subir
     (la petición falsa) e Imprimir.
   - En iPhone no se prueba: queda en Riesgos.
-- [ ] **D8 Atrás cierra el diseñador** (B8), con el guardado de B9.
+  - Descargar: `lib/fileDownload` (`downloadBlob`), compartido con Exportar. El enlace del blob se
+    soltaba justo después del click y Chrome de Android lo lee después: ahora vive 40 s.
+  - Imprimir: con el dedo, `printPdfHtmlInTab` abre el .html en una pestaña que se imprime sola
+    (Chrome de Android imprime la página entera y no el iframe oculto). Si la bloquea, el iframe.
+    Ctrl+P y el escritorio siguen con el iframe.
+  - Abrir y Subir: sin cambios (el `accept` ya lleva el tipo MIME y la versión se lee del
+    `data-fm-version`, así que un `ica_v3 (1).html` de Descargas abre bien).
+- [x] ~~**D8 Atrás cierra el diseñador**~~ (2026-11-27, cubierto por B8, c05ea4cd: `useBackClose`
+      llama a `closeDesigner`, que guarda antes de cerrar) (B8), con el guardado de B9.
 - [ ] **D9 Rendimiento:**
   - La plantilla del ICA tiene 226 celdas en una sola tabla.
   - Medir en un Android de gama media, con DevTools remoto: tocar para seleccionar, teclear en una
