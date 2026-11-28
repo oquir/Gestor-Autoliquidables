@@ -40,5 +40,10 @@ export function getViewportLayout({
     paddingBottom: padding,
     homeLeft: Math.round((rootWidth - portWidth) / 2),
     homeTop: panY,
+    // Revisar en el celular deja el documento en 976 px y lo achica con scale: su caja queda mas
+    // ancha que la raiz, mx-auto ya no centra (la pega a la izquierda) y el scale encoge hacia el
+    // centro de la caja, corrido a la derecha del de la raiz. Con este margen los dos centros
+    // coinciden. En el escritorio el documento nunca pasa del puerto y queda en 0.
+    documentShift: Math.min(0, (rootWidth - documentWidth) / 2),
   }
 }

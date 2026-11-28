@@ -221,6 +221,45 @@ describe('geometría del lienzo libre', () => {
     expect(zoomed?.rootWidth).toBeGreaterThan(small?.rootWidth ?? 0)
     expect(focused?.documentWidth).toBeGreaterThanOrEqual(normal?.documentWidth ?? 0)
   })
+
+  it('en el escritorio el documento entra en la raiz y no lleva margen propio', () => {
+    for (const portWidth of [800, 1200, 1600, 2600]) {
+      for (const zoom of [0.5, 1, 1.5]) {
+        const layout = getViewportLayout({
+          portWidth,
+          portHeight: 800,
+          zoom,
+          panelsCollapsed: false,
+        })
+        expect(layout?.documentShift).toBe(0)
+      }
+    }
+  })
+
+  // Revisar en el celular: documento de 976 px achicado con scale. Sin el margen, mx-auto lo pegaba
+  // a la izquierda de la raiz y el documento quedaba corrido ~90 px y cortado a la derecha.
+  it('en Revisar del celular el centro del documento cae en el centro de la raiz', () => {
+    for (const portWidth of [352, 382, 404]) {
+      const zoom: number = Math.floor(((portWidth + 8 - 24) / 976) * 100) / 100
+      const layout = getViewportLayout({
+        portWidth,
+        portHeight: 700,
+        zoom,
+        panelsCollapsed: false,
+        minDocumentWidth: 976,
+      })
+
+      expect(layout).not.toBeNull()
+      if (!layout) return
+      expect(layout.documentShift).toBeLessThan(0)
+      expect(layout.documentShift + layout.documentWidth / 2).toBe(layout.rootWidth / 2)
+      // Con el inicio, el documento achicado queda entero dentro de la vista.
+      const left: number =
+        layout.documentShift + (layout.documentWidth * (1 - zoom)) / 2 - layout.homeLeft
+      expect(left).toBeGreaterThanOrEqual(0)
+      expect(left + layout.documentWidth * zoom).toBeLessThanOrEqual(portWidth)
+    }
+  })
 })
 
 describe('Ctrl + flechas entre pasos', () => {

@@ -189,12 +189,15 @@ export function useCanvasViewport(): CanvasViewportReturn {
     : undefined
 
   // A escala 1 ni transform ni margen: scale(1) crearia bloque contenedor y contexto de
-  // apilamiento. El ancho va siempre.
+  // apilamiento. El ancho va siempre. El margen izquierdo solo si el documento no entra en la raiz
+  // (documentShift); si no, centra mx-auto.
+  const shift: CSSProperties = layout?.documentShift ? { marginLeft: layout.documentShift } : {}
   const contentStyle: CSSProperties =
     zoom === 1
-      ? { width: layout?.documentWidth }
+      ? { width: layout?.documentWidth, ...shift }
       : {
           width: layout?.documentWidth,
+          ...shift,
           transform: `scale(${zoom})`,
           transformOrigin: 'top center',
           marginBottom: contentHeight * (zoom - 1),

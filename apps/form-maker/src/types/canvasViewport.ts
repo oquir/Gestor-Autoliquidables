@@ -15,4 +15,6 @@ export interface ViewportLayout {
   paddingBottom: number
   homeLeft: number
   homeTop: number
+  // Margen izquierdo del documento cuando es mas ancho que la raiz (negativo); 0 si mx-auto basta.
+  documentShift: number
 }
