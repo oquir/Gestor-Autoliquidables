@@ -476,12 +476,28 @@ Ya apila las filas por debajo de 40rem (`@container/form`, verificado a 390 px e
 
 ## 6. Fase 5 — Cierre
 
-- [ ] **C1 Rendimiento** en gama media, en un Android real y con CPU ×4 en emulación:
+- [x] ~~**C1 Rendimiento**~~ (2026-11-27, sin cambios de código; el usuario lo probó en su Android
+      y lo vio bien. El bajo rendimiento sigue como interruptor, apagado al arrancar) en gama media,
+      en un Android real y con CPU ×4 en emulación:
   - Del toque a la respuesta, menos de 100 ms.
   - Teclear en un panel, menos de 16 ms de JS.
   - Montar la lista del paso 1 del ICA, menos de 200 ms.
   - Si conviene que el bajo rendimiento arranque activado en táctil, **lo decide el usuario**: hoy
     es un interruptor.
+  - **Emulación** (2026-11-27, sin cambios de código; misma receta que D9: Edge headless sin
+    extensiones, 412×915 táctil, CPU ×4, ICA de fábrica en la vista de lista):
+    - Tocar un campo: 32–48 ms a la pantalla.
+    - Pulsación larga: la hoja del campo se pinta ~50 ms después de cumplirse los 450 ms. Ojo al
+      medir: con CPU ×4 la emulación atrasa los temporizadores (un `setTimeout` de 450 ms suelto
+      salta a los 636–762 ms), así que hay que medir desde que salta el temporizador.
+    - Teclear en Etiqueta: 14,6 ms de JS por tecla (perfil, promedio de 6). La primera tecla, ~21.
+      Lo que queda es React escribiendo atributos (`setProp`); ningún componente sobresale.
+    - Paso siguiente o anterior (monta la lista, el paso 1 incluido): 39–44 ms de JS, 80 ms a la
+      pantalla.
+    - "+ Agregar" y abrir el Simulador: 64 ms.
+    - Simulador: entrar al paso 1 desde el modal, 48 ms; teclear, 8–11 ms de JS por tecla.
+    - Bajo rendimiento: en D9 quitó trabajo de animaciones, pero no acortó el toque. Con estas
+      medidas no hace falta que arranque activado en táctil (falta la decisión del usuario).
 - [ ] **C2 Pasada completa:** Android real, más la emulación de iPhone y iPad.
 - [ ] **C3 Documentación:**
   - `CLAUDE.md`: rehacer el Known gap de responsive y agregar las invariantes nuevas (los dos ejes,
