@@ -17,11 +17,14 @@ export const SUBMITTED_CLASSES: string = 'text-[11px] font-medium text-success'
 // Modal de entrada. Centrado sobre una tarjeta tan larga como el paso 1, en el celular quedaba a
 // media pagina con Continuar fuera de la pantalla: ahi deja de flotar, ocupa la tarjeta (el paso de
 // atras se esconde) y su pie se pega abajo como el de navegacion.
+// En tablet con el dedo pasaba lo mismo: los controles de 44 px (S2) alargan el paso 1 (1450 px a
+// 1180x820) y el modal quedaba a media tarjeta con Continuar fuera. Ahi va arriba, pegado al scroll
+// y con el alto de la pantalla (C2 de docs/Plan-Movil.md). Con mouse sigue centrado.
 export const INTRO_OVERLAY_CLASSES: string =
-  'absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-slate-900/30 p-4 dark:bg-black/50 max-sm:static max-sm:block max-sm:bg-transparent max-sm:p-0 max-sm:dark:bg-transparent'
+  'absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-slate-900/30 p-4 dark:bg-black/50 sm:pointer-coarse:items-start max-sm:static max-sm:block max-sm:bg-transparent max-sm:p-0 max-sm:dark:bg-transparent'
 
 export const INTRO_PANEL_CLASSES: string =
-  'flex max-h-full w-full max-w-2xl flex-col overflow-auto rounded-xl border border-border bg-surface p-5 shadow-2xl max-sm:max-h-none max-sm:overflow-visible max-sm:rounded-none max-sm:border-0 max-sm:p-0 max-sm:shadow-none'
+  'flex max-h-full w-full max-w-2xl flex-col overflow-auto rounded-xl border border-border bg-surface p-5 shadow-2xl sm:pointer-coarse:sticky sm:pointer-coarse:top-4 sm:pointer-coarse:max-h-[calc(100dvh-8rem)] max-sm:max-h-none max-sm:overflow-visible max-sm:rounded-none max-sm:border-0 max-sm:p-0 max-sm:shadow-none'
 
 export const INTRO_FOOTER_CLASSES: string =
   'mt-5 flex items-center justify-between gap-3 border-t border-border pt-3 max-sm:sticky max-sm:-bottom-4 max-sm:z-10 max-sm:-mx-6 max-sm:-mb-6 max-sm:mt-6 max-sm:rounded-b-lg max-sm:bg-surface max-sm:px-3 max-sm:pb-safe-3'
